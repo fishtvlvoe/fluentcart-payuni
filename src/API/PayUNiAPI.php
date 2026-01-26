@@ -4,6 +4,7 @@ namespace BuyGoFluentCart\PayUNi\API;
 
 use BuyGoFluentCart\PayUNi\Gateway\PayUNiSettingsBase;
 use BuyGoFluentCart\PayUNi\Services\PayUNiCryptoService;
+use BuyGoFluentCart\PayUNi\Utils\Logger;
 
 /**
  * PayUNiAPI
@@ -95,13 +96,58 @@ final class PayUNiAPI
         ]);
 
         if (is_wp_error($resp)) {
+            Logger::error('PayUNi API request failed (WP_Error)', [
+                'trade_type' => $tradeType,
+                'url' => $url,
+                'mode' => $mode,
+                'error_message' => $resp->get_error_message(),
+                'error_code' => $resp->get_error_code(),
+            ]);
             return $resp;
         }
 
+        $httpCode = wp_remote_retrieve_response_code($resp);
+        $httpMessage = wp_remote_retrieve_response_message($resp);
         $body = wp_remote_retrieve_body($resp);
+
+        if ($httpCode !== 200) {
+            $errorMessage = sprintf(
+                'PayUNi API returned HTTP %d: %s',
+                $httpCode,
+                $httpMessage ?: 'Unknown error'
+            );
+
+            Logger::error('PayUNi API request failed (HTTP error)', [
+                'trade_type' => $tradeType,
+                'url' => $url,
+                'mode' => $mode,
+                'http_code' => $httpCode,
+                'http_message' => $httpMessage,
+                'response_body' => $body,
+            ]);
+
+            return new \WP_Error(
+                'payuni_http_error',
+                $errorMessage,
+                [
+                    'url' => $url,
+                    'http_code' => $httpCode,
+                    'http_message' => $httpMessage,
+                    'body' => $body,
+                ]
+            );
+        }
+
         $decoded = json_decode($body, true);
 
         if (!is_array($decoded)) {
+            Logger::error('PayUNi API invalid response format', [
+                'trade_type' => $tradeType,
+                'url' => $url,
+                'mode' => $mode,
+                'response_body' => $body,
+            ]);
+
             return new \WP_Error('payuni_invalid_response', 'Invalid PayUNi response', [
                 'url' => $url,
                 'body' => $body,
