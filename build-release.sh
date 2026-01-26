@@ -32,18 +32,29 @@ mkdir -p "${PLUGIN_DIR}"
 rsync -av \
     --exclude='.git' \
     --exclude='.gitignore' \
+    --exclude='.gitattributes' \
     --exclude='.DS_Store' \
     --exclude='node_modules' \
+    --exclude='vendor' \
+    --exclude='coverage' \
+    --exclude='*.zip' \
     --exclude='tests' \
     --exclude='phpunit-unit.xml' \
     --exclude='composer.json' \
     --exclude='composer.lock' \
-    --exclude='vendor' \
-    --exclude='README.md' \
+    --exclude='release.sh' \
+    --exclude='bump-version.sh' \
+    --exclude='build-release.sh' \
+    --exclude='setup-token.sh' \
+    --exclude='test-update.sh' \
+    --exclude='VERSION-GUIDE.md' \
+    --exclude='RELEASE-GUIDE.md' \
+    --exclude='TEST-UPDATE.md' \
+    --exclude='GITHUB-SETUP.md' \
+    --exclude='GITHUB-TOKEN-SETUP.md' \
     --exclude='UPDATE-SETUP.md' \
     --exclude='TESTING.md' \
-    --exclude='build-release.sh' \
-    --exclude='*.zip' \
+    --exclude='FILE-ANALYSIS.md' \
     ./ "${PLUGIN_DIR}/"
 
 # 建立 zip 檔案

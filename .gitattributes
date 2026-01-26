@@ -1,0 +1,25 @@
+# 開發腳本
+release.sh export-ignore
+bump-version.sh export-ignore
+build-release.sh export-ignore
+setup-token.sh export-ignore
+test-update.sh export-ignore
+
+# 開發文件
+VERSION-GUIDE.md export-ignore
+RELEASE-GUIDE.md export-ignore
+TEST-UPDATE.md export-ignore
+GITHUB-SETUP.md export-ignore
+GITHUB-TOKEN-SETUP.md export-ignore
+UPDATE-SETUP.md export-ignore
+TESTING.md export-ignore
+FILE-ANALYSIS.md export-ignore
+
+# 測試檔案
+tests/ export-ignore
+phpunit-unit.xml export-ignore
+
+# 開發工具
+.gitignore export-ignore
+composer.json export-ignore
+composer.lock export-ignore
