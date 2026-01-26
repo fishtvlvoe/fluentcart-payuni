@@ -457,6 +457,18 @@ function buygo_fc_payuni_bootstrap(): void
     }, 20);
 
     /**
+     * PayUNi 訂閱後台管理介面
+     *
+     * 提供管理員從 WordPress 後台管理 PayUNi 訂閱的功能
+     */
+    if (is_admin()) {
+        require_once BUYGO_FC_PAYUNI_PATH . 'includes/class-admin-subscription-manager.php';
+
+        $adminManager = new \BuyGoFluentCart\PayUNi\Admin\AdminSubscriptionManager();
+        $adminManager->init();
+    }
+
+    /**
      * 保底：如果 FluentCart 把使用者先導到收據頁（付款待處理），
      * 我們在「剛下單的那一次」自動導到 PayUNi 付款頁。
      */

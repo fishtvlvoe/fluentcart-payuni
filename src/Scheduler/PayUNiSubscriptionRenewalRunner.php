@@ -252,6 +252,42 @@ final class PayUNiSubscriptionRenewalRunner
             return;
         }
 
+        // 關鍵修正：更新 next_billing_date 到下一個週期，避免重複扣款
+        // recordRenewalPayment 會建立新的 renewal 訂單，所以需要重新載入 subscription
+        $subscription->refresh();
+
+        // 簡化邏輯：直接使用現在時間 + 計費週期來計算下次扣款日期
+        // 避免依賴 guessNextBillingDate() 可能回傳不準確的結果
+        $billingInterval = $subscription->billing_interval ?? 'monthly';
+        $days = \FluentCart\App\Services\Payments\PaymentHelper::getIntervalDays($billingInterval);
+
+        // 如果 billing_interval 不支援（返回 1 天），嘗試手動判斷
+        if ($days === 1 && $billingInterval !== 'daily') {
+            if (stripos($billingInterval, 'year') !== false) {
+                $days = 365;
+            } elseif (stripos($billingInterval, 'month') !== false) {
+                $days = 30;
+            } elseif (stripos($billingInterval, 'week') !== false) {
+                $days = 7;
+            }
+        }
+
+        // 使用現在時間 + 計費週期（確保是未來日期，避免重複扣款）
+        $nextBillingDate = gmdate('Y-m-d H:i:s', time() + $days * DAY_IN_SECONDS);
+
+        Logger::info('PayUNi subscription renewal: next_billing_date calculated', [
+            'subscription_id' => $subscription->id,
+            'next_billing_date' => $nextBillingDate,
+            'billing_interval' => $billingInterval,
+            'calculated_days' => $days,
+            'trade_no' => $tradeNo,
+        ]);
+
+        // 更新 next_billing_date
+        SubscriptionService::syncSubscriptionStates($subscription, [
+            'next_billing_date' => $nextBillingDate,
+        ]);
+
         // 清掉錯誤標記（如果有）
         $subscription->updateMeta('payuni_last_error', null);
     }

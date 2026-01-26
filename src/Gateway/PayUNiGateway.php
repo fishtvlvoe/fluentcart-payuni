@@ -614,6 +614,31 @@ class PayUNiGateway extends AbstractPaymentGateway
             'amount' => $tradeAmt,
         ]);
 
+        // 關鍵修正：如果這是訂閱訂單，退款後需要取消訂閱，避免續扣排程繼續執行
+        if ($order && $order->type === \FluentCart\App\Helpers\Status::ORDER_TYPE_SUBSCRIPTION) {
+            $subscription = \FluentCart\App\Models\Subscription::query()
+                ->where('parent_order_id', $order->id)
+                ->first();
+
+            if ($subscription && in_array($subscription->status, [
+                \FluentCart\App\Helpers\Status::SUBSCRIPTION_ACTIVE,
+                \FluentCart\App\Helpers\Status::SUBSCRIPTION_TRIALING,
+            ])) {
+                \FluentCart\App\Modules\Subscriptions\Services\SubscriptionService::syncSubscriptionStates($subscription, [
+                    'status' => \FluentCart\App\Helpers\Status::SUBSCRIPTION_CANCELED,
+                    'canceled_at' => gmdate('Y-m-d H:i:s'),
+                    'next_billing_date' => null,
+                ]);
+
+                $this->addRefundLog($orderId, '訂閱已取消', sprintf('訂閱 #%d 已因退款而取消', $subscription->id), 'info');
+                Logger::info('PayUNi subscription canceled after refund', [
+                    'subscription_id' => $subscription->id,
+                    'order_id' => $orderId,
+                    'trade_no' => $tradeNo,
+                ]);
+            }
+        }
+
         return $tradeNo;
     }
 

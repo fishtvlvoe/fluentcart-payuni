@@ -29,14 +29,17 @@ class PayUNiSubscriptionGateway extends AbstractPaymentGateway
     /**
      * supported features (給 FluentCart UI/邏輯判斷用)
      * - subscriptions: 代表這個閘道支援訂閱/定期扣款（我們在外掛內自己跑排程扣款）
+     * - card_update: 支援更新信用卡資料（新卡需要進行 3D 驗證）
      */
     public array $supportedFeatures = ['payment', 'webhook', 'subscriptions', 'card_update'];
 
     public function __construct()
     {
         $settings = new PayUNiSettingsBase();
+        $subscriptions = new PayUNiSubscriptions();
 
-        parent::__construct($settings);
+        // 透過 parent 建構函式傳入 subscriptions，讓 AbstractPaymentGateway 自動加入 'subscriptions' 到 supportedFeatures
+        parent::__construct($settings, $subscriptions);
     }
 
     public function meta(): array
