@@ -2,7 +2,7 @@
 /**
  * Plugin Name: PayUNiGateway for FluentCart
  * Description: Add PayUNi (統一金流) payment gateway to FluentCart.
- * Version: 0.1.3
+ * Version: 0.1.4
  * Requires at least: 6.5
  * Requires PHP: 8.2
  * Author: BuyGo
@@ -12,7 +12,7 @@
 
 defined('ABSPATH') || exit;
 
-define('BUYGO_FC_PAYUNI_VERSION', '0.1.3');
+define('BUYGO_FC_PAYUNI_VERSION', '0.1.4');
 define('BUYGO_FC_PAYUNI_FILE', __FILE__);
 define('BUYGO_FC_PAYUNI_PATH', plugin_dir_path(__FILE__));
 define('BUYGO_FC_PAYUNI_URL', plugin_dir_url(__FILE__));
