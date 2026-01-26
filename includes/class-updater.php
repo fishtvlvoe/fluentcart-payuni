@@ -55,6 +55,32 @@ final class Updater
 
         // 在更新前驗證下載 URL（可選，增加安全性）
         add_filter('upgrader_pre_download', [$this, 'validate_download_url'], 10, 3);
+
+        // 啟用自動更新按鈕（WordPress 5.5+）
+        add_filter('auto_update_plugin', [$this, 'enable_auto_update'], 10, 2);
+    }
+
+    /**
+     * 啟用外掛自動更新功能
+     *
+     * 讓 WordPress 在外掛列表頁面顯示「啟用自動更新」按鈕
+     *
+     * @param bool|null $update 是否啟用自動更新（null 表示由使用者決定）
+     * @param object $item 外掛資訊物件
+     * @return bool|null
+     */
+    public function enable_auto_update($update, $item)
+    {
+        $plugin_basename = plugin_basename($this->plugin_file);
+
+        // 只處理我們自己的外掛
+        if (!isset($item->plugin) || $item->plugin !== $plugin_basename) {
+            return $update;
+        }
+
+        // 如果使用者已經設定過自動更新，尊重使用者的選擇
+        // 如果為 null，表示允許使用者透過 UI 控制
+        return $update;
     }
 
     /**

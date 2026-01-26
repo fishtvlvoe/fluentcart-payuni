@@ -14,6 +14,8 @@ use BuyGoFluentCart\PayUNi\Webhook\ReturnHandler;
 
 use BuyGoFluentCart\PayUNi\Utils\Logger;
 use BuyGoFluentCart\PayUNi\API\PayUNiAPI;
+use BuyGoFluentCart\PayUNi\Services\PayUNiCryptoService;
+use FluentCart\App\Models\Order;
 
 // 如果 FluentCart 沒載入，避免 class extends 直接炸掉
 if (!class_exists(AbstractPaymentGateway::class)) {
@@ -390,14 +392,31 @@ class PayUNiGateway extends AbstractPaymentGateway
      * FluentCart refund entrypoint.
      *
      * Called by FluentCart Refund service. Should return vendor refund id or WP_Error.
+     *
+     * 退款流程：
+     * 1. 先查詢交易狀態（CloseStatus）
+     * 2. 根據狀態決定使用 trade/close（退款）或 trade/cancel（取消授權）
+     *    - CloseStatus 1（請款申請中）→ 使用 trade/cancel
+     *    - CloseStatus 2（請款成功）或 7（請款處理中）→ 使用 trade/close
+     *    - CloseStatus 3（請款取消）或 9（未申請）→ 不需要退款
+     *
+     * 注意：訂閱的初始付款退款後，FluentCart 會自動取消訂閱，後續續訂不會再扣款。
+     * 如果這是訂閱的初始付款，建議在退款前先取消 PayUNi 的綁卡（credit_bind/cancel），
+     * 但這通常由 FluentCart 的退款服務處理。
      */
     public function processRefund($transaction, $amount, $args)
     {
+        // 取得訂單資訊（用於日誌記錄）
+        $order = Order::query()->where('id', $transaction->order_id)->first();
+        $orderId = $order ? $order->id : null;
+
         if (!$amount || $amount <= 0) {
-            return new \WP_Error(
+            $error = new \WP_Error(
                 'invalid_refund_amount',
                 __('Refund amount is required and must be greater than zero.', 'fluentcart-payuni')
             );
+            $this->addRefundLog($orderId, '退款失敗', '退款金額無效：' . $error->get_error_message(), 'error');
+            return $error;
         }
 
         $tradeNo = (string) ($transaction->vendor_charge_id ?? '');
@@ -406,19 +425,126 @@ class PayUNiGateway extends AbstractPaymentGateway
         }
 
         if (!$tradeNo) {
-            return new \WP_Error(
+            $error = new \WP_Error(
                 'missing_trade_no',
                 __('Cannot process refund: missing PayUNi TradeNo.', 'fluentcart-payuni')
             );
-        }
-
-        // FluentCart passes amount in cents typically
-        $tradeAmt = (int) round(((int) $amount) / 100);
-        if ($tradeAmt < 1 && (int) $amount >= 1) {
-            $tradeAmt = (int) $amount;
+            $this->addRefundLog($orderId, '退款失敗', '缺少 PayUNi TradeNo，無法處理退款', 'error');
+            return $error;
         }
 
         $mode = $this->settings->getMode();
+        $api = new PayUNiAPI($this->settings);
+        $crypto = new \BuyGoFluentCart\PayUNi\Services\PayUNiCryptoService($this->settings);
+
+        $this->addRefundLog($orderId, '開始退款流程', sprintf('TradeNo: %s, 退款金額: %d', $tradeNo, $amount), 'info');
+
+        // 步驟 1：查詢交易狀態
+        $queryInfo = [
+            'MerID' => $this->settings->getMerId($mode),
+            'TradeNo' => $tradeNo,
+            'Timestamp' => time(),
+        ];
+
+        $this->addRefundLog($orderId, '查詢交易狀態', sprintf('發送 trade_query API 請求，參數: %s', wp_json_encode($queryInfo)), 'info');
+
+        $queryResp = $api->post('trade_query', $queryInfo, '2.0', $mode);
+
+        if (is_wp_error($queryResp)) {
+            $errorMsg = sprintf('PayUNi trade_query API 失敗: %s', $queryResp->get_error_message());
+            Logger::error('PayUNi trade query failed before refund', [
+                'trade_no' => $tradeNo,
+                'error' => $queryResp->get_error_message(),
+            ]);
+            $this->addRefundLog($orderId, '查詢交易狀態失敗', $errorMsg, 'error');
+            // 如果查詢失敗，嘗試直接退款（向後相容）
+            $this->addRefundLog($orderId, '嘗試直接退款', '查詢失敗，嘗試直接執行退款（向後相容）', 'warning');
+            return $this->attemptRefund($api, $crypto, $tradeNo, $amount, $mode, $orderId);
+        }
+
+        if (!isset($queryResp['EncryptInfo'], $queryResp['HashInfo'])) {
+            Logger::warning('PayUNi trade query invalid response, attempting direct refund', [
+                'trade_no' => $tradeNo,
+            ]);
+            $this->addRefundLog($orderId, '查詢回應格式錯誤', 'PayUNi 回應缺少 EncryptInfo/HashInfo，嘗試直接退款', 'warning');
+            return $this->attemptRefund($api, $crypto, $tradeNo, $amount, $mode, $orderId);
+        }
+
+        if (!$crypto->verifyHashInfo((string) $queryResp['EncryptInfo'], (string) $queryResp['HashInfo'], $mode)) {
+            Logger::warning('PayUNi trade query hash mismatch, attempting direct refund', [
+                'trade_no' => $tradeNo,
+            ]);
+            $this->addRefundLog($orderId, '查詢 HashInfo 驗證失敗', 'HashInfo 驗證不通過，嘗試直接退款', 'warning');
+            return $this->attemptRefund($api, $crypto, $tradeNo, $amount, $mode, $orderId);
+        }
+
+        $queryDecrypted = $crypto->decryptInfo((string) $queryResp['EncryptInfo'], $mode);
+        $queryStatus = (string) ($queryDecrypted['Status'] ?? '');
+
+        $this->addRefundLog($orderId, '查詢交易狀態回應', sprintf('Status: %s, 回應內容: %s', $queryStatus, wp_json_encode($queryDecrypted)), 'info');
+
+        if ($queryStatus !== 'SUCCESS') {
+            Logger::warning('PayUNi trade query failed, attempting direct refund', [
+                'trade_no' => $tradeNo,
+                'status' => $queryStatus,
+            ]);
+            $this->addRefundLog($orderId, '查詢交易狀態失敗', sprintf('Status: %s，嘗試直接退款', $queryStatus), 'warning');
+            return $this->attemptRefund($api, $crypto, $tradeNo, $amount, $mode, $orderId);
+        }
+
+        // 取得 CloseStatus（從 Result 陣列的第一筆）
+        $closeStatus = null;
+        if (isset($queryDecrypted['Result']) && is_array($queryDecrypted['Result']) && !empty($queryDecrypted['Result'][0])) {
+            $closeStatus = (int) ($queryDecrypted['Result'][0]['CloseStatus'] ?? 0);
+        }
+
+        Logger::info('PayUNi trade query result', [
+            'trade_no' => $tradeNo,
+            'close_status' => $closeStatus,
+        ]);
+
+        $closeStatusMap = [
+            1 => '請款申請中',
+            2 => '請款成功',
+            3 => '請款取消',
+            7 => '請款處理中',
+            9 => '未申請',
+        ];
+        $closeStatusText = $closeStatusMap[$closeStatus] ?? '未知狀態';
+
+        $this->addRefundLog($orderId, '交易狀態查詢成功', sprintf('CloseStatus: %d (%s)', $closeStatus, $closeStatusText), 'info');
+
+        // 步驟 2：根據 CloseStatus 決定退款方式
+        // CloseStatus: 1=請款申請中, 2=請款成功, 3=請款取消, 7=請款處理中, 9=未申請
+        if ($closeStatus === 1) {
+            // 請款申請中 → 使用取消授權（trade/cancel）
+            $this->addRefundLog($orderId, '使用取消授權', 'CloseStatus=1（請款申請中），使用 trade/cancel API', 'info');
+            return $this->cancelTrade($api, $crypto, $tradeNo, $mode, $orderId);
+        } elseif ($closeStatus === 3 || $closeStatus === 9) {
+            // 請款取消或未申請 → 不需要退款
+            $errorMsg = sprintf('此筆交易狀態為 %d (%s)，不需要退款。', $closeStatus, $closeStatusText);
+            $this->addRefundLog($orderId, '不需要退款', $errorMsg, 'warning');
+            return new \WP_Error(
+                'payuni_refund_not_needed',
+                $errorMsg
+            );
+        } else {
+            // CloseStatus 2（請款成功）或 7（請款處理中）→ 使用退款（trade/close）
+            $this->addRefundLog($orderId, '使用退款 API', sprintf('CloseStatus=%d (%s)，使用 trade/close API', $closeStatus, $closeStatusText), 'info');
+            return $this->attemptRefund($api, $crypto, $tradeNo, $amount, $mode, $orderId);
+        }
+    }
+
+    /**
+     * 執行退款（trade/close）
+     */
+    private function attemptRefund(PayUNiAPI $api, PayUNiCryptoService $crypto, string $tradeNo, int $amount, string $mode, $orderId = null)
+    {
+        // FluentCart passes amount in cents typically
+        $tradeAmt = (int) round($amount / 100);
+        if ($tradeAmt < 1 && $amount >= 1) {
+            $tradeAmt = $amount;
+        }
 
         $encryptInfo = [
             'MerID' => $this->settings->getMerId($mode),
@@ -428,20 +554,31 @@ class PayUNiGateway extends AbstractPaymentGateway
             'CloseType' => 2,
         ];
 
-        $api = new PayUNiAPI($this->settings);
+        $this->addRefundLog($orderId, '發送退款 API 請求', sprintf('trade_close API，參數: %s', wp_json_encode($encryptInfo)), 'info');
+
         $resp = $api->post('trade_close', $encryptInfo, '1.0', $mode);
 
         if (is_wp_error($resp)) {
+            $errorMsg = sprintf('PayUNi trade_close API 請求失敗: %s', $resp->get_error_message());
+            $this->addRefundLog($orderId, '退款 API 請求失敗', $errorMsg, 'error');
+            Logger::error('PayUNi refund API request failed', [
+                'trade_no' => $tradeNo,
+                'error' => $resp->get_error_message(),
+            ]);
             return $resp;
         }
 
-        // Decrypt response
+        $this->addRefundLog($orderId, '收到退款 API 回應', sprintf('回應內容: %s', wp_json_encode($resp)), 'info');
+
         if (!isset($resp['EncryptInfo'], $resp['HashInfo'])) {
+            $errorMsg = 'PayUNi 退款回應格式錯誤：缺少 EncryptInfo/HashInfo';
+            $this->addRefundLog($orderId, '退款回應格式錯誤', $errorMsg, 'error');
             return new \WP_Error('payuni_invalid_refund_response', __('Invalid PayUNi refund response.', 'fluentcart-payuni'));
         }
 
-        $crypto = new \BuyGoFluentCart\PayUNi\Services\PayUNiCryptoService($this->settings);
         if (!$crypto->verifyHashInfo((string) $resp['EncryptInfo'], (string) $resp['HashInfo'], $mode)) {
+            $errorMsg = 'PayUNi 退款回應 HashInfo 驗證失敗';
+            $this->addRefundLog($orderId, '退款 HashInfo 驗證失敗', $errorMsg, 'error');
             return new \WP_Error('payuni_refund_hash_mismatch', __('PayUNi refund HashInfo mismatch.', 'fluentcart-payuni'));
         }
 
@@ -449,7 +586,17 @@ class PayUNiGateway extends AbstractPaymentGateway
         $status = (string) ($decrypted['Status'] ?? '');
         $message = (string) ($decrypted['Message'] ?? '');
 
+        $this->addRefundLog($orderId, '退款 API 回應解密', sprintf('Status: %s, Message: %s, 完整回應: %s', $status, $message, wp_json_encode($decrypted)), 'info');
+
         if ($status !== 'SUCCESS') {
+            $errorMsg = sprintf('PayUNi 退款失敗: %s (Status: %s)', $message ?: '未知錯誤', $status);
+            $this->addRefundLog($orderId, '退款失敗', $errorMsg, 'error');
+            Logger::error('PayUNi refund failed', [
+                'trade_no' => $tradeNo,
+                'status' => $status,
+                'message' => $message,
+                'decrypted' => $decrypted,
+            ]);
             return new \WP_Error(
                 'payuni_refund_failed',
                 sprintf(
@@ -460,8 +607,118 @@ class PayUNiGateway extends AbstractPaymentGateway
             );
         }
 
-        // Return vendor refund id (TradeNo is acceptable for linking)
+        $successMsg = sprintf('PayUNi 退款成功！TradeNo: %s, 退款金額: %d', $tradeNo, $tradeAmt);
+        $this->addRefundLog($orderId, '退款成功', $successMsg, 'info');
+        Logger::info('PayUNi refund succeeded', [
+            'trade_no' => $tradeNo,
+            'amount' => $tradeAmt,
+        ]);
+
         return $tradeNo;
+    }
+
+    /**
+     * 取消交易授權（trade/cancel）
+     */
+    private function cancelTrade(PayUNiAPI $api, PayUNiCryptoService $crypto, string $tradeNo, string $mode, $orderId = null)
+    {
+        $encryptInfo = [
+            'MerID' => $this->settings->getMerId($mode),
+            'TradeNo' => $tradeNo,
+            'Timestamp' => time(),
+        ];
+
+        $this->addRefundLog($orderId, '發送取消授權 API 請求', sprintf('trade_cancel API，參數: %s', wp_json_encode($encryptInfo)), 'info');
+
+        $resp = $api->post('trade_cancel', $encryptInfo, '1.0', $mode);
+
+        if (is_wp_error($resp)) {
+            $errorMsg = sprintf('PayUNi trade_cancel API 請求失敗: %s', $resp->get_error_message());
+            $this->addRefundLog($orderId, '取消授權 API 請求失敗', $errorMsg, 'error');
+            Logger::error('PayUNi cancel API request failed', [
+                'trade_no' => $tradeNo,
+                'error' => $resp->get_error_message(),
+            ]);
+            return $resp;
+        }
+
+        $this->addRefundLog($orderId, '收到取消授權 API 回應', sprintf('回應內容: %s', wp_json_encode($resp)), 'info');
+
+        if (!isset($resp['EncryptInfo'], $resp['HashInfo'])) {
+            $errorMsg = 'PayUNi 取消授權回應格式錯誤：缺少 EncryptInfo/HashInfo';
+            $this->addRefundLog($orderId, '取消授權回應格式錯誤', $errorMsg, 'error');
+            return new \WP_Error('payuni_invalid_cancel_response', __('Invalid PayUNi cancel response.', 'fluentcart-payuni'));
+        }
+
+        if (!$crypto->verifyHashInfo((string) $resp['EncryptInfo'], (string) $resp['HashInfo'], $mode)) {
+            $errorMsg = 'PayUNi 取消授權回應 HashInfo 驗證失敗';
+            $this->addRefundLog($orderId, '取消授權 HashInfo 驗證失敗', $errorMsg, 'error');
+            return new \WP_Error('payuni_cancel_hash_mismatch', __('PayUNi cancel HashInfo mismatch.', 'fluentcart-payuni'));
+        }
+
+        $decrypted = $crypto->decryptInfo((string) $resp['EncryptInfo'], $mode);
+        $status = (string) ($decrypted['Status'] ?? '');
+        $message = (string) ($decrypted['Message'] ?? '');
+
+        $this->addRefundLog($orderId, '取消授權 API 回應解密', sprintf('Status: %s, Message: %s, 完整回應: %s', $status, $message, wp_json_encode($decrypted)), 'info');
+
+        if ($status !== 'SUCCESS') {
+            $errorMsg = sprintf('PayUNi 取消授權失敗: %s (Status: %s)', $message ?: '未知錯誤', $status);
+            $this->addRefundLog($orderId, '取消授權失敗', $errorMsg, 'error');
+            Logger::error('PayUNi cancel failed', [
+                'trade_no' => $tradeNo,
+                'status' => $status,
+                'message' => $message,
+            ]);
+            return new \WP_Error(
+                'payuni_cancel_failed',
+                sprintf(
+                    /* translators: %s: payuni message */
+                    __('PayUNi cancel failed: %s', 'fluentcart-payuni'),
+                    $message ?: $status
+                )
+            );
+        }
+
+        $successMsg = sprintf('PayUNi 取消授權成功！TradeNo: %s', $tradeNo);
+        $this->addRefundLog($orderId, '取消授權成功', $successMsg, 'info');
+        Logger::info('PayUNi trade cancel succeeded', [
+            'trade_no' => $tradeNo,
+        ]);
+
+        return $tradeNo;
+    }
+
+    /**
+     * 記錄退款相關日誌到訂單活動頁面
+     */
+    private function addRefundLog($orderId, string $title, string $content, string $level = 'info'): void
+    {
+        if (!$orderId) {
+            return;
+        }
+
+        // 使用 FluentCart 的日誌系統（會出現在訂單活動頁面）
+        if (function_exists('fluent_cart_add_log')) {
+            fluent_cart_add_log(
+                '[PayUNi 退款] ' . $title,
+                $content,
+                $level,
+                [
+                    'module_name' => 'order',
+                    'module_id' => $orderId,
+                ]
+            );
+        }
+
+        // 同時記錄到 PHP error log（透過 Logger）
+        if ($level === 'error') {
+            Logger::error('Refund: ' . $title, ['content' => $content, 'order_id' => $orderId]);
+        } elseif ($level === 'warning') {
+            Logger::warning('Refund: ' . $title, ['content' => $content, 'order_id' => $orderId]);
+        } else {
+            Logger::info('Refund: ' . $title, ['content' => $content, 'order_id' => $orderId]);
+        }
     }
 }
 
