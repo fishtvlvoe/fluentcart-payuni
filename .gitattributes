@@ -21,5 +21,6 @@ phpunit-unit.xml export-ignore
 
 # 開發工具
 .gitignore export-ignore
+.gitattributes export-ignore
 composer.json export-ignore
 composer.lock export-ignore
