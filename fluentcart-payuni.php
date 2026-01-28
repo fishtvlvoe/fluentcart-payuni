@@ -94,6 +94,61 @@ function buygo_fc_payuni_bootstrap(): void
         return;
     }
 
+    // Phase 4：管理員可修改訂閱下次扣款日（next_billing_date），與續扣邏輯一致。
+    add_action('rest_api_init', function () {
+        if (!class_exists(\FluentCart\App\Models\Subscription::class) || !class_exists(\FluentCart\App\Modules\Subscriptions\Services\SubscriptionService::class)) {
+            return;
+        }
+
+        register_rest_route('buygo-fc-payuni/v1', '/subscriptions/(?P<id>\d+)/next-billing-date', [
+            'methods'             => 'PATCH',
+            'permission_callback'  => function () {
+                return is_user_logged_in() && (current_user_can('manage_options') || (defined('FLUENT_CART_PRO') && current_user_can('fluent_cart_admin')));
+            },
+            'args'                 => [
+                'id' => [
+                    'required'          => true,
+                    'type'              => 'integer',
+                    'sanitize_callback' => 'absint',
+                ],
+            ],
+            'callback'            => function (\WP_REST_Request $request) {
+                $subscriptionId = (int) $request->get_param('id');
+                $subscription   = \FluentCart\App\Models\Subscription::query()->find($subscriptionId);
+
+                if (!$subscription || (string) $subscription->current_payment_method !== 'payuni_subscription') {
+                    return new \WP_REST_Response(['message' => __('訂閱不存在或非 PayUNi 訂閱。', 'fluentcart-payuni')], 404);
+                }
+
+                $body = $request->get_json_params() ?: [];
+                $raw  = isset($body['next_billing_date']) ? sanitize_text_field((string) $body['next_billing_date']) : '';
+
+                if ($raw === '') {
+                    return new \WP_REST_Response(['message' => __('請提供 next_billing_date。', 'fluentcart-payuni')], 400);
+                }
+
+                // 接受 Y-m-d 或 Y-m-d H:i:s，統一存成 Y-m-d H:i:s
+                $ts = strtotime($raw);
+                if ($ts === false) {
+                    return new \WP_REST_Response(['message' => __('日期格式不正確。', 'fluentcart-payuni')], 400);
+                }
+
+                $nextBillingDate = gmdate('Y-m-d H:i:s', $ts);
+
+                \FluentCart\App\Modules\Subscriptions\Services\SubscriptionService::syncSubscriptionStates($subscription, [
+                    'next_billing_date' => $nextBillingDate,
+                ]);
+
+                $subscription->refresh();
+
+                return new \WP_REST_Response([
+                    'message'      => __('下次扣款日已更新。', 'fluentcart-payuni'),
+                    'subscription' => $subscription,
+                ], 200);
+            },
+        ]);
+    });
+
     // FluentCart 核心的「暫停訂閱」API 目前是 stub，直接回傳 "Not available yet"（422）。
     // 攔截 PUT .../orders/{order}/subscriptions/{subscription}/pause，若為 payuni_subscription 則由本外掛處理並回傳成功。
     add_filter('rest_pre_dispatch', function ($result, $server, $request) {
@@ -148,6 +203,63 @@ function buygo_fc_payuni_bootstrap(): void
             'subscription' => $updated,
         ], 200);
     }, 10, 3);
+
+    // FluentCart 核心的「重新啟用訂閱」API 目前是 stub，回傳 422 "暫無"。
+    // 用較高優先級攔截 PUT/POST .../orders/{order}/subscriptions/{subscription}/reactivate，若為 payuni_subscription 則由本外掛處理。
+    add_filter('rest_pre_dispatch', function ($result, $server, $request) {
+        if (!($request instanceof \WP_REST_Request)) {
+            return $result;
+        }
+
+        $method = $request->get_method();
+        if ($method !== 'PUT' && $method !== 'POST') {
+            return $result;
+        }
+
+        $route = $request->get_route();
+        if ($route === null || strpos($route, 'subscriptions') === false || strpos($route, 'reactivate') === false) {
+            return $result;
+        }
+
+        $orderId        = $request->get_param('order');
+        $subscriptionId = $request->get_param('subscription');
+        if ((empty($orderId) || empty($subscriptionId)) && preg_match('#/orders/([^/]+)/subscriptions/([^/]+)/reactivate#', $route, $m)) {
+            $orderId        = $m[1];
+            $subscriptionId = $m[2];
+        }
+        if (empty($orderId) || empty($subscriptionId)) {
+            return $result;
+        }
+
+        if (!class_exists(\FluentCart\App\Models\Subscription::class)) {
+            return $result;
+        }
+
+        $subscription = \FluentCart\App\Models\Subscription::query()->find((int) $subscriptionId);
+        if (!$subscription || (int) $subscription->parent_order_id !== (int) $orderId) {
+            return $result;
+        }
+
+        if ((string) $subscription->current_payment_method !== 'payuni_subscription') {
+            return $result;
+        }
+
+        $subModule = new \BuyGoFluentCart\PayUNi\Gateway\PayUNiSubscriptions();
+        try {
+            $subModule->reactivateSubscription([], (int) $subscription->id);
+        } catch (\Throwable $e) {
+            return new \WP_REST_Response([
+                'message' => $e->getMessage(),
+            ], 400);
+        }
+
+        $updated = \FluentCart\App\Models\Subscription::query()->find($subscription->id);
+
+        return new \WP_REST_Response([
+            'message'      => __('訂閱已重新啟用。', 'fluentcart-payuni'),
+            'subscription' => $updated,
+        ], 200);
+    }, 999, 3);
 
     // FluentCart 前台金額顯示：TWD 隱藏不必要的小數（例如 NT$30.00 → NT$30）
     add_filter('fluent_cart/hide_unnecessary_decimals', function ($hide, $context) {
@@ -274,10 +386,12 @@ function buygo_fc_payuni_bootstrap(): void
 
         $settings = new \BuyGoFluentCart\PayUNi\Gateway\PayUNiSettingsBase();
         $rest_base = rest_url('fluent-cart/v2/');
+        $payuni_rest = rest_url('buygo-fc-payuni/v1/');
         wp_localize_script('buygo-fc-payuni-subscription-detail', 'buygo_fc_payuni_subscription_detail', [
-            'restUrl'      => $rest_base,
-            'nonce'        => wp_create_nonce('wp_rest'),
-            'displayName'  => $settings->getDisplayName(),
+            'restUrl'       => $rest_base,
+            'payuniApiBase' => $payuni_rest,
+            'nonce'         => wp_create_nonce('wp_rest'),
+            'displayName'   => $settings->getDisplayName(),
         ]);
     }, 20);
 
