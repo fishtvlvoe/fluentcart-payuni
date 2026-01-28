@@ -20,8 +20,11 @@ class PayUNiSubscriptions extends AbstractSubscriptionModule
      * PayUNi 沒有遠端訂閱管理系統，訂閱是透過本地排程管理的。
      * 這個方法主要用於前台客戶查看訂閱時，確認並返回當前本地狀態。
      *
+     * 注意：此方法必須返回 Subscription 物件（與 Stripe/PayPal 一致），
+     * 而不是陣列，因為 SubscriptionController::fetchSubscription() 會直接使用返回值。
+     *
      * @param \FluentCart\App\Models\Subscription $subscriptionModel 訂閱模型
-     * @return \WP_Error|array 返回訂閱狀態資訊或錯誤
+     * @return \WP_Error|\FluentCart\App\Models\Subscription 返回訂閱物件或錯誤
      */
     public function reSyncSubscriptionFromRemote($subscriptionModel)
     {
@@ -39,16 +42,10 @@ class PayUNiSubscriptions extends AbstractSubscriptionModule
         ]);
 
         // PayUNi 訂閱是本地管理的，沒有遠端 API 可以查詢
-        // 我們只需要確認本地狀態並返回即可
-        return [
-            'status' => 'success',
-            'message' => __('訂閱狀態已同步。', 'fluentcart-payuni'),
-            'data' => [
-                'subscription_status' => $subscriptionModel->status,
-                'next_billing_date' => $subscriptionModel->next_billing_date,
-                'bill_count' => $subscriptionModel->bill_count,
-            ],
-        ];
+        // 我們只需要重新載入訂閱模型並返回即可（確保資料是最新的）
+        $subscriptionModel->refresh();
+
+        return $subscriptionModel;
     }
 
     /**

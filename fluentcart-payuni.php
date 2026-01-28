@@ -2,7 +2,7 @@
 /**
  * Plugin Name: PayUNiGateway for FluentCart
  * Description: Add PayUNi (統一金流) payment gateway to FluentCart.
- * Version: 0.1.4
+ * Version: 0.1.5
  * Requires at least: 6.5
  * Requires PHP: 8.2
  * Author: BuyGo
@@ -12,7 +12,7 @@
 
 defined('ABSPATH') || exit;
 
-define('BUYGO_FC_PAYUNI_VERSION', '0.1.4');
+define('BUYGO_FC_PAYUNI_VERSION', '0.1.5');
 define('BUYGO_FC_PAYUNI_FILE', __FILE__);
 define('BUYGO_FC_PAYUNI_PATH', plugin_dir_path(__FILE__));
 define('BUYGO_FC_PAYUNI_URL', plugin_dir_url(__FILE__));
@@ -455,18 +455,6 @@ function buygo_fc_payuni_bootstrap(): void
             error_log('[fluentcart-payuni] Renewal runner error: ' . $e->getMessage());
         }
     }, 20);
-
-    /**
-     * PayUNi 訂閱後台管理介面
-     *
-     * 提供管理員從 WordPress 後台管理 PayUNi 訂閱的功能
-     */
-    if (is_admin()) {
-        require_once BUYGO_FC_PAYUNI_PATH . 'includes/class-admin-subscription-manager.php';
-
-        $adminManager = new \BuyGoFluentCart\PayUNi\Admin\AdminSubscriptionManager();
-        $adminManager->init();
-    }
 
     /**
      * 保底：如果 FluentCart 把使用者先導到收據頁（付款待處理），

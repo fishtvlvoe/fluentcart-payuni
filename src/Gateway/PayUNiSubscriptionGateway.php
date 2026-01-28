@@ -30,8 +30,9 @@ class PayUNiSubscriptionGateway extends AbstractPaymentGateway
      * supported features (給 FluentCart UI/邏輯判斷用)
      * - subscriptions: 代表這個閘道支援訂閱/定期扣款（我們在外掛內自己跑排程扣款）
      * - card_update: 支援更新信用卡資料（新卡需要進行 3D 驗證）
+     * - refund: 支援退款（實際打 PayUNi API 由 PayUNiGateway 同一套邏輯處理）
      */
-    public array $supportedFeatures = ['payment', 'webhook', 'subscriptions', 'card_update'];
+    public array $supportedFeatures = ['payment', 'refund', 'webhook', 'subscriptions', 'card_update'];
 
     public function __construct()
     {
@@ -174,6 +175,15 @@ class PayUNiSubscriptionGateway extends AbstractPaymentGateway
                 'message' => $e->getMessage(),
             ];
         }
+    }
+
+    /**
+     * 退款：訂閱續扣／初次付款的 PayUNi 交易都走同一套 trade/close 或 trade/cancel，
+     * 直接委派給 PayUNiGateway 處理。
+     */
+    public function processRefund($transaction, $amount, $args = [])
+    {
+        return (new PayUNiGateway())->processRefund($transaction, $amount, $args);
     }
 }
 
