@@ -369,15 +369,11 @@ function buygo_fc_payuni_bootstrap(): void
             return;
         }
 
-        $templatePath = BUYGO_FC_PAYUNI_PATH . 'templates/checkout/payuni-subscription.html';
+        // 不輸出舊版 payuni-subscription.html，避免載入時短暫出現舊表單再被 JS 替換。
+        // 只輸出極簡 placeholder，由 payuni-checkout.js 的 subUi.run() 直接畫新表單。
+        echo '<div class="buygo-payuni-subscription-placeholder" aria-live="polite" style="padding:12px 0;color:#6b7280;font-size:14px;">'
+            . esc_html__('載入中…', 'fluentcart-payuni') . '</div>';
 
-        if (file_exists($templatePath)) {
-            // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingCustomConstant -- plugin internal template
-            echo file_get_contents($templatePath);
-        }
-
-        // FluentCart 的 embed container 可能會過濾 <link> 標籤，導致後備 UI 沒有套到 CSS。
-        // 所以這裡只做「保險載入腳本」：確保 payuni-checkout.js 一定會跑、一定會把 CSS 插到 head。
         $jsUrl = BUYGO_FC_PAYUNI_URL . 'assets/js/payuni-checkout.js';
 
         echo '<script>(function(){try{if(window.__buygoFcPayuniCheckoutUiLoaded){return;}var s=document.createElement("script");s.src=' . wp_json_encode($jsUrl) . ';s.defer=true;document.head.appendChild(s);}catch(e){}})();</script>';
