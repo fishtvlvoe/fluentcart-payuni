@@ -3,8 +3,8 @@
 ▋ 當前位置
 
 • 里程碑：v1 訂閱＋退款＋頁面＋修改日期＋退閱完整流程。
-• 階段：Phase 2（退款流程）— 已完成驗收，tag：gsd-phase-2。
-• 下一步：Phase 3（頁面一致性／前台結帳付款 UI）— 後台訂閱／訂單頁與 FluentCart 一致；前台結帳 PayUNi 區塊與原生風格一致。
+• 階段：Phase 3（頁面一致性／前台結帳付款 UI）— 已完成驗收，tag：gsd-phase-3。
+• 下一步：Phase 4（修改日期）— next_billing_date 檢視與管理員可編輯、與續扣一致。
 • Phase 1 已執行：1-1、1-2 驗收與補註完成，見 .planning/1-1-SUMMARY.md、1-2-SUMMARY.md、1-VERIFICATION.md。
 
 ▋ 決策紀錄
