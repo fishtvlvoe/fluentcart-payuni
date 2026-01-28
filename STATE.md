@@ -3,8 +3,8 @@
 ▋ 當前位置
 
 • 里程碑：v1 訂閱＋退款＋頁面＋修改日期＋退閱完整流程。
-• 階段：Phase 3（頁面一致性／前台結帳付款 UI）— 已完成驗收，tag：gsd-phase-3。
-• 下一步：Phase 4（修改日期）— next_billing_date 檢視與管理員可編輯、與續扣一致。
+• 階段：Phase 4（修改日期）— 已完成驗收，tag：gsd-phase-4。
+• 下一步：Phase 5（退閱完整流程）— 取消原因選單、狀態與紀錄、與金流對應（若支援）。
 • Phase 1 已執行：1-1、1-2 驗收與補註完成，見 .planning/1-1-SUMMARY.md、1-2-SUMMARY.md、1-VERIFICATION.md。
 
 ▋ 決策紀錄
