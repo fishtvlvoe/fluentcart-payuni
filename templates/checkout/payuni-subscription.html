@@ -1,4 +1,4 @@
-<div class="buygo-payuni" style="--buygo-payuni-accent:#136196;margin:12px 0;">
+<div class="buygo-payuni" style="--buygo-payuni-accent:#2563eb;margin:12px 0;">
 
   <div class="card">
 
@@ -14,13 +14,18 @@
 
           <div class="left">
 
+            <span class="method-icon-wrap" aria-hidden="true">
+              <svg class="buygo-payuni-method-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="5" width="20" height="14" rx="2"/>
+                <path d="M2 10h20"/>
+              </svg>
+            </span>
+
             <input class="radio" type="radio" name="payuni_payment_type" value="credit" checked>
 
             <div>
 
               <div class="label">信用卡</div>
-
-              <div class="desc small muted">初次付款會導向 3D 驗證頁，完成後回到收據頁，後續將由系統自動續扣。</div>
 
             </div>
 
@@ -30,11 +35,21 @@
 
       </div>
 
+      <p class="methods-hint">初次付款會導向 3D 驗證頁，完成後回到收據頁，後續將由系統自動續扣。</p>
+
     </div>
 
     <div class="section">
 
       <div class="section-title">信用卡資料</div>
+
+      <div class="payment-secure">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0110 0v4"/>
+        </svg>
+        安全加密付款，由統一金流處理，卡號不會儲存於本站。
+      </div>
 
       <div class="grid">
 
@@ -68,9 +83,7 @@
 
       </div>
 
-      <div class="hint small muted">請放心，我們將由「統一金流」加密，你的個人資料。</div>
-
-      <div class="hint small muted">提示：初次付款會導向 3D 驗證頁，完成後會回到收據頁。</div>
+      <div class="hint small muted">初次付款會導向 3D 驗證頁，完成後會回到收據頁。</div>
 
     </div>
 

@@ -1,7 +1,9 @@
+/* PayUNi Checkout — 對齊 FluentCart 原生結帳風格（Payment / Card 區塊） */
+
 .buygo-payuni {
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
     Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-  color: #0f172a;
+  color: #374151;
 }
 
 .buygo-payuni * {
@@ -10,112 +12,198 @@
 
 .buygo-payuni p {
   margin: 0;
-  line-height: 1.6;
-  color: #0f172a;
+  line-height: 1.5;
+  color: #374151;
 }
 
 .buygo-payuni .muted {
-  color: #475569;
+  color: #6b7280;
 }
 
 .buygo-payuni .small {
-  font-size: 13px;
-  line-height: 1.55;
+  font-size: 12px;
+  line-height: 1.5;
 }
 
+/* 外層卡片：淺灰邊、適度圓角、留白（左右縮小避免「前面像按鈕」的錯覺） */
 .buygo-payuni .card {
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
   background: #fff;
-  padding: 16px;
+  padding: 16px 16px 20px;
 }
 
 .buygo-payuni .section {
-  margin-top: 14px;
+  margin-top: 20px;
 }
 
+.buygo-payuni .section:first-child {
+  margin-top: 0;
+}
+
+/* 區塊標題：與原生 Payment / Card 一致 */
 .buygo-payuni .section-title {
-  font-weight: 700;
-  font-size: 14px;
+  font-weight: 600;
+  font-size: 15px;
   letter-spacing: -0.01em;
-  margin: 0 0 10px;
+  color: #374151;
+  margin: 0 0 12px;
 }
 
+/* 付款方式：水平磚（對齊 Carte bancaire / Klarna 橫向排列） */
 .buygo-payuni .methods {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
 }
 
+@media (max-width: 560px) {
+  .buygo-payuni .methods {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 單一方法磚：緊湊、icon + 標籤為主 */
 .buygo-payuni .method {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 12px;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
   background: #fff;
   cursor: pointer;
-  transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  transition: background 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
 }
 
 .buygo-payuni .method:hover {
-  background: #f8fafc;
-  border-color: #cbd5e1;
+  background: #f9fafb;
+  border-color: #d1d5db;
 }
 
 .buygo-payuni .method.selected {
-  border-color: var(--buygo-payuni-accent, #136196);
-  background: rgba(19, 97, 150, 0.06);
-  box-shadow: 0 0 0 3px rgba(19, 97, 150, 0.12);
+  border-color: var(--buygo-payuni-accent, #2563eb);
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
 }
 
 .buygo-payuni .method .left {
   display: flex;
-  gap: 12px;
-  align-items: flex-start;
+  gap: 10px;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.buygo-payuni .method-icon-wrap {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.buygo-payuni .method.selected .method-icon-wrap {
+  color: var(--buygo-payuni-accent, #2563eb);
+}
+
+.buygo-payuni .buygo-payuni-method-icon {
+  width: 22px;
+  height: 22px;
 }
 
 .buygo-payuni .method .radio {
-  margin-top: 2px;
-  width: 18px;
-  height: 18px;
-  accent-color: var(--buygo-payuni-accent, #136196);
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+  overflow: hidden;
 }
 
 .buygo-payuni .method .label {
-  font-weight: 700;
+  font-weight: 600;
   font-size: 14px;
   letter-spacing: -0.01em;
+  color: #374151;
 }
 
 .buygo-payuni .method .desc {
   margin-top: 2px;
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.4;
 }
 
+/* 單一方式說明（ATM/超商只顯示一句） */
+.buygo-payuni .method-only-hint {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+/* 頁面最下方：唯一一段總說明（縮小上緣，避免「中間多一行」感） */
+.buygo-payuni .page-footer-hint {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+/* 安全付款提示（可選，對齊原生 padlock + Link） */
+.buygo-payuni .payment-secure {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 13px;
+  color: #059669;
+}
+
+.buygo-payuni .payment-secure svg {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+/* 表單欄位：與原生輸入框一致，與上方區塊左緣對齊（無多餘偽元素） */
 .buygo-payuni .field {
   display: grid;
   gap: 6px;
+  margin-left: 0;
+  padding-left: 0;
+}
+
+.buygo-payuni .field::before,
+.buygo-payuni .field::after {
+  display: none !important;
 }
 
 .buygo-payuni .grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 10px;
-  max-width: 460px;
+  gap: 8px;
+  max-width: 100%;
+  margin-left: 0;
+  padding-left: 0;
 }
 
 .buygo-payuni .grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 8px 12px;
 }
 
 .buygo-payuni label {
   font-size: 13px;
-  font-weight: 700;
-  color: #0f172a;
+  font-weight: 600;
+  color: #374151;
 }
 
 .buygo-payuni input[type="text"],
@@ -125,30 +213,48 @@
   width: 100%;
   min-height: 44px;
   padding: 10px 12px;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   background: #fff;
-  color: #0f172a;
+  color: #374151;
+  font-size: 14px;
   outline: none;
-  transition: border-color 180ms ease, box-shadow 180ms ease;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
 .buygo-payuni input::placeholder {
-  color: #94a3b8;
+  color: #9ca3af;
+}
+
+/* 卡號欄位：強制左對齊，隱藏右側瀏覽器圖示（避免「前面空白／右側像按鈕」） */
+.buygo-payuni input.payuni-input-card-number {
+  padding-left: 12px !important;
+  text-indent: 0 !important;
+}
+
+.buygo-payuni input.payuni-input-card-number::-webkit-credentials-auto-fill-button,
+.buygo-payuni input.payuni-input-card-number::-webkit-contacts-auto-fill-button,
+.buygo-payuni input.payuni-input-card-number::-webkit-caps-lock-indicator {
+  visibility: hidden;
+  pointer-events: none;
+  position: absolute;
+  right: -9999px;
 }
 
 .buygo-payuni input:focus,
 .buygo-payuni select:focus {
-  border-color: var(--buygo-payuni-accent, #136196);
-  box-shadow: 0 0 0 3px rgba(19, 97, 150, 0.18);
+  border-color: var(--buygo-payuni-accent, #2563eb);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
 }
 
 .buygo-payuni .hint {
   margin-top: 10px;
   padding: 10px 12px;
-  border-radius: 12px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  font-size: 13px;
+  color: #6b7280;
 }
 
 @media (max-width: 420px) {
@@ -165,3 +271,48 @@
   }
 }
 
+/* 結帳頁為 Vue，父層樣式會覆蓋；用較高優先級鎖住我們的呈現 */
+[class*="fluent-cart-checkout_embed_payment_container"] .buygo-payuni .method {
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  border-radius: 10px;
+  min-height: 48px;
+}
+
+[class*="fluent-cart-checkout_embed_payment_container"] .buygo-payuni .method.selected {
+  border-color: var(--buygo-payuni-accent, #2563eb);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+[class*="fluent-cart-checkout_embed_payment_container"] .buygo-payuni .section,
+[class*="fluent-cart-checkout_embed_payment_container"] .buygo-payuni .payment-secure {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+[class*="fluent-cart-checkout_embed_payment_container"] .buygo-payuni .card {
+  padding: 16px !important;
+}
+
+[class*="fluent-cart-checkout_embed_payment_container"] .buygo-payuni input[type="text"],
+[class*="fluent-cart-checkout_embed_payment_container"] .buygo-payuni input[type="tel"],
+[class*="fluent-cart-checkout_embed_payment_container"] .buygo-payuni input[type="password"],
+[class*="fluent-cart-checkout_embed_payment_container"] .buygo-payuni select {
+  padding: 10px 12px !important;
+  text-indent: 0 !important;
+  margin-left: 0 !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 8px !important;
+  box-sizing: border-box !important;
+}
+
+[class*="fluent-cart-checkout_embed_payment_container"] .buygo-payuni input.payuni-input-card-number {
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+}
+
+[class*="fluent-cart-checkout_embed_payment_container"] .buygo-payuni input::-webkit-outer-spin-button,
+[class*="fluent-cart-checkout_embed_payment_container"] .buygo-payuni input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
