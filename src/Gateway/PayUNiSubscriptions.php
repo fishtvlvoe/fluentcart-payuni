@@ -156,7 +156,7 @@ class PayUNiSubscriptions extends AbstractSubscriptionModule
 
         // 否則返回信用卡輸入表單的 HTML
         ob_start();
-        include BUYGO_FC_PAYUNI_DIR . 'templates/checkout/payuni-subscription.html';
+        include BUYGO_FC_PAYUNI_PATH . 'templates/checkout/payuni-subscription.html';
         $html = ob_get_clean();
 
         return [

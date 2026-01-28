@@ -149,6 +149,105 @@ function buygo_fc_payuni_bootstrap(): void
         ]);
     });
 
+    /**
+     * 前台會員「更新付款」：GET 表單、POST 更新。獨立註冊，只依賴 Subscription + CustomerResource，
+     * 避免因 SubscriptionService 未載入而整段 rest_api_init 被 return 導致 404。
+     */
+    add_action('rest_api_init', function () {
+        if (!class_exists(\FluentCart\App\Models\Subscription::class)
+            || !class_exists('FluentCart\Api\Resource\CustomerResource')
+            || !class_exists(\BuyGoFluentCart\PayUNi\Gateway\PayUNiSubscriptions::class)) {
+            return;
+        }
+
+        $uuidRegex = '[a-zA-Z0-9\-]+';
+
+        register_rest_route('buygo-fc-payuni/v1', '/subscriptions/(?P<subscription_uuid>' . $uuidRegex . ')/card-form', [
+            'methods'             => 'GET',
+            'permission_callback' => function () {
+                return is_user_logged_in();
+            },
+            'args'                 => [
+                'subscription_uuid' => [
+                    'required' => true,
+                    'type'     => 'string',
+                ],
+            ],
+            'callback'             => function (\WP_REST_Request $request) {
+                $customer = \FluentCart\Api\Resource\CustomerResource::getCurrentCustomer();
+                if (!$customer) {
+                    return new \WP_REST_Response(['message' => __('請先登入。', 'fluentcart-payuni')], 401);
+                }
+
+                $subscription = \FluentCart\App\Models\Subscription::query()
+                    ->where('customer_id', $customer->id)
+                    ->where('uuid', $request->get_param('subscription_uuid'))
+                    ->first();
+
+                if (!$subscription || (string) $subscription->current_payment_method !== 'payuni_subscription') {
+                    return new \WP_REST_Response(['message' => __('訂閱不存在或非 PayUNi 訂閱。', 'fluentcart-payuni')], 404);
+                }
+
+                $subModule = new \BuyGoFluentCart\PayUNi\Gateway\PayUNiSubscriptions();
+                $result    = $subModule->cardUpdate([], $subscription->id);
+
+                $html = isset($result['data']['html']) ? $result['data']['html'] : '';
+
+                return new \WP_REST_Response(['html' => $html], 200);
+            },
+        ]);
+
+        register_rest_route('buygo-fc-payuni/v1', '/subscriptions/(?P<subscription_uuid>' . $uuidRegex . ')/card-update', [
+            'methods'             => 'POST',
+            'permission_callback' => function () {
+                return is_user_logged_in();
+            },
+            'args'                 => [
+                'subscription_uuid' => [
+                    'required' => true,
+                    'type'     => 'string',
+                ],
+            ],
+            'callback'             => function (\WP_REST_Request $request) {
+                $customer = \FluentCart\Api\Resource\CustomerResource::getCurrentCustomer();
+                if (!$customer) {
+                    return new \WP_REST_Response(['message' => __('請先登入。', 'fluentcart-payuni')], 401);
+                }
+
+                $subscription = \FluentCart\App\Models\Subscription::query()
+                    ->where('customer_id', $customer->id)
+                    ->where('uuid', $request->get_param('subscription_uuid'))
+                    ->first();
+
+                if (!$subscription || (string) $subscription->current_payment_method !== 'payuni_subscription') {
+                    return new \WP_REST_Response(['message' => __('訂閱不存在或非 PayUNi 訂閱。', 'fluentcart-payuni')], 404);
+                }
+
+                $body = $request->get_json_params() ?: [];
+                $data = [
+                    'method'               => 'payuni_subscription',
+                    'payuni_card_number'   => isset($body['payuni_card_number']) ? sanitize_text_field((string) $body['payuni_card_number']) : '',
+                    'payuni_card_expiry'   => isset($body['payuni_card_expiry']) ? sanitize_text_field((string) $body['payuni_card_expiry']) : '',
+                    'payuni_card_cvc'      => isset($body['payuni_card_cvc']) ? sanitize_text_field((string) $body['payuni_card_cvc']) : '',
+                ];
+
+                try {
+                    $subModule = new \BuyGoFluentCart\PayUNi\Gateway\PayUNiSubscriptions();
+                    $result    = $subModule->cardUpdate($data, $subscription->id);
+                } catch (\Exception $e) {
+                    return new \WP_REST_Response(['message' => $e->getMessage()], 400);
+                }
+
+                $response = ['message' => isset($result['message']) ? $result['message'] : __('付款方式已更新成功！', 'fluentcart-payuni')];
+                if (!empty($result['redirect_url'])) {
+                    $response['redirect_url'] = $result['redirect_url'];
+                }
+
+                return new \WP_REST_Response($response, 200);
+            },
+        ]);
+    });
+
     // FluentCart 核心的「暫停訂閱」API 目前是 stub，直接回傳 "Not available yet"（422）。
     // 攔截 PUT .../orders/{order}/subscriptions/{subscription}/pause，若為 payuni_subscription 則由本外掛處理並回傳成功。
     add_filter('rest_pre_dispatch', function ($result, $server, $request) {
@@ -365,6 +464,33 @@ function buygo_fc_payuni_bootstrap(): void
 
         return $subscription;
     }, 10, 2);
+
+    /**
+     * 前台會員訂閱頁「更新付款」：若為 PayUNi 訂閱，modal 打開時載入換卡表單並由本外掛 API 處理送出。
+     * 一併載入結帳用 PayUNi CSS，讓 modal 表單與結帳頁樣式一致。
+     */
+    add_action('fluent_cart/customer_app', function () {
+        wp_enqueue_style(
+            'buygo-fc-payuni-checkout',
+            BUYGO_FC_PAYUNI_URL . 'assets/css/payuni-checkout.css',
+            [],
+            BUYGO_FC_PAYUNI_VERSION
+        );
+
+        wp_enqueue_script(
+            'buygo-fc-payuni-account-card-form',
+            BUYGO_FC_PAYUNI_URL . 'assets/js/payuni-account-card-form.js',
+            ['fluentcart-customer-js'],
+            BUYGO_FC_PAYUNI_VERSION,
+            true
+        );
+
+        wp_localize_script('buygo-fc-payuni-account-card-form', 'buygo_fc_payuni_account', [
+            'restUrl'    => rest_url('buygo-fc-payuni/v1/'),
+            'fcRestUrl'  => rest_url('fluent-cart/v2/'),
+            'nonce'      => wp_create_nonce('wp_rest'),
+        ]);
+    }, 5);
 
     /**
      * 訂閱詳情頁 PayUNi 操作 UI：僅在 FluentCart 後台 (page=fluent-cart) 載入注入用 JS，

@@ -85,7 +85,7 @@
       cancelBtn.textContent = '取消訂閱';
       cancelBtn.setAttribute('title', '將此訂閱標記為已取消，不再續扣');
       cancelBtn.addEventListener('click', function () {
-        cancelSubscription(subscription, cancelBtn);
+        showCancelReasonModal(subscription, cancelBtn);
       });
       wrap.appendChild(cancelBtn);
     }
@@ -107,6 +107,15 @@
         reactivateSubscription(subscription, reactivateBtn);
       });
       wrap.appendChild(reactivateBtn);
+
+      var cancelReason = subscription.config && subscription.config.cancellation_reason;
+      if (cancelReason) {
+        var reasonLabel = (CANCEL_REASON_OPTIONS.filter(function (o) { return o.value === cancelReason; })[0] || {}).label || cancelReason;
+        var reasonRow = document.createElement('div');
+        reasonRow.style.cssText = 'margin-top:12px;padding-top:12px;border-top:1px solid #ebeef5;font-size:13px;color:#606266;';
+        reasonRow.textContent = '取消原因：' + reasonLabel;
+        wrap.appendChild(reasonRow);
+      }
     }
 
     body.appendChild(wrap);
@@ -340,7 +349,77 @@
       });
   }
 
-  function cancelSubscription(subscription, buttonEl) {
+  var CANCEL_REASON_OPTIONS = [
+    { value: 'customer_request', label: '客戶要求' },
+    { value: 'too_expensive', label: '價格考量' },
+    { value: 'not_using', label: '不再使用' },
+    { value: 'switching', label: '改用其他方案' },
+    { value: 'other', label: '其他' },
+  ];
+
+  function showCancelReasonModal(subscription, buttonEl) {
+    var overlay = document.createElement('div');
+    overlay.setAttribute('class', 'payuni-cancel-reason-overlay');
+    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:100000;';
+
+    var box = document.createElement('div');
+    box.setAttribute('class', 'payuni-cancel-reason-box');
+    box.style.cssText = 'background:#fff;padding:20px;border-radius:8px;min-width:280px;box-shadow:0 4px 20px rgba(0,0,0,0.15);';
+
+    var title = document.createElement('div');
+    title.style.marginBottom = '12px';
+    title.style.fontWeight = '600';
+    title.textContent = '請選擇取消原因';
+    box.appendChild(title);
+
+    var select = document.createElement('select');
+    select.style.cssText = 'width:100%;padding:8px 12px;margin-bottom:16px;border:1px solid #dcdfe6;border-radius:4px;font-size:14px;';
+    CANCEL_REASON_OPTIONS.forEach(function (opt) {
+      var option = document.createElement('option');
+      option.value = opt.value;
+      option.textContent = opt.label;
+      select.appendChild(option);
+    });
+    box.appendChild(select);
+
+    var btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:8px;justify-content:flex-end;';
+
+    var backBtn = document.createElement('button');
+    backBtn.type = 'button';
+    backBtn.setAttribute('class', 'el-button el-button--default');
+    backBtn.textContent = '返回';
+    backBtn.addEventListener('click', function () {
+      document.body.removeChild(overlay);
+    });
+    btnRow.appendChild(backBtn);
+
+    var confirmBtn = document.createElement('button');
+    confirmBtn.type = 'button';
+    confirmBtn.setAttribute('class', 'el-button el-button--danger');
+    confirmBtn.textContent = '確定取消';
+    confirmBtn.addEventListener('click', function () {
+      var reason = (select.value || '').trim();
+      if (!reason) {
+        alert('請選擇取消原因');
+        return;
+      }
+      document.body.removeChild(overlay);
+      doCancelSubscription(subscription, buttonEl, reason);
+    });
+    btnRow.appendChild(confirmBtn);
+
+    box.appendChild(btnRow);
+    overlay.appendChild(box);
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) {
+        document.body.removeChild(overlay);
+      }
+    });
+    document.body.appendChild(overlay);
+  }
+
+  function doCancelSubscription(subscription, buttonEl, cancelReason) {
     var config = getConfig();
     var restUrl = config.restUrl;
     var nonce = config.nonce;
@@ -356,10 +435,6 @@
       return;
     }
 
-    if (!window.confirm('確定要取消此訂閱？取消後將不再自動扣款。')) {
-      return;
-    }
-
     var url = restUrl + 'orders/' + orderId + '/subscriptions/' + subscriptionId + '/cancel';
     var originalText = buttonEl.textContent;
     buttonEl.disabled = true;
@@ -372,7 +447,7 @@
         'X-WP-Nonce': nonce,
       },
       credentials: 'same-origin',
-      body: JSON.stringify({ cancel_reason: 'customer_request' }),
+      body: JSON.stringify({ cancel_reason: cancelReason }),
     })
       .then(function (res) {
         var ct = res.headers.get('content-type');
