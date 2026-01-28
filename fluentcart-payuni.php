@@ -796,6 +796,52 @@ function buygo_fc_payuni_bootstrap(): void
                 }
             }
 
+            // 換卡 3D 回跳：沒有 OrderTransaction，用 card_update + subscription_uuid 辨識並導回訂閱詳情頁
+            $cardUpdate = !empty($_REQUEST['card_update']) && sanitize_text_field(wp_unslash($_REQUEST['card_update'])) === '1';
+            $subUuid = !empty($_REQUEST['subscription_uuid']) ? sanitize_text_field(wp_unslash($_REQUEST['subscription_uuid'])) : '';
+
+            if ($cardUpdate && $subUuid !== '' && class_exists(\BuyGoFluentCart\PayUNi\Gateway\PayUNiSubscriptions::class)) {
+                // 診斷：記錄回跳時是否有 EncryptInfo/HashInfo（PayUNi 3D 若用 GET 轉址可能沒帶）
+                if (defined('WP_DEBUG') && WP_DEBUG && function_exists('error_log')) {
+                    error_log('[fluentcart-payuni] Card update return: card_update=1, sub_uuid=' . $subUuid
+                        . ', has_EncryptInfo=' . (isset($_REQUEST['EncryptInfo']) && $_REQUEST['EncryptInfo'] !== '' ? '1' : '0')
+                        . ', has_HashInfo=' . (isset($_REQUEST['HashInfo']) && $_REQUEST['HashInfo'] !== '' ? '1' : '0'));
+                }
+
+                $handled = \BuyGoFluentCart\PayUNi\Gateway\PayUNiSubscriptions::handleCardUpdateReturn($subUuid);
+
+                if ($handled) {
+                    $subscriptionUrl = home_url('/account/subscription/' . $subUuid . '/');
+                    $subscriptionUrl = add_query_arg('payuni_card_updated', '1', $subscriptionUrl);
+
+                    wp_safe_redirect($subscriptionUrl);
+                    exit;
+                }
+
+                // 有 card_update + subscription_uuid 但處理失敗：仍導回訂閱頁，帶錯誤參數讓前端可提示
+                $subscriptionUrl = home_url('/account/subscription/' . $subUuid . '/');
+                $subscriptionUrl = add_query_arg('payuni_card_update', 'error', $subscriptionUrl);
+
+                wp_safe_redirect($subscriptionUrl);
+                exit;
+            }
+
+            // Fallback：回跳沒有 card_update/subscription_uuid（PayUNi 可能沒保留 ReturnURL 的 query），
+            // 但有 EncryptInfo/HashInfo 時，從 MerTradeNo（CU + 訂閱 id + A...）反查訂閱並處理換卡
+            $hasEncrypt = !empty($_REQUEST['EncryptInfo']) && !empty($_REQUEST['HashInfo']);
+            if ($hasEncrypt && class_exists(\BuyGoFluentCart\PayUNi\Gateway\PayUNiSubscriptions::class)) {
+                $fallbackUuid = \BuyGoFluentCart\PayUNi\Gateway\PayUNiSubscriptions::resolveSubscriptionUuidFromReturn();
+                if ($fallbackUuid !== '') {
+                    $handled = \BuyGoFluentCart\PayUNi\Gateway\PayUNiSubscriptions::handleCardUpdateReturn($fallbackUuid);
+                    if ($handled) {
+                        $subscriptionUrl = home_url('/account/subscription/' . $fallbackUuid . '/');
+                        $subscriptionUrl = add_query_arg('payuni_card_updated', '1', $subscriptionUrl);
+                        wp_safe_redirect($subscriptionUrl);
+                        exit;
+                    }
+                }
+            }
+
             echo esc_html('SUCCESS');
             exit;
         }

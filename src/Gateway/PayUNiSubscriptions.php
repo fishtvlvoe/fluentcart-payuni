@@ -211,12 +211,28 @@ class PayUNiSubscriptions extends AbstractSubscriptionModule
         // 這裡使用小額授權（TradeAmt=1）來驗證卡片並取得 CreditHash
         $merchantTradeNo = 'CU' . $subscription->id . 'A' . base_convert((string) time(), 10, 36);
 
+        $subscriptionUuid = (string) ($subscription->uuid ?? '');
+        $returnUrl = $subscriptionUuid
+            ? add_query_arg([
+                'fct_payment_listener' => '1',
+                'method' => 'payuni',
+                'payuni_return' => '1',
+                'card_update' => '1',
+                'subscription_uuid' => $subscriptionUuid,
+            ], site_url('/'))
+            : add_query_arg([
+                'fct_payment_listener' => '1',
+                'method' => 'payuni',
+                'payuni_return' => '1',
+            ], site_url('/'));
+
         $encryptInfo = [
             'MerID' => $settings->getMerId($mode),
             'MerTradeNo' => $merchantTradeNo,
             'TradeAmt' => 1, // 小額授權（1 元）
             'Timestamp' => time(),
             'ProdDesc' => '更新付款方式',
+            'ReturnURL' => $returnUrl,
             'CardNo' => $cardNumber,
             'CardExpired' => $cardExpiry,
             'CardCVC' => $cardCvc,
@@ -294,6 +310,159 @@ class PayUNiSubscriptions extends AbstractSubscriptionModule
             'status' => 'success',
             'message' => __('付款方式已更新成功！', 'fluentcart-payuni'),
         ];
+    }
+
+    /**
+     * 從回跳的 EncryptInfo 解密出 MerTradeNo，若為換卡格式（CU + 訂閱 id + A...）則反查訂閱並回傳 uuid。
+     * 用於 PayUNi 回跳時未保留 ReturnURL 的 card_update/subscription_uuid 時仍能辨識是哪一筆換卡。
+     *
+     * @return string 訂閱 uuid，無法解析時回傳空字串
+     */
+    public static function resolveSubscriptionUuidFromReturn()
+    {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- return from gateway
+        $encryptInfo = isset($_REQUEST['EncryptInfo']) ? (string) wp_unslash($_REQUEST['EncryptInfo']) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- return from gateway
+        $hashInfo = isset($_REQUEST['HashInfo']) ? (string) wp_unslash($_REQUEST['HashInfo']) : '';
+        if (!$encryptInfo || !$hashInfo) {
+            return '';
+        }
+
+        $settings = new PayUNiSettingsBase();
+        $crypto = new \BuyGoFluentCart\PayUNi\Services\PayUNiCryptoService($settings);
+        if (!$crypto->verifyHashInfo($encryptInfo, $hashInfo)) {
+            return '';
+        }
+
+        $decrypted = $crypto->decryptInfo($encryptInfo);
+        if (!$decrypted) {
+            return '';
+        }
+
+        $merTradeNo = (string) ($decrypted['MerTradeNo'] ?? '');
+        if (strpos($merTradeNo, 'CU') !== 0) {
+            return '';
+        }
+
+        if (!preg_match('/^CU(\d+)A/', $merTradeNo, $m)) {
+            return '';
+        }
+
+        $subscriptionId = (int) $m[1];
+        if ($subscriptionId <= 0) {
+            return '';
+        }
+
+        $subscription = \FluentCart\App\Models\Subscription::query()
+            ->where('id', $subscriptionId)
+            ->where('current_payment_method', 'payuni_subscription')
+            ->first();
+
+        return $subscription && !empty($subscription->uuid) ? (string) $subscription->uuid : '';
+    }
+
+    /**
+     * 處理換卡 3D 回跳：解密 PayUNi 回傳、驗證 MerTradeNo 為 CU+訂閱 id、更新訂閱 CreditHash，供 template_redirect 在無 OrderTransaction 時呼叫。
+     *
+     * @param string $subscriptionUuid 訂閱 uuid（來自 URL 的 subscription_uuid）
+     * @return bool 是否成功處理並更新訂閱
+     */
+    public static function handleCardUpdateReturn($subscriptionUuid)
+    {
+        $subscriptionUuid = sanitize_text_field((string) $subscriptionUuid);
+        if (!$subscriptionUuid) {
+            Logger::warning('Card update return: empty subscription_uuid');
+            return false;
+        }
+
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- return from gateway
+        $encryptInfo = isset($_REQUEST['EncryptInfo']) ? (string) wp_unslash($_REQUEST['EncryptInfo']) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- return from gateway
+        $hashInfo = isset($_REQUEST['HashInfo']) ? (string) wp_unslash($_REQUEST['HashInfo']) : '';
+        if (!$encryptInfo || !$hashInfo) {
+            Logger::warning('Card update return: missing EncryptInfo or HashInfo', [
+                'subscription_uuid' => $subscriptionUuid,
+                'has_encrypt' => !empty($encryptInfo),
+                'has_hash' => !empty($hashInfo),
+            ]);
+            return false;
+        }
+
+        $settings = new PayUNiSettingsBase();
+        $crypto = new \BuyGoFluentCart\PayUNi\Services\PayUNiCryptoService($settings);
+        if (!$crypto->verifyHashInfo($encryptInfo, $hashInfo)) {
+            Logger::warning('Card update return HashInfo mismatch', ['subscription_uuid' => $subscriptionUuid]);
+            return false;
+        }
+
+        $decrypted = $crypto->decryptInfo($encryptInfo);
+        if (!$decrypted) {
+            Logger::warning('Card update return: decrypt failed', ['subscription_uuid' => $subscriptionUuid]);
+            return false;
+        }
+
+        $merTradeNo = (string) ($decrypted['MerTradeNo'] ?? '');
+        if (strpos($merTradeNo, 'CU') !== 0) {
+            Logger::warning('Card update return: MerTradeNo not CU prefix', [
+                'subscription_uuid' => $subscriptionUuid,
+                'mer_trade_no' => $merTradeNo,
+            ]);
+            return false;
+        }
+
+        $subscription = \FluentCart\App\Models\Subscription::query()
+            ->where('uuid', $subscriptionUuid)
+            ->first();
+        if (!$subscription || (string) $subscription->current_payment_method !== 'payuni_subscription') {
+            Logger::warning('Card update return: subscription not found or wrong payment method', [
+                'subscription_uuid' => $subscriptionUuid,
+            ]);
+            return false;
+        }
+
+        $expectedPrefix = 'CU' . $subscription->id . 'A';
+        if (strpos($merTradeNo, $expectedPrefix) !== 0) {
+            Logger::warning('Card update return MerTradeNo mismatch', [
+                'expected_prefix' => $expectedPrefix,
+                'mer_trade_no' => $merTradeNo,
+            ]);
+            return false;
+        }
+
+        $status = (string) ($decrypted['Status'] ?? '');
+        if (empty($status) && array_key_exists('TradeStatus', $decrypted)) {
+            $status = ((string) ($decrypted['TradeStatus'] ?? '') === '1') ? 'SUCCESS' : 'FAILED';
+        }
+        if ($status !== 'SUCCESS') {
+            Logger::warning('Card update return: status not SUCCESS', [
+                'subscription_uuid' => $subscriptionUuid,
+                'status' => $status,
+            ]);
+            return false;
+        }
+
+        $creditHash = (string) ($decrypted['CreditHash'] ?? '');
+        $card4No = (string) ($decrypted['Card4No'] ?? '');
+        if (!$creditHash) {
+            Logger::warning('Card update return: no CreditHash in decrypted', ['subscription_uuid' => $subscriptionUuid]);
+            return false;
+        }
+
+        $subscription->updateMeta('payuni_credit_hash', $creditHash);
+        $subscription->updateMeta('active_payment_method', [
+            'details' => [
+                'method' => 'PayUNi',
+                'brand' => 'card',
+                'last_4' => $card4No,
+            ],
+        ]);
+
+        Logger::info('PayUNi card update return applied', [
+            'subscription_id' => $subscription->id,
+            'subscription_uuid' => $subscriptionUuid,
+        ]);
+
+        return true;
     }
 
     /**
