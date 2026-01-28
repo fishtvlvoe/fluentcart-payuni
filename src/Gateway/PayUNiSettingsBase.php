@@ -17,6 +17,8 @@ if (!class_exists(BaseGatewaySettings::class)) {
      */
     class PayUNiSettingsBase
     {
+        public const DEFAULT_DISPLAY_NAME = '統一金流';
+
         public function getMode(): string
         {
             return 'test';
@@ -41,6 +43,11 @@ if (!class_exists(BaseGatewaySettings::class)) {
         {
             return false;
         }
+
+        public function getDisplayName(): string
+        {
+            return self::DEFAULT_DISPLAY_NAME;
+        }
     }
 
     return;
@@ -48,6 +55,9 @@ if (!class_exists(BaseGatewaySettings::class)) {
 
 class PayUNiSettingsBase extends BaseGatewaySettings
 {
+    /** 後台／前台顯示用名稱，預設「統一金流」，可於設定覆寫 */
+    public const DEFAULT_DISPLAY_NAME = '統一金流';
+
     public $methodHandler = 'fluent_cart_payment_settings_payuni';
 
     public ?StoreSettings $storeSettings = null;
@@ -81,6 +91,8 @@ class PayUNiSettingsBase extends BaseGatewaySettings
             // follow_store | test | live
             'gateway_mode' => 'follow_store',
             'gateway_description' => '',
+            // 後台／訂閱詳情顯示名稱，空白則用 DEFAULT_DISPLAY_NAME（統一金流）
+            'gateway_display_name' => '',
             'test_mer_id' => '',
             'test_hash_key' => '',
             'test_hash_iv' => '',
@@ -89,6 +101,19 @@ class PayUNiSettingsBase extends BaseGatewaySettings
             'live_hash_iv' => '',
             'debug' => 'no',
         ];
+    }
+
+    /**
+     * 回傳付款閘道顯示名稱（供後台訂閱詳情、meta 標題等使用）。
+     * 可被設定 gateway_display_name 覆寫，預設為「統一金流」。
+     */
+    public function getDisplayName(): string
+    {
+        $name = (string) $this->get('gateway_display_name');
+
+        $name = $name !== '' ? $name : self::DEFAULT_DISPLAY_NAME;
+
+        return (string) __($name, 'fluentcart-payuni');
     }
 
     public function get($key = '')

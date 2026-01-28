@@ -296,8 +296,9 @@ final class SubscriptionPaymentProcessor
                 // 關鍵：把 subscription 狀態同步成 active，並確保有 next_billing_date。
                 // 否則後台會顯示「未付款」/「Invalid Date」，也不會進入我們的續扣 runner 條件。
                 SubscriptionService::syncSubscriptionStates($subscription, [
-                    'status' => Status::SUBSCRIPTION_ACTIVE,
-                    'current_payment_method' => 'payuni_subscription',
+                    'status'                  => Status::SUBSCRIPTION_ACTIVE,
+                    'current_payment_method'  => 'payuni_subscription',
+                    'vendor_subscription_id' => 'payuni_' . $subscription->id,
                 ]);
             }
         } catch (\Throwable $e) {

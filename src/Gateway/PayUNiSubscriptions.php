@@ -74,6 +74,31 @@ class PayUNiSubscriptions extends AbstractSubscriptionModule
     }
 
     /**
+     * 暫停訂閱（後台「暫停訂閱」按鈕）
+     *
+     * PayUNi 沒有遠端訂閱管理，僅需將本地訂閱狀態改為 paused。
+     * 實際更新由呼叫方（rest_pre_dispatch 或 FluentCart 核心）以
+     * SubscriptionService::syncSubscriptionStates 處理。
+     *
+     * @param array $data 請求資料
+     * @param object $order 訂單物件
+     * @param object $subscription 訂閱物件
+     * @return array
+     */
+    public function pauseSubscription($data, $order, $subscription)
+    {
+        Logger::info('PayUNi subscription pause requested', [
+            'subscription_id' => $subscription->id,
+            'order_id' => $order->id,
+        ]);
+
+        return [
+            'status' => 'success',
+            'message' => __('訂閱已暫停。', 'fluentcart-payuni'),
+        ];
+    }
+
+    /**
      * 取消訂閱（前台/後台手動取消）
      *
      * FluentCart 從前台或後台取消訂閱時會呼叫這個方法。

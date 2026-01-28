@@ -45,12 +45,14 @@ class PayUNiSubscriptionGateway extends AbstractPaymentGateway
 
     public function meta(): array
     {
+        $displayName = $this->settings->getDisplayName();
+
         return [
-            'title' => 'PayUNi 信用卡（定期定額）',
+            'title' => $displayName . __('（定期定額）', 'fluentcart-payuni'),
             'route' => $this->methodSlug,
             'slug' => $this->methodSlug,
-            'label' => 'PayUNi（訂閱）',
-            'admin_title' => 'PayUNi（訂閱 / 定期定額）',
+            'label' => $displayName . __('（訂閱）', 'fluentcart-payuni'),
+            'admin_title' => $displayName . __('（訂閱 / 定期定額）', 'fluentcart-payuni'),
             'description' => esc_html__('使用 PayUNi 信用卡定期定額付款（初次需 3D 驗證）。', 'fluentcart-payuni'),
             'logo' => BUYGO_FC_PAYUNI_URL . 'assets/payuni-logo.svg',
             'icon' => BUYGO_FC_PAYUNI_URL . 'assets/payuni-logo.svg',
@@ -184,6 +186,20 @@ class PayUNiSubscriptionGateway extends AbstractPaymentGateway
     public function processRefund($transaction, $amount, $args = [])
     {
         return (new PayUNiGateway())->processRefund($transaction, $amount, $args);
+    }
+
+    /**
+     * 訂閱詳情頁「獲取訂閱」旁可用的 PayUNi 後台連結。
+     * 統一金流商店後台登入為 https://www.payuni.com.tw/login ，交易動態明細需登入後於後台內操作。
+     * 預設導向 www 首頁，避免 bare 網域 DNS 無法解析；可透過 fluent_cart/subscription/url_payuni_subscription 覆寫。
+     *
+     * @param string $url 預設空字串
+     * @param array  $data 含 vendor_subscription_id, payment_mode, subscription
+     * @return string
+     */
+    public function getSubscriptionUrl($url, $data): string
+    {
+        return 'https://www.payuni.com.tw/';
     }
 }
 

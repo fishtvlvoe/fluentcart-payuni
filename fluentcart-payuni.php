@@ -94,6 +94,61 @@ function buygo_fc_payuni_bootstrap(): void
         return;
     }
 
+    // FluentCart 核心的「暫停訂閱」API 目前是 stub，直接回傳 "Not available yet"（422）。
+    // 攔截 PUT .../orders/{order}/subscriptions/{subscription}/pause，若為 payuni_subscription 則由本外掛處理並回傳成功。
+    add_filter('rest_pre_dispatch', function ($result, $server, $request) {
+        if (!($request instanceof \WP_REST_Request) || $request->get_method() !== 'PUT') {
+            return $result;
+        }
+
+        $route = $request->get_route();
+        if ($route === null || strpos($route, 'subscriptions') === false || substr($route, -6) !== '/pause') {
+            return $result;
+        }
+
+        $orderId      = $request->get_param('order');
+        $subscriptionId = $request->get_param('subscription');
+        if ((empty($orderId) || empty($subscriptionId)) && preg_match('#/orders/([^/]+)/subscriptions/([^/]+)/pause$#', $route, $m)) {
+            $orderId      = $m[1];
+            $subscriptionId = $m[2];
+        }
+        if (empty($orderId) || empty($subscriptionId)) {
+            return $result;
+        }
+
+        if (!class_exists(\FluentCart\App\Models\Subscription::class) || !class_exists(\FluentCart\App\Helpers\Status::class)) {
+            return $result;
+        }
+
+        $subscription = \FluentCart\App\Models\Subscription::query()->find((int) $subscriptionId);
+        if (!$subscription || (int) $subscription->parent_order_id !== (int) $orderId) {
+            return $result;
+        }
+
+        if ((string) $subscription->current_payment_method !== 'payuni_subscription') {
+            return $result;
+        }
+
+        $order = \FluentCart\App\Models\Order::query()->find((int) $orderId);
+        if (!$order) {
+            return $result;
+        }
+
+        $subModule = new \BuyGoFluentCart\PayUNi\Gateway\PayUNiSubscriptions();
+        $subModule->pauseSubscription([], $order, $subscription);
+
+        \FluentCart\App\Modules\Subscriptions\Services\SubscriptionService::syncSubscriptionStates($subscription, [
+            'status' => \FluentCart\App\Helpers\Status::SUBSCRIPTION_PAUSED,
+        ]);
+
+        $updated = \FluentCart\App\Models\Subscription::query()->find($subscription->id);
+
+        return new \WP_REST_Response([
+            'message'      => __('訂閱已暫停。', 'fluentcart-payuni'),
+            'subscription' => $updated,
+        ], 200);
+    }, 10, 3);
+
     // FluentCart 前台金額顯示：TWD 隱藏不必要的小數（例如 NT$30.00 → NT$30）
     add_filter('fluent_cart/hide_unnecessary_decimals', function ($hide, $context) {
         if (!class_exists(\FluentCart\Api\CurrencySettings::class)) {
@@ -144,6 +199,87 @@ function buygo_fc_payuni_bootstrap(): void
 
         return array_values($filtered);
     }, 20, 2);
+
+    // 訂閱詳情頁：為 PayUNi 訂閱注入「更多操作」（同步狀態、查看 PayUNi 後台）。
+    // subscription.url 已由 getSubscriptionUrl 提供；這裡補上 gateway_actions 供前端或未來擴充使用。
+    add_filter('fluent_cart/subscription/view', function ($subscription, $args) {
+        if (!is_object($subscription) || (string) ($subscription->current_payment_method ?? '') !== 'payuni_subscription') {
+            return $subscription;
+        }
+
+        $settings = new \BuyGoFluentCart\PayUNi\Gateway\PayUNiSettingsBase();
+        $gatewayDisplayName = $settings->getDisplayName();
+
+        // 供 FluentCart 訂閱詳情「View on X」等處顯示友善名稱（若 FluentCart 有讀此屬性）
+        $subscription->payment_method_display_name = $gatewayDisplayName;
+
+        // 讓 FluentCart 訂閱詳情頁的「More」下拉（含取消訂閱）顯示：需有 vendor_subscription_id
+        if (empty($subscription->vendor_subscription_id)) {
+            $subscription->vendor_subscription_id = 'payuni_' . ($subscription->id ?? 0);
+        }
+
+        $url = '';
+        if (function_exists('apply_filters')) {
+            $mode = isset($subscription->order) && is_object($subscription->order)
+                ? ($subscription->order->mode ?? '')
+                : '';
+            $url = (string) apply_filters('fluent_cart/subscription/url_payuni_subscription', '', [
+                'vendor_subscription_id' => $subscription->vendor_subscription_id ?? '',
+                'payment_mode'           => $mode,
+                'subscription'           => $subscription,
+            ]);
+        }
+
+        $subscription->payuni_gateway_actions = [
+            [
+                'label'   => __('同步訂閱狀態', 'fluentcart-payuni'),
+                'action'  => 'fetch',
+                'tooltip' => __('從本站重新載入訂閱狀態與下次扣款日', 'fluentcart-payuni'),
+            ],
+            [
+                'label'   => sprintf(__('查看 %s 交易明細', 'fluentcart-payuni'), $gatewayDisplayName),
+                'type'    => 'link',
+                'url'     => $url ?: 'https://www.payuni.com.tw/',
+                'tooltip' => sprintf(__('於新分頁開啟 %s 商店後台', 'fluentcart-payuni'), $gatewayDisplayName),
+            ],
+        ];
+
+        // 供訂閱詳情頁對應 PayUNi 回傳資訊的顯示用資料（可依需要擴充：交易編號、卡號末四碼等）
+        $subscription->payuni_display = (object) [
+            'gateway_display_name' => $gatewayDisplayName,
+            'next_billing_date'    => isset($subscription->next_billing_date) ? $subscription->next_billing_date : null,
+            'status'               => isset($subscription->status) ? $subscription->status : null,
+        ];
+
+        return $subscription;
+    }, 10, 2);
+
+    /**
+     * 訂閱詳情頁 PayUNi 操作 UI：僅在 FluentCart 後台 (page=fluent-cart) 載入注入用 JS，
+     * 當 hash 為 #/subscriptions/{id} 且該訂閱為 payuni_subscription 時顯示「同步訂閱狀態」「查看 PayUNi 交易明細」。
+     */
+    add_action('admin_enqueue_scripts', function ($hook) {
+        if (!isset($_GET['page']) || $_GET['page'] !== 'fluent-cart') {
+            return;
+        }
+
+        $script_url = BUYGO_FC_PAYUNI_URL . 'assets/js/payuni-subscription-detail.js';
+        wp_enqueue_script(
+            'buygo-fc-payuni-subscription-detail',
+            $script_url,
+            [],
+            BUYGO_FC_PAYUNI_VERSION,
+            true
+        );
+
+        $settings = new \BuyGoFluentCart\PayUNi\Gateway\PayUNiSettingsBase();
+        $rest_base = rest_url('fluent-cart/v2/');
+        wp_localize_script('buygo-fc-payuni-subscription-detail', 'buygo_fc_payuni_subscription_detail', [
+            'restUrl'      => $rest_base,
+            'nonce'        => wp_create_nonce('wp_rest'),
+            'displayName'  => $settings->getDisplayName(),
+        ]);
+    }, 20);
 
     add_action('fluent_cart/register_payment_methods', function ($args) {
         try {
