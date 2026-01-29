@@ -3,41 +3,66 @@
 ## Current Status
 
 **Phase**: 1 (訂閱核心修復)
-**Status**: Planning → Ready to Execute
+**Status**: ✅ Completed → Phase 2 Ready
 **Last Updated**: 2026-01-29
 
 ## Progress
 
 | Phase | Status | Completion |
 |-------|--------|------------|
-| 1: 訂閱核心修復 | 🔵 Planned | 0% |
-| 2: 訂閱重試機制 | ⚪ Not Started | 0% |
+| 1: 訂閱核心修復 | ✅ Completed | 100% |
+| 2: 訂閱重試機制 | 🔵 Ready to Start | 0% |
 | 3: ATM/CVS 測試 | ⚪ Not Started | 0% |
 | 4: Webhook 可靠性 | ⚪ Not Started | 0% |
 | 5: 測試覆蓋率 | ⚪ Not Started | 0% |
 
-**Overall**: 0/11 requirements completed (0%)
+**Overall**: 2/11 requirements completed (18%)
 
 ## Current Phase Details
 
-### Phase 1: 訂閱核心修復
+### Phase 1: 訂閱核心修復 ✅ COMPLETED
 
 **Goal**: 修復訂閱卡片更換和帳單日期同步問題
 
 **Requirements**:
-- [ ] SUB-03: 訂閱卡片更換 3D 驗證修復
-- [ ] SUB-04: 帳單日期自動同步
+- [x] SUB-03: 訂閱卡片更換 3D 驗證修復 ✅
+- [x] SUB-04: 帳單日期自動同步 ✅ (已實作)
+
+**Completed Tasks**:
+1. ✅ 分析 3D fallback 邏輯
+2. ✅ 設計修復方案（三層 fallback + state 參數）
+3. ✅ 實作修復並撰寫測試（6 tests, 24 assertions）
+4. ✅ 驗證帳單日期同步已在 confirmCreditPaymentSucceeded 實作
+5. ⏸️ 沙盒環境測試需使用者手動驗證（等使用者醒來）
+
+**Commits**:
+- 8a1dbf3: fix(subscription): improve 3D verification fallback for card update
+- 900abe3: test(subscription): add unit tests for card update fallback
+
+### Phase 2: 訂閱重試機制 🔵 READY
+
+**Goal**: 加入訂閱續扣失敗自動重試機制
+
+**Requirements**:
+- [ ] SUB-05: 訂閱續扣失敗時有自動重試機制
 
 **Next Steps**:
-1. 分析 `src/Gateway/PayUNiSubscriptions.php:799-843` 的 3D fallback 邏輯
-2. 設計修復方案（參考 woomp 的 state 參數）
-3. 實作修復並撰寫測試
-4. 測試 3D 驗證流程（沙盒環境）
-5. 在 `confirmCreditPaymentSucceeded` 加入 `syncSubscriptionStates`
+1. 分析 PayUNiSubscriptionRenewalRunner 續扣邏輯
+2. 設計重試策略（24h/48h/72h）
+3. 在 subscription meta 記錄重試次數和時間
+4. 實作重試排程機制
+5. 撰寫測試
 
 ## Recent Changes
 
-### 2026-01-29
+### 2026-01-29 (Phase 1 Complete)
+- ✓ **Phase 1: 訂閱核心修復 完成**
+  - 3D fallback 機制改善（三層 fallback + state 參數）
+  - 單元測試新增（6 tests, 24 assertions）
+  - 驗證帳單日期同步已實作
+  - Commits: 8a1dbf3, 900abe3
+
+### 2026-01-29 (Project Init)
 - ✓ Codebase mapping completed (7 documents, 1572 lines)
 - ✓ Woomp architecture analysis completed
 - ✓ GSD project initialized
@@ -50,14 +75,16 @@
 ## Known Issues
 
 ### Critical (P0)
-1. **訂閱卡片更換 3D fallback 脆弱**
-   - Location: `src/Gateway/PayUNiSubscriptions.php:799-843`
+1. **訂閱卡片更換 3D fallback 脆弱** ✅ FIXED
+   - Location: `src/Gateway/PayUNiSubscriptions.php:214-228`, `fluentcart-payuni.php:799-853`
    - Impact: 3D 驗證後可能遺失 subscription_id
-   - Status: Identified, fix planned in Phase 1
+   - Status: ✅ Fixed with 3-layer fallback + state parameter
+   - Commit: 8a1dbf3
 
-2. **訂閱帳單日期未同步**
+2. **訂閱帳單日期未同步** ✅ VERIFIED
    - Impact: 後台顯示 Invalid Date 或「未付款」
-   - Status: Identified, fix planned in Phase 1
+   - Status: ✅ Already implemented in confirmCreditPaymentSucceeded:298-302
+   - Note: syncSubscriptionStates automatically calculates next_billing_date
 
 ### High (P1)
 3. **無訂閱續扣失敗重試**

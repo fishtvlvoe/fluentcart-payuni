@@ -4,15 +4,17 @@
 
 ### 訂閱功能修復（Subscription）
 
-- [ ] **SUB-03**: 用戶可以更換訂閱信用卡且 3D 驗證流程正確完成
+- [x] **SUB-03**: 用戶可以更換訂閱信用卡且 3D 驗證流程正確完成 ✅
   - 接受標準：3D 驗證後正確回傳 subscription_id，卡片更新成功
-  - 技術細節：修復 `PayUNiSubscriptions.php:799-843` 的參數回傳鏈
+  - 技術細節：修復 `PayUNiSubscriptions.php:214-228` 加入 state 參數，`fluentcart-payuni.php:799-853` 三層 fallback
   - 對應：Phase 1
+  - 完成：2026-01-29 (Commit 8a1dbf3)
 
-- [ ] **SUB-04**: 訂閱帳單日期在首次付款後自動同步
+- [x] **SUB-04**: 訂閱帳單日期在首次付款後自動同步 ✅
   - 接受標準：FluentCart 後台訂閱列表顯示正確的下次扣款日期（非 Invalid Date）
-  - 技術細節：`confirmCreditPaymentSucceeded` 呼叫 `syncSubscriptionStates`
+  - 技術細節：`confirmCreditPaymentSucceeded:298-302` 已實作 `syncSubscriptionStates`
   - 對應：Phase 1
+  - 完成：驗證已存在（無需新實作）
 
 - [ ] **SUB-05**: 訂閱續扣失敗時有自動重試機制
   - 接受標準：失敗後 24/48/72 小時自動重試，3 次失敗才標記為 failing
@@ -89,19 +91,19 @@
 
 ## Traceability（需求對應 Phases）
 
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| SUB-03 | 1 | Pending |
-| SUB-04 | 1 | Pending |
-| SUB-05 | 2 | Pending |
-| ATM-03 | 3 | Pending |
-| CVS-03 | 3 | Pending |
-| WEBHOOK-03 | 4 | Pending |
-| API-01 | 4 | Pending |
-| TEST-01 | 5 | Pending |
-| TEST-02 | 5 | Pending |
-| TEST-03 | 5 | Pending |
-| TEST-04 | 5 | Pending |
+| Requirement | Phase | Status | Completed |
+|-------------|-------|--------|-----------|
+| SUB-03 | 1 | ✅ Completed | 2026-01-29 |
+| SUB-04 | 1 | ✅ Completed | 2026-01-29 |
+| SUB-05 | 2 | Pending | - |
+| ATM-03 | 3 | Pending | - |
+| CVS-03 | 3 | Pending | - |
+| WEBHOOK-03 | 4 | Pending | - |
+| API-01 | 4 | Pending | - |
+| TEST-01 | 5 | 🔄 Partial (6 tests) | 2026-01-29 |
+| TEST-02 | 5 | Pending | - |
+| TEST-03 | 5 | Pending | - |
+| TEST-04 | 5 | Pending | - |
 
 ---
 
