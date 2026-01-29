@@ -47,4 +47,20 @@ jQuery(document).ready(function($) {
         $btn.text(payuniSettings.labels.copySuccess);
         setTimeout(() => $btn.text(originalText), 2000);
     });
+
+    // Toggle collapsible sections
+    $('.section-toggle').on('click', function() {
+        const $header = $(this);
+        const sectionId = $header.data('section');
+        const $content = $('#' + sectionId);
+        const $icon = $header.find('.dashicons');
+
+        $content.slideToggle(300);
+
+        if ($icon.hasClass('dashicons-arrow-down')) {
+            $icon.removeClass('dashicons-arrow-down').addClass('dashicons-arrow-up');
+        } else {
+            $icon.removeClass('dashicons-arrow-up').addClass('dashicons-arrow-down');
+        }
+    });
 });

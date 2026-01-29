@@ -278,17 +278,118 @@ class SettingsPage
                 </p>
             </div>
 
-            <!-- Help Text -->
+            <!-- Quick Links Section -->
             <div class="settings-section">
-                <p class="description">
-                    <?php
-                    $settingsUrl = admin_url('admin.php?page=fluent-cart-payment-settings');
-                    printf(
-                        __('完整設定請至 <a href="%s">FluentCart → 支付方式 → PayUNi</a>', 'fluentcart-payuni'),
-                        esc_url($settingsUrl)
-                    );
-                    ?>
-                </p>
+                <h2><?php echo esc_html__('快速連結', 'fluentcart-payuni'); ?></h2>
+                <div class="quick-links-grid">
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=fluent-cart-payment-settings')); ?>" class="quick-link-card">
+                        <span class="dashicons dashicons-admin-settings"></span>
+                        <div>
+                            <strong><?php echo esc_html__('編輯 PayUNi 憑證', 'fluentcart-payuni'); ?></strong>
+                            <p><?php echo esc_html__('修改 MerID、Hash Key、Hash IV', 'fluentcart-payuni'); ?></p>
+                        </div>
+                    </a>
+
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=payuni-webhook-logs')); ?>" class="quick-link-card">
+                        <span class="dashicons dashicons-list-view"></span>
+                        <div>
+                            <strong><?php echo esc_html__('Webhook 記錄', 'fluentcart-payuni'); ?></strong>
+                            <p><?php echo esc_html__('查看付款通知記錄', 'fluentcart-payuni'); ?></p>
+                        </div>
+                    </a>
+
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=fluent-cart#/orders')); ?>" class="quick-link-card">
+                        <span class="dashicons dashicons-cart"></span>
+                        <div>
+                            <strong><?php echo esc_html__('訂單列表', 'fluentcart-payuni'); ?></strong>
+                            <p><?php echo esc_html__('查看 PayUNi 交易資訊', 'fluentcart-payuni'); ?></p>
+                        </div>
+                    </a>
+
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=fluent-cart#/subscriptions')); ?>" class="quick-link-card">
+                        <span class="dashicons dashicons-update"></span>
+                        <div>
+                            <strong><?php echo esc_html__('訂閱列表', 'fluentcart-payuni'); ?></strong>
+                            <p><?php echo esc_html__('管理自動續扣訂閱', 'fluentcart-payuni'); ?></p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Configuration Guidance Section -->
+            <div class="settings-section">
+                <h2 class="section-toggle" data-section="config-guide">
+                    <span class="dashicons dashicons-arrow-down"></span>
+                    <?php echo esc_html__('設定指南', 'fluentcart-payuni'); ?>
+                </h2>
+                <div class="section-content" id="config-guide" style="display: none;">
+                    <h3><?php echo esc_html__('如何取得 PayUNi 憑證', 'fluentcart-payuni'); ?></h3>
+                    <ol>
+                        <li><?php echo esc_html__('登入 ', 'fluentcart-payuni'); ?><a href="https://www.payuni.com.tw/" target="_blank"><?php echo esc_html__('PayUNi 商店後台', 'fluentcart-payuni'); ?></a></li>
+                        <li><?php echo esc_html__('前往「API 串接」→「商店資訊」', 'fluentcart-payuni'); ?></li>
+                        <li><?php echo esc_html__('複製 MerID（商店代號）', 'fluentcart-payuni'); ?></li>
+                        <li><?php echo esc_html__('複製 Hash Key 和 Hash IV（API 金鑰）', 'fluentcart-payuni'); ?></li>
+                        <li><?php echo esc_html__('將憑證貼到 ', 'fluentcart-payuni'); ?><a href="<?php echo esc_url(admin_url('admin.php?page=fluent-cart-payment-settings')); ?>"><?php echo esc_html__('FluentCart 支付方式設定', 'fluentcart-payuni'); ?></a></li>
+                    </ol>
+
+                    <h3><?php echo esc_html__('如何切換測試/正式環境', 'fluentcart-payuni'); ?></h3>
+                    <p><?php echo esc_html__('在 ', 'fluentcart-payuni'); ?><a href="<?php echo esc_url(admin_url('admin.php?page=fluent-cart-payment-settings')); ?>"><?php echo esc_html__('FluentCart 支付方式 → PayUNi 設定', 'fluentcart-payuni'); ?></a><?php echo esc_html__(' 中：', 'fluentcart-payuni'); ?></p>
+                    <ul>
+                        <li><strong><?php echo esc_html__('跟隨商店：', 'fluentcart-payuni'); ?></strong><?php echo esc_html__(' 依照 FluentCart 訂單模式（推薦）', 'fluentcart-payuni'); ?></li>
+                        <li><strong><?php echo esc_html__('強制測試：', 'fluentcart-payuni'); ?></strong><?php echo esc_html__(' 總是使用沙盒環境（開發用）', 'fluentcart-payuni'); ?></li>
+                        <li><strong><?php echo esc_html__('強制正式：', 'fluentcart-payuni'); ?></strong><?php echo esc_html__(' 總是使用正式環境（不建議）', 'fluentcart-payuni'); ?></li>
+                    </ul>
+
+                    <h3><?php echo esc_html__('設定 Webhook URL', 'fluentcart-payuni'); ?></h3>
+                    <p><?php echo esc_html__('將上方的 NotifyURL 複製到 PayUNi 後台：', 'fluentcart-payuni'); ?></p>
+                    <ol>
+                        <li><?php echo esc_html__('登入 PayUNi 後台', 'fluentcart-payuni'); ?></li>
+                        <li><?php echo esc_html__('前往「API 串接」→「Webhook 設定」', 'fluentcart-payuni'); ?></li>
+                        <li><?php echo esc_html__('貼上 NotifyURL', 'fluentcart-payuni'); ?></li>
+                        <li><?php echo esc_html__('儲存後點擊上方「測試連線」按鈕驗證', 'fluentcart-payuni'); ?></li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- Troubleshooting Section -->
+            <div class="settings-section">
+                <h2 class="section-toggle" data-section="troubleshooting">
+                    <span class="dashicons dashicons-arrow-down"></span>
+                    <?php echo esc_html__('常見問題排查', 'fluentcart-payuni'); ?>
+                </h2>
+                <div class="section-content" id="troubleshooting" style="display: none;">
+                    <h3><?php echo esc_html__('❓ Webhook 測試失敗', 'fluentcart-payuni'); ?></h3>
+                    <ul>
+                        <li><?php echo esc_html__('檢查主機防火牆是否允許 PayUNi IP', 'fluentcart-payuni'); ?></li>
+                        <li><?php echo esc_html__('確認網站沒有使用 Basic Auth 保護', 'fluentcart-payuni'); ?></li>
+                        <li><?php echo esc_html__('檢查 SSL 憑證是否有效（正式環境必須使用 HTTPS）', 'fluentcart-payuni'); ?></li>
+                        <li><?php echo esc_html__('查看 ', 'fluentcart-payuni'); ?><a href="<?php echo esc_url(admin_url('admin.php?page=payuni-webhook-logs')); ?>"><?php echo esc_html__('Webhook 記錄', 'fluentcart-payuni'); ?></a><?php echo esc_html__(' 確認是否有錯誤', 'fluentcart-payuni'); ?></li>
+                    </ul>
+
+                    <h3><?php echo esc_html__('❓ 付款後訂單狀態未更新', 'fluentcart-payuni'); ?></h3>
+                    <ul>
+                        <li><?php echo esc_html__('確認 Webhook URL 已正確設定在 PayUNi 後台', 'fluentcart-payuni'); ?></li>
+                        <li><?php echo esc_html__('檢查 ', 'fluentcart-payuni'); ?><a href="<?php echo esc_url(admin_url('admin.php?page=payuni-webhook-logs')); ?>"><?php echo esc_html__('Webhook 記錄', 'fluentcart-payuni'); ?></a><?php echo esc_html__(' 是否有收到通知', 'fluentcart-payuni'); ?></li>
+                        <li><?php echo esc_html__('如果記錄狀態為「失敗」，查看錯誤訊息', 'fluentcart-payuni'); ?></li>
+                        <li><?php echo esc_html__('如果沒有記錄，使用上方「測試連線」按鈕驗證 Webhook 可達性', 'fluentcart-payuni'); ?></li>
+                    </ul>
+
+                    <h3><?php echo esc_html__('❓ 憑證狀態顯示「未填寫」', 'fluentcart-payuni'); ?></h3>
+                    <ul>
+                        <li><?php echo esc_html__('前往 ', 'fluentcart-payuni'); ?><a href="<?php echo esc_url(admin_url('admin.php?page=fluent-cart-payment-settings')); ?>"><?php echo esc_html__('FluentCart 支付方式設定', 'fluentcart-payuni'); ?></a></li>
+                        <li><?php echo esc_html__('找到「PayUNi 統一金流」並點擊設定', 'fluentcart-payuni'); ?></li>
+                        <li><?php echo esc_html__('根據目前模式填寫對應的憑證（測試或正式）', 'fluentcart-payuni'); ?></li>
+                        <li><?php echo esc_html__('儲存後重新整理此頁面', 'fluentcart-payuni'); ?></li>
+                    </ul>
+
+                    <h3><?php echo esc_html__('❓ 訂閱自動續扣失敗', 'fluentcart-payuni'); ?></h3>
+                    <ul>
+                        <li><?php echo esc_html__('前往 ', 'fluentcart-payuni'); ?><a href="<?php echo esc_url(admin_url('admin.php?page=fluent-cart#/subscriptions')); ?>"><?php echo esc_html__('FluentCart 訂閱列表', 'fluentcart-payuni'); ?></a></li>
+                        <li><?php echo esc_html__('點擊失敗的訂閱查看 PayUNi Meta Box', 'fluentcart-payuni'); ?></li>
+                        <li><?php echo esc_html__('檢查續扣歷史和失敗原因', 'fluentcart-payuni'); ?></li>
+                        <li><?php echo esc_html__('常見原因：信用卡過期、餘額不足、需要 3D 驗證（不應發生於續扣）', 'fluentcart-payuni'); ?></li>
+                    </ul>
+                </div>
             </div>
         </div>
         <?php

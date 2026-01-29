@@ -33,3 +33,41 @@ if (!function_exists('wp_json_encode')) {
     }
 }
 
+if (!function_exists('site_url')) {
+    function site_url($path = '', $scheme = null)
+    {
+        $url = 'http://example.com';
+        if ($path && is_string($path)) {
+            $url .= '/' . ltrim($path, '/');
+        }
+        return $url;
+    }
+}
+
+if (!function_exists('add_query_arg')) {
+    function add_query_arg($args, $url = '')
+    {
+        if (empty($url)) {
+            $url = 'http://example.com';
+        }
+
+        $parsed = parse_url($url);
+        $query = isset($parsed['query']) ? $parsed['query'] : '';
+
+        parse_str($query, $queryParams);
+
+        if (is_array($args)) {
+            $queryParams = array_merge($queryParams, $args);
+        }
+
+        $newQuery = http_build_query($queryParams);
+
+        $scheme = isset($parsed['scheme']) ? $parsed['scheme'] . '://' : '';
+        $host = isset($parsed['host']) ? $parsed['host'] : '';
+        $path = isset($parsed['path']) ? $parsed['path'] : '';
+        $fragment = isset($parsed['fragment']) ? '#' . $parsed['fragment'] : '';
+
+        return $scheme . $host . $path . ($newQuery ? '?' . $newQuery : '') . $fragment;
+    }
+}
+
