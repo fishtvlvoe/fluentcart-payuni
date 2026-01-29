@@ -107,11 +107,11 @@ Plans:
   4. Recent webhook events summary visible (latest 5 entries)
   5. Statistics use transient cache to avoid repeated queries
   6. Admin assets only load on FluentCart pages (not globally)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 10-01: TBD
-- [ ] 10-02: TBD
+- [ ] 10-01-PLAN.md — Statistics service with transient caching and REST API endpoint
+- [ ] 10-02-PLAN.md — Dashboard admin page with Chart.js visualizations
 
 #### Phase 11: User Guidance and Documentation
 **Goal**: Merchants can quickly find information and understand plugin features
@@ -152,8 +152,8 @@ Phases execute in numeric order: 6 → 7 → 8 → 9 → 10 → 11
 | 6. Meta Storage & Order Detail | v1.1 | 2/2 | Complete | 2026-01-29 |
 | 7. Webhook Log Viewer UI | v1.1 | 2/2 | Complete | 2026-01-29 |
 | 8. Settings Page Integration | v1.1 | 2/2 | Complete | 2026-01-29 |
-| 9. Subscription Detail Enhancement | v1.1 | 0/2 | Ready | - |
-| 10. Dashboard Statistics & Monitoring | v1.1 | 0/TBD | Not started | - |
+| 9. Subscription Detail Enhancement | v1.1 | 2/2 | Complete | 2026-01-29 |
+| 10. Dashboard Statistics & Monitoring | v1.1 | 0/2 | Ready | - |
 | 11. User Guidance and Documentation | v1.1 | 0/TBD | Not started | - |
 
 ---
