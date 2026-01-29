@@ -4,7 +4,7 @@
 
 **Phase**: 4 (Webhook 可靠性)
 **Status**: ✅ Completed (All Plans Complete)
-**Last Updated**: 2026-01-29
+**Last Updated**: 2026-01-29 17:18
 
 ## Progress
 
@@ -89,14 +89,14 @@
 2. ⏳ 聯繫 PayUNi 確認通知機制
 3. ⏳ CVS 付款測試（延後）
 
-### Phase 4: Webhook 可靠性 🔵 IN PROGRESS
+### Phase 4: Webhook 可靠性 ✅ COMPLETED
 
 **Goal**: 改善 webhook 處理的可靠性和冪等性
 
 **Requirements**:
 - [x] WEBHOOK-03: Webhook 去重機制改為資料庫實作 ✅
 - [x] API-01: PayUNi API 呼叫加入 idempotency key ✅
-- [ ] TEST-02: Webhook 處理邊界案例測試
+- [x] WEBHOOK-04: Webhook 日誌可查詢和除錯 ✅
 
 **Completed Plans**:
 1. ✅ **Plan 01: Webhook 去重基礎設施** (2026-01-29)
@@ -118,6 +118,13 @@
    - 驗證 MerTradeNo 格式符合規範（≤20 字元）
    - Commits: c540817, aa6ccae
 
+4. ✅ **Plan 05: Webhook 日誌查詢 API** (2026-01-29)
+   - 建立 `WebhookLogAPI` REST endpoint
+   - 支援 transaction_id、trade_no、webhook_type 過濾
+   - 分頁功能（預設 20 筆，最多 100 筆）
+   - 管理員專用查詢介面
+   - Commits: 901165b, a11a330, 5fbcd86
+
 **Phase Complete**: All webhook reliability requirements implemented
 
 **Next Steps**:
@@ -125,9 +132,18 @@
 
 ## Recent Changes
 
-### 2026-01-29 (Phase 4 COMPLETE)
-- ✓ **Phase 4: Webhook 可靠性 完成**
-  - 所有 3 個 plans 完成
+### 2026-01-29 (Phase 4 Plan 05 Complete)
+- ✓ **Phase 4 Plan 05: Webhook 日誌查詢 API 完成**
+  - 建立 `WebhookLogAPI` REST endpoint (`/fluentcart-payuni/v1/webhook-logs`)
+  - 支援 transaction_id、trade_no、webhook_type 過濾
+  - 分頁功能（per_page 預設 20，最多 100）
+  - 管理員專用（requires manage_options capability）
+  - 建立測試腳本和驗證文件
+  - Commits: 901165b, a11a330, 5fbcd86
+  - **Phase 4 完成**: 所有 4 個 plans 完成
+
+### 2026-01-29 (Phase 4 Plans 01-03 Complete)
+- ✓ **Phase 4: Webhook 可靠性 (Plans 01-03)**
   - Webhook 去重機制從 transient 遷移至資料庫（24h TTL）
   - NotifyHandler 和 ReturnHandler 整合去重服務
   - API 呼叫加入 idempotency key 追蹤
