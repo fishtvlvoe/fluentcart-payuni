@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 7 of 11 (Webhook Log Viewer UI)
-Plan: 1 of 2 complete (07-01 ✓)
-Status: In progress
-Last activity: 2026-01-29 — Completed 07-01-PLAN.md (Webhook Log Viewer 基礎架構)
+Plan: 2 of 2 complete (07-01 ✓, 07-02 ✓)
+Status: Phase complete
+Last activity: 2026-01-29 — Completed 07-02-PLAN.md (Webhook Log Viewer 前端實作)
 
-Progress: [█████████░] 23% (v1.1 - 3/13 plans complete, 1/6 phases complete)
+Progress: [███████████] 31% (v1.1 - 4/13 plans complete, 2/6 phases complete)
 
 ## Performance Metrics
 
@@ -39,9 +39,9 @@ Progress: [█████████░] 23% (v1.1 - 3/13 plans complete, 1/6 
 - 81 commits across 5 phases
 
 **v1.1 Progress:**
-- Plans completed: 3/13
-- Average duration: 3 min (06-01: 2 min, 06-02: 3 min, 07-01: 3.5 min)
-- Phases completed: 1/6 (Phase 6: 2/2 plans complete, Phase 7: 1/2 plans complete)
+- Plans completed: 4/13
+- Average duration: 3 min (06-01: 2 min, 06-02: 3 min, 07-01: 3.5 min, 07-02: 3 min)
+- Phases completed: 2/6 (Phase 6: 2/2 complete, Phase 7: 2/2 complete)
 
 ## Accumulated Context
 
@@ -63,6 +63,9 @@ Recent decisions affecting v1.1 work:
 - **LONGTEXT for raw_payload (07-01)**: Use LONGTEXT instead of TEXT/MEDIUMTEXT for webhook payloads (4GB limit ensures no truncation)
 - **webhook_status column (07-01)**: Single enum column ('processed', 'duplicate', 'failed', 'pending') instead of multiple boolean flags (easier to query and extend)
 - **manage_fluentcart capability (07-01)**: Allow FluentCart shop managers webhook log access without full admin privileges
+- **jQuery for admin UI (07-02)**: Use jQuery for WordPress admin compatibility instead of vanilla JS
+- **Store payload only for new webhooks (07-02)**: Duplicates marked but no payload stored to save database space
+- **JSON_UNESCAPED_UNICODE (07-02)**: Support Chinese characters in webhook payloads
 
 Full decision log: PROJECT.md Key Decisions table
 
@@ -88,11 +91,11 @@ None yet (v1.1 just started)
 
 ## Session Continuity
 
-Last session: 2026-01-29 21:05
-Stopped at: Completed 07-01-PLAN.md (Webhook Log Viewer 基礎架構)
+Last session: 2026-01-29 21:07
+Stopped at: Completed 07-02-PLAN.md (Webhook Log Viewer 前端實作)
 Resume file: None
 
-**Next action:** Execute 07-02-PLAN.md (Webhook Log Viewer 前端實作)
+**Next action:** Phase 7 complete. Review ROADMAP.md for next phase.
 
 ---
 
