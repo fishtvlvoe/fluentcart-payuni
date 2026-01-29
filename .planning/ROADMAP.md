@@ -77,8 +77,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 08-01-PLAN.md — Settings page with credential status, webhook URLs, and reachability test
-- [ ] 08-02-PLAN.md — User guidance, quick links, troubleshooting section, and unit tests
+- [x] 08-01-PLAN.md — Settings page with credential status, webhook URLs, and reachability test
+- [x] 08-02-PLAN.md — User guidance, quick links, troubleshooting section, and unit tests
 
 #### Phase 9: Subscription Detail Enhancement
 **Goal**: Merchants can monitor subscription health and renewal history
@@ -151,7 +151,7 @@ Phases execute in numeric order: 6 → 7 → 8 → 9 → 10 → 11
 |-------|-----------|----------------|--------|-----------|
 | 6. Meta Storage & Order Detail | v1.1 | 2/2 | Complete | 2026-01-29 |
 | 7. Webhook Log Viewer UI | v1.1 | 2/2 | Complete | 2026-01-29 |
-| 8. Settings Page Integration | v1.1 | 0/2 | Ready to execute | - |
+| 8. Settings Page Integration | v1.1 | 2/2 | Complete | 2026-01-29 |
 | 9. Subscription Detail Enhancement | v1.1 | 0/TBD | Not started | - |
 | 10. Dashboard Statistics & Monitoring | v1.1 | 0/TBD | Not started | - |
 | 11. User Guidance and Documentation | v1.1 | 0/TBD | Not started | - |

@@ -17,11 +17,11 @@ FluentCart 後台完整整合 — 在 FluentCart 後台頁面中顯示 PayUNi �
 
 ### Webhook 日誌查看器
 
-- [ ] **WEBHOOK-04**: 在 WP 後台建立「PayUNi → Webhook 日誌」選單頁面
-- [ ] **WEBHOOK-05**: 列表顯示 Webhook 事件(時間、類型、transaction_id、狀態)
-- [ ] **WEBHOOK-06**: 提供搜尋和篩選功能(日期範圍、webhook 類型、狀態)
-- [ ] **WEBHOOK-07**: 點擊事件可查看完整 payload 和回應(modal 或詳情頁)
-- [ ] **WEBHOOK-08**: 列表使用分頁和 eager loading(避免 N+1 查詢問題)
+- [x] **WEBHOOK-04**: 在 WP 後台建立「PayUNi → Webhook 日誌」選單頁面
+- [x] **WEBHOOK-05**: 列表顯示 Webhook 事件(時間、類型、transaction_id、狀態)
+- [x] **WEBHOOK-06**: 提供搜尋和篩選功能(日期範圍、webhook 類型、狀態)
+- [x] **WEBHOOK-07**: 點擊事件可查看完整 payload 和回應(modal 或詳情頁)
+- [x] **WEBHOOK-08**: 列表使用分頁和 eager loading(避免 N+1 查詢問題)
 
 ### 訂閱頁面整合
 
@@ -40,11 +40,11 @@ FluentCart 後台完整整合 — 在 FluentCart 後台頁面中顯示 PayUNi �
 
 ### 設定頁面整合
 
-- [ ] **SETTING-01**: 在 WP 後台建立「PayUNi → 設定」選單頁面
-- [ ] **SETTING-02**: 提供測試/正式環境快速切換介面
-- [ ] **SETTING-03**: 顯示 Webhook URL 並提供可達性測試按鈕
-- [ ] **SETTING-04**: 提供 API 金鑰管理介面(顯示/隱藏、重新生成)
-- [ ] **SETTING-05**: 設定檢查功能(檢查必要欄位是否填寫、Webhook URL 是否可達)
+- [x] **SETTING-01**: 在 WP 後台建立「PayUNi → 設定」選單頁面
+- [x] **SETTING-02**: 顯示測試/正式環境狀態並提供切換指引(實際切換在 FluentCart 支付方式設定)
+- [x] **SETTING-03**: 顯示 Webhook URL 並提供可達性測試按鈕
+- [x] **SETTING-04**: 顯示 API 金鑰填寫狀態(filled/empty 指示器,實際管理在 FluentCart 設定)
+- [x] **SETTING-05**: 設定檢查功能(檢查必要欄位是否填寫、Webhook URL 是否可達、提供故障排查指南)
 
 ### 使用者引導和說明
 
@@ -57,9 +57,9 @@ FluentCart 後台完整整合 — 在 FluentCart 後台頁面中顯示 PayUNi �
 ### 基礎設施和效能
 
 - [x] **INFRA-01**: 確保 hook priority 正確(FluentCart 載入後再初始化整合)
-- [ ] **INFRA-02**: 所有 REST API endpoint 加入 permission_callback(管理員或 shop_manager)
-- [ ] **INFRA-03**: 列表查詢使用 eager loading(避免 N+1 查詢)
-- [ ] **INFRA-04**: admin_enqueue_scripts 只在相關頁面載入資源(避免全域載入)
+- [x] **INFRA-02**: 所有 REST API endpoint 加入 permission_callback(管理員或 shop_manager)
+- [x] **INFRA-03**: 列表查詢使用 eager loading(避免 N+1 查詢)
+- [x] **INFRA-04**: admin_enqueue_scripts 只在相關頁面載入資源(避免全域載入)
 - [ ] **INFRA-05**: 使用 Vue 3 + Element Plus(與 FluentCart 後台一致)
 
 ## v1.2 Requirements (Deferred)
@@ -107,11 +107,11 @@ FluentCart 後台完整整合 — 在 FluentCart 後台頁面中顯示 PayUNi �
 | WEBHOOK-08 | Phase 7 | Complete |
 | INFRA-02 | Phase 7 | Complete |
 | INFRA-03 | Phase 7 | Complete |
-| SETTING-01 | Phase 8 | Pending |
-| SETTING-02 | Phase 8 | Pending |
-| SETTING-03 | Phase 8 | Pending |
-| SETTING-04 | Phase 8 | Pending |
-| SETTING-05 | Phase 8 | Pending |
+| SETTING-01 | Phase 8 | Complete |
+| SETTING-02 | Phase 8 | Complete |
+| SETTING-03 | Phase 8 | Complete |
+| SETTING-04 | Phase 8 | Complete |
+| SETTING-05 | Phase 8 | Complete |
 | SUB-06 | Phase 9 | Pending |
 | SUB-07 | Phase 9 | Pending |
 | SUB-08 | Phase 9 | Pending |
