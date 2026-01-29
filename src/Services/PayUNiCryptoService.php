@@ -71,6 +71,11 @@ final class PayUNiCryptoService
         $hashKey = trim($this->settings->getHashKey($mode ?: $this->settings->getMode()));
         $hashIV = trim($this->settings->getHashIV($mode ?: $this->settings->getMode()));
 
+        // Validate hex string before calling hex2bin to prevent warnings
+        if (!ctype_xdigit($encryptInfo)) {
+            return [];
+        }
+
         $raw = hex2bin($encryptInfo);
         if ($raw === false) {
             return [];
