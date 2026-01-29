@@ -110,8 +110,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 10-01-PLAN.md — Statistics service with transient caching and REST API endpoint
-- [ ] 10-02-PLAN.md — Dashboard admin page with Chart.js visualizations
+- [x] 10-01-PLAN.md — Statistics service with transient caching and REST API endpoint
+- [x] 10-02-PLAN.md — Dashboard admin page with Chart.js visualizations
 
 #### Phase 11: User Guidance and Documentation
 **Goal**: Merchants can quickly find information and understand plugin features
@@ -153,7 +153,7 @@ Phases execute in numeric order: 6 → 7 → 8 → 9 → 10 → 11
 | 7. Webhook Log Viewer UI | v1.1 | 2/2 | Complete | 2026-01-29 |
 | 8. Settings Page Integration | v1.1 | 2/2 | Complete | 2026-01-29 |
 | 9. Subscription Detail Enhancement | v1.1 | 2/2 | Complete | 2026-01-29 |
-| 10. Dashboard Statistics & Monitoring | v1.1 | 0/2 | Ready | - |
+| 10. Dashboard Statistics & Monitoring | v1.1 | 2/2 | Complete | 2026-01-29 |
 | 11. User Guidance and Documentation | v1.1 | 0/TBD | Not started | - |
 
 ---
