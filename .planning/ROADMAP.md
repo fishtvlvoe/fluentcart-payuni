@@ -70,15 +70,15 @@ Plans:
 **Requirements**: SETTING-01, SETTING-02, SETTING-03, SETTING-04, SETTING-05
 **Success Criteria** (what must be TRUE):
   1. Admin menu contains "PayUNi → Settings" page
-  2. Test/production environment toggle interface available
+  2. Test/production environment status visible with credential fill indicators
   3. Webhook URL displayed with reachability test button
-  4. API key management interface supports show/hide and regenerate
-  5. Settings validation checks required fields and webhook URL reachability
-**Plans**: TBD
+  4. Quick links to related PayUNi features (webhook logs, orders, subscriptions)
+  5. Configuration guidance and troubleshooting help available
+**Plans**: 2 plans
 
 Plans:
-- [ ] 08-01: TBD
-- [ ] 08-02: TBD
+- [ ] 08-01-PLAN.md — Settings page with credential status, webhook URLs, and reachability test
+- [ ] 08-02-PLAN.md — User guidance, quick links, troubleshooting section, and unit tests
 
 #### Phase 9: Subscription Detail Enhancement
 **Goal**: Merchants can monitor subscription health and renewal history
@@ -151,7 +151,7 @@ Phases execute in numeric order: 6 → 7 → 8 → 9 → 10 → 11
 |-------|-----------|----------------|--------|-----------|
 | 6. Meta Storage & Order Detail | v1.1 | 2/2 | Complete | 2026-01-29 |
 | 7. Webhook Log Viewer UI | v1.1 | 2/2 | Complete | 2026-01-29 |
-| 8. Settings Page Integration | v1.1 | 0/TBD | Not started | - |
+| 8. Settings Page Integration | v1.1 | 0/2 | Ready to execute | - |
 | 9. Subscription Detail Enhancement | v1.1 | 0/TBD | Not started | - |
 | 10. Dashboard Statistics & Monitoring | v1.1 | 0/TBD | Not started | - |
 | 11. User Guidance and Documentation | v1.1 | 0/TBD | Not started | - |
