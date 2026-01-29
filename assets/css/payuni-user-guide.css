@@ -1,0 +1,267 @@
+/* PayUNi User Guide Styles */
+
+/* Container Layout */
+.payuni-user-guide .guide-container {
+    display: flex;
+    gap: 30px;
+    max-width: 1200px;
+    margin-top: 20px;
+}
+
+/* Sidebar Navigation */
+.payuni-user-guide .guide-sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 32px;  /* WordPress admin bar height */
+    align-self: flex-start;
+}
+
+.payuni-user-guide .guide-nav {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+}
+
+.payuni-user-guide .guide-nav li a {
+    display: block;
+    padding: 12px 16px;
+    color: #1d2327;
+    text-decoration: none;
+    border-bottom: 1px solid #dcdcde;
+    transition: background-color 0.2s;
+}
+
+.payuni-user-guide .guide-nav li:last-child a {
+    border-bottom: none;
+}
+
+.payuni-user-guide .guide-nav li a:hover {
+    background-color: #f6f7f7;
+}
+
+.payuni-user-guide .guide-nav li a.active {
+    background-color: #2271b1;
+    color: #fff;
+}
+
+/* Main Content Area */
+.payuni-user-guide .guide-content {
+    flex: 1;
+    background: #fff;
+    padding: 24px;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+}
+
+/* Content Sections */
+.payuni-user-guide .guide-section {
+    display: none;
+}
+
+.payuni-user-guide .guide-section.active {
+    display: block;
+}
+
+.payuni-user-guide .guide-section h2 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #2271b1;
+    color: #1d2327;
+}
+
+.payuni-user-guide .guide-section h3 {
+    margin-top: 24px;
+    margin-bottom: 12px;
+    color: #1d2327;
+}
+
+.payuni-user-guide .guide-section p {
+    line-height: 1.6;
+    color: #50575e;
+}
+
+/* Quick Start Cards */
+.payuni-user-guide .quick-links-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.payuni-user-guide .quick-link-card {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    background: #f6f7f7;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #1d2327;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.payuni-user-guide .quick-link-card:hover {
+    border-color: #2271b1;
+    background-color: #f0f6fc;
+}
+
+.payuni-user-guide .quick-link-card:focus {
+    outline: 2px solid #2271b1;
+    outline-offset: 2px;
+}
+
+.payuni-user-guide .quick-link-card .dashicons {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    margin-right: 12px;
+    color: #2271b1;
+    flex-shrink: 0;
+}
+
+.payuni-user-guide .quick-link-card div {
+    flex: 1;
+}
+
+.payuni-user-guide .quick-link-card strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #1d2327;
+}
+
+.payuni-user-guide .quick-link-card p {
+    margin: 0;
+    font-size: 13px;
+    color: #646970;
+}
+
+/* Setup Steps */
+.payuni-user-guide .setup-steps {
+    counter-reset: step;
+    list-style: none;
+    padding-left: 0;
+    margin: 16px 0;
+}
+
+.payuni-user-guide .setup-steps li {
+    position: relative;
+    padding-left: 40px;
+    margin-bottom: 16px;
+    counter-increment: step;
+}
+
+.payuni-user-guide .setup-steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    width: 28px;
+    height: 28px;
+    background: #2271b1;
+    color: #fff;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 28px;
+    font-weight: 600;
+}
+
+.payuni-user-guide .setup-steps li strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #1d2327;
+}
+
+.payuni-user-guide .setup-steps li p {
+    margin: 0;
+    color: #50575e;
+}
+
+/* Feature Locations Table */
+.payuni-user-guide .feature-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+}
+
+.payuni-user-guide .feature-table th,
+.payuni-user-guide .feature-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #dcdcde;
+}
+
+.payuni-user-guide .feature-table th {
+    background: #f6f7f7;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+.payuni-user-guide .feature-table tbody tr:hover {
+    background: #f6f7f7;
+}
+
+.payuni-user-guide .feature-table td {
+    color: #50575e;
+}
+
+.payuni-user-guide .feature-table td strong {
+    color: #1d2327;
+}
+
+/* Description text */
+.payuni-user-guide .description {
+    padding: 12px;
+    background: #f0f6fc;
+    border-left: 4px solid #2271b1;
+    color: #1d2327;
+    line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 782px) {
+    .payuni-user-guide .guide-container {
+        flex-direction: column;
+    }
+
+    .payuni-user-guide .guide-sidebar {
+        width: 100%;
+        position: static;
+    }
+
+    .payuni-user-guide .guide-nav {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .payuni-user-guide .guide-nav li {
+        flex: 1;
+        min-width: 120px;
+    }
+
+    .payuni-user-guide .guide-nav li a {
+        text-align: center;
+        border-bottom: none;
+        border-right: 1px solid #dcdcde;
+    }
+
+    .payuni-user-guide .guide-nav li:last-child a {
+        border-right: none;
+    }
+
+    .payuni-user-guide .quick-links-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .payuni-user-guide .feature-table {
+        font-size: 14px;
+    }
+
+    .payuni-user-guide .feature-table th,
+    .payuni-user-guide .feature-table td {
+        padding: 8px;
+    }
+}
