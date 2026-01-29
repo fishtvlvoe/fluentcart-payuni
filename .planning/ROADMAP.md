@@ -83,13 +83,14 @@
 
 **Priority**: P2
 
-**Plans**: 4 plans
+**Plans**: 5 plans
 
 Plans:
 - [ ] 04-01-PLAN.md — 建立 Webhook 去重基礎設施（資料表 + 服務）
 - [ ] 04-02-PLAN.md — 整合去重服務到 Webhook Handler
 - [ ] 04-03-PLAN.md — 加入 API Idempotency Key 機制
 - [ ] 04-04-PLAN.md — 撰寫去重機制單元測試
+- [ ] 04-05-PLAN.md — 建立 Webhook 日誌查詢 API
 
 ---
 
