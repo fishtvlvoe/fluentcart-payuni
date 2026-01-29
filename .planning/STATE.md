@@ -3,7 +3,7 @@
 ## Current Status
 
 **Phase**: 4 (Webhook 可靠性)
-**Status**: 🔵 In Progress (Plan 03 完成)
+**Status**: ✅ Completed (All Plans Complete)
 **Last Updated**: 2026-01-29
 
 ## Progress
@@ -13,10 +13,10 @@
 | 1: 訂閱核心修復 | ✅ Completed | 100% |
 | 2: 訂閱重試機制 | ✅ Completed | 100% |
 | 3: ATM/CVS 測試 | ⏸️ Paused (Webhook Issue) | 80% |
-| 4: Webhook 可靠性 | 🔵 In Progress | 67% (2/3 plans) |
+| 4: Webhook 可靠性 | ✅ Completed | 100% (3/3 plans) |
 | 5: 測試覆蓋率 | ⚪ Not Started | 0% |
 
-**Overall**: 5/11 requirements completed (45%)
+**Overall**: 6/11 requirements completed (55%)
 
 ## Current Phase Details
 
@@ -105,17 +105,43 @@
    - 外掛啟用/升級時自動建立資料表
    - Commits: f70c570, 6b9496c, c5c2996
 
-2. ✅ **Plan 03: API Idempotency Key** (2026-01-29)
+2. ✅ **Plan 02: 整合去重服務到 Webhook Handlers** (2026-01-29)
+   - NotifyHandler 遷移至資料庫去重（移除 transient）
+   - ReturnHandler 加入資料庫去重
+   - 實作 mark-before-process 模式防止並發重複處理
+   - 支援 payuni 和 payuni_subscription 兩種付款方式
+   - Commits: f7b3ee7
+
+3. ✅ **Plan 03: API Idempotency Key** (2026-01-29)
    - 建立 `IdempotencyService` (generateKey, generateUuid)
    - PayUNiAPI 記錄 idempotency key 到 Logger
    - 驗證 MerTradeNo 格式符合規範（≤20 字元）
    - Commits: c540817, aa6ccae
 
+**Phase Complete**: All webhook reliability requirements implemented
+
 **Next Steps**:
-1. ⏳ Plan 02: 整合去重服務到 NotifyHandler 和 ReturnHandler
-2. ⏳ Phase 5: 測試覆蓋率提升
+1. ⏳ Phase 5: 測試覆蓋率提升
 
 ## Recent Changes
+
+### 2026-01-29 (Phase 4 COMPLETE)
+- ✓ **Phase 4: Webhook 可靠性 完成**
+  - 所有 3 個 plans 完成
+  - Webhook 去重機制從 transient 遷移至資料庫（24h TTL）
+  - NotifyHandler 和 ReturnHandler 整合去重服務
+  - API 呼叫加入 idempotency key 追蹤
+  - 實作 mark-before-process 模式防止並發重複
+  - Commits: f70c570, 6b9496c, c5c2996, f7b3ee7, c540817, aa6ccae
+
+### 2026-01-29 (Phase 4 Plan 02 Complete)
+- ✓ **Phase 4 Plan 02: Webhook Handler 整合完成**
+  - NotifyHandler 移除 transient，使用 WebhookDeduplicationService
+  - ReturnHandler 加入 WebhookDeduplicationService 去重
+  - 支援 payuni 和 payuni_subscription 付款方式
+  - 實作 mark-before-process 模式（先標記再處理）
+  - 記錄 payload hash 作為審計追蹤
+  - Commits: f7b3ee7
 
 ### 2026-01-29 (Phase 4 Plan 03 Complete)
 - ✓ **Phase 4 Plan 03: API Idempotency Key 完成**
@@ -198,8 +224,10 @@
 ### Medium (P2)
 5. **Webhook 去重不可靠** ✅ FIXED
    - Current: Database-driven (24h TTL)
-   - Status: ✅ Implemented in Phase 4 Plan 01
-   - Commits: f70c570, 6b9496c, c5c2996
+   - Status: ✅ Implemented in Phase 4 Plans 01-02
+   - Solution: WebhookDeduplicationService + payuni_webhook_log table
+   - Integrated in NotifyHandler and ReturnHandler
+   - Commits: f70c570, 6b9496c, c5c2996, f7b3ee7
 
 6. **無 API idempotency key** ✅ FIXED
    - Impact: 重試可能重複扣款
