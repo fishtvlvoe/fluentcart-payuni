@@ -88,10 +88,9 @@ final class SubscriptionPaymentProcessor
             'trx_hash' => $trxHash,
         ], site_url('/'));
 
-        $notifyUrl = add_query_arg([
-            'fct_payment_listener' => '1',
-            'method' => 'payuni',
-        ], site_url('/'));
+        // 新的 NotifyURL：使用乾淨的路徑格式（無 query string）
+        // 參考 woomp 外掛，PayUNi 對這種格式的 URL 處理較穩定
+        $notifyUrl = home_url('fluentcart-api/payuni-notify');
 
         $usrMail = '';
         try {

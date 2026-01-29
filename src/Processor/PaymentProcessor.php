@@ -65,10 +65,9 @@ final class PaymentProcessor
             'trx_hash' => $trxHash,
         ], site_url('/'));
 
-        $notifyUrl = add_query_arg([
-            'fct_payment_listener' => '1',
-            'method' => 'payuni',
-        ], site_url('/'));
+        // 新的 NotifyURL：使用乾淨的路徑格式（無 query string）
+        // 參考 woomp 外掛，PayUNi 對這種格式的 URL 處理較穩定
+        $notifyUrl = home_url('fluentcart-api/payuni-notify');
 
         // 一次性信用卡（站內刷卡 + 3D）：走 PayUNi credit API（跟 woomp 的做法一樣）
         // - 有卡號欄位就優先走 credit（避免「選信用卡卻還要去 PayUNi 頁面填卡」）

@@ -729,7 +729,41 @@ function buygo_fc_payuni_bootstrap(): void
     }, 10, 1);
 
     /**
-     * Back-compat listener:
+     * 新的 PayUNi Webhook 端點（乾淨的 URL 路徑，無 query string）
+     *
+     * 模仿 WooCommerce 的 wc-api 端點格式，因為 PayUNi 對 query string 的處理不穩定。
+     * NotifyURL: https://example.com/fluentcart-api/payuni-notify
+     */
+    add_action('init', function () {
+        add_rewrite_rule(
+            '^fluentcart-api/payuni-notify/?$',
+            'index.php?fluentcart_payuni_notify=1',
+            'top'
+        );
+    }, 10);
+
+    add_action('parse_request', function ($wp) {
+        if (!empty($wp->query_vars['fluentcart_payuni_notify'])) {
+            // Log webhook received
+            if (defined('WP_DEBUG') && WP_DEBUG && function_exists('error_log')) {
+                error_log('[fluentcart-payuni] Webhook received at new endpoint: ' . date('Y-m-d H:i:s'));
+                error_log('[fluentcart-payuni] IP: ' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'));
+                error_log('[fluentcart-payuni] POST keys: ' . json_encode(array_keys($_POST)));
+            }
+
+            (new \BuyGoFluentCart\PayUNi\Webhook\NotifyHandler())->processNotify();
+            exit;
+        }
+    }, 10);
+
+    // 註冊 query var
+    add_filter('query_vars', function ($vars) {
+        $vars[] = 'fluentcart_payuni_notify';
+        return $vars;
+    });
+
+    /**
+     * Back-compat listener (舊的 query string 格式，保留相容性):
      * 有些金流後台/舊設定會用 ?fct_payment_listener=1&method=payuni 送回來，
      * 但 FluentCart 的 IPN listener 其實是 ?fluent-cart=fct_payment_listener_ipn&method=xxx。
      *
