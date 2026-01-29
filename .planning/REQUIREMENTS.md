@@ -25,10 +25,10 @@ FluentCart 後台完整整合 — 在 FluentCart 後台頁面中顯示 PayUNi �
 
 ### 訂閱頁面整合
 
-- [ ] **SUB-06**: 在 FluentCart 訂閱詳情頁面顯示續扣歷史(日期、金額、狀態、重試次數)
-- [ ] **SUB-07**: 顯示下次扣款日期和預計金額
-- [ ] **SUB-08**: 顯示綁定的付款卡片資訊(末四碼、到期日)
-- [ ] **SUB-09**: 使用 FluentCart filter 注入訂閱 meta box
+- [x] **SUB-06**: 在 FluentCart 訂閱詳情頁面顯示續扣歷史(日期、金額、狀態、重試次數)
+- [x] **SUB-07**: 顯示下次扣款日期和預計金額
+- [x] **SUB-08**: 顯示綁定的付款卡片資訊(末四碼、到期日)
+- [x] **SUB-09**: 使用 FluentCart filter 注入訂閱 meta box
 
 ### Dashboard 統計
 
@@ -112,10 +112,10 @@ FluentCart 後台完整整合 — 在 FluentCart 後台頁面中顯示 PayUNi �
 | SETTING-03 | Phase 8 | Complete |
 | SETTING-04 | Phase 8 | Complete |
 | SETTING-05 | Phase 8 | Complete |
-| SUB-06 | Phase 9 | Pending |
-| SUB-07 | Phase 9 | Pending |
-| SUB-08 | Phase 9 | Pending |
-| SUB-09 | Phase 9 | Pending |
+| SUB-06 | Phase 9 | Complete |
+| SUB-07 | Phase 9 | Complete |
+| SUB-08 | Phase 9 | Complete |
+| SUB-09 | Phase 9 | Complete |
 | DASH-01 | Phase 10 | Pending |
 | DASH-02 | Phase 10 | Pending |
 | DASH-03 | Phase 10 | Pending |

@@ -93,8 +93,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 09-01-PLAN.md — Create SubscriptionPayUNiMetaBox with renewal history, card info, failure details
-- [ ] 09-02-PLAN.md — Enhanced subscription detail UI with renewal history table and styling
+- [x] 09-01-PLAN.md — Create SubscriptionPayUNiMetaBox with renewal history, card info, failure details
+- [x] 09-02-PLAN.md — Enhanced subscription detail UI with renewal history table and styling
 
 #### Phase 10: Dashboard Statistics & Monitoring
 **Goal**: Merchants can monitor PayUNi performance and subscription health at a glance
