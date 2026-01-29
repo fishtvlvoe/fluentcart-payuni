@@ -44,8 +44,8 @@ See: `.planning/milestones/v1.0-ROADMAP.md` for detailed phase breakdown
 **Plans**: 2 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — Create OrderPayUNiMetaBox with status, ATM, and CVS display
-- [ ] 06-02-PLAN.md — Add credit card info and human verification
+- [x] 06-01-PLAN.md — Create OrderPayUNiMetaBox with status, ATM, and CVS display
+- [x] 06-02-PLAN.md — Add credit card info and human verification
 
 #### Phase 7: Webhook Log Viewer UI
 **Goal**: Merchants can view and debug webhook events through admin interface
@@ -149,7 +149,7 @@ Phases execute in numeric order: 6 → 7 → 8 → 9 → 10 → 11
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 6. Meta Storage & Order Detail | v1.1 | 0/2 | Planned | - |
+| 6. Meta Storage & Order Detail | v1.1 | 2/2 | Complete | 2026-01-29 |
 | 7. Webhook Log Viewer UI | v1.1 | 0/TBD | Not started | - |
 | 8. Settings Page Integration | v1.1 | 0/TBD | Not started | - |
 | 9. Subscription Detail Enhancement | v1.1 | 0/TBD | Not started | - |

@@ -9,11 +9,11 @@ FluentCart 後台完整整合 — 在 FluentCart 後台頁面中顯示 PayUNi �
 
 ### 訂單頁面整合
 
-- [ ] **ORDER-01**: 在 FluentCart 訂單詳情頁面顯示 PayUNi 交易狀態(成功/失敗/處理中)
-- [ ] **ORDER-02**: 在訂單詳情頁面顯示 ATM 虛擬帳號資訊(帳號、銀行代碼、到期日)
-- [ ] **ORDER-03**: 在訂單詳情頁面顯示超商繳費代碼資訊(代碼、超商類型、到期日)
-- [ ] **ORDER-04**: 在訂單詳情頁面顯示信用卡資訊(末四碼、到期日、3D 驗證狀態)
-- [ ] **ORDER-05**: 使用 FluentCart filter 注入 PayUNi meta box(不修改核心檔案)
+- [x] **ORDER-01**: 在 FluentCart 訂單詳情頁面顯示 PayUNi 交易狀態(成功/失敗/處理中)
+- [x] **ORDER-02**: 在訂單詳情頁面顯示 ATM 虛擬帳號資訊(帳號、銀行代碼、到期日)
+- [x] **ORDER-03**: 在訂單詳情頁面顯示超商繳費代碼資訊(代碼、超商類型、到期日)
+- [x] **ORDER-04**: 在訂單詳情頁面顯示信用卡資訊(末四碼、到期日、3D 驗證狀態)
+- [x] **ORDER-05**: 使用 FluentCart filter 注入 PayUNi meta box(不修改核心檔案)
 
 ### Webhook 日誌查看器
 
@@ -56,7 +56,7 @@ FluentCart 後台完整整合 — 在 FluentCart 後台頁面中顯示 PayUNi �
 
 ### 基礎設施和效能
 
-- [ ] **INFRA-01**: 確保 hook priority 正確(FluentCart 載入後再初始化整合)
+- [x] **INFRA-01**: 確保 hook priority 正確(FluentCart 載入後再初始化整合)
 - [ ] **INFRA-02**: 所有 REST API endpoint 加入 permission_callback(管理員或 shop_manager)
 - [ ] **INFRA-03**: 列表查詢使用 eager loading(避免 N+1 查詢)
 - [ ] **INFRA-04**: admin_enqueue_scripts 只在相關頁面載入資源(避免全域載入)
@@ -94,12 +94,12 @@ FluentCart 後台完整整合 — 在 FluentCart 後台頁面中顯示 PayUNi �
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ORDER-01 | Phase 6 | Pending |
-| ORDER-02 | Phase 6 | Pending |
-| ORDER-03 | Phase 6 | Pending |
-| ORDER-04 | Phase 6 | Pending |
-| ORDER-05 | Phase 6 | Pending |
-| INFRA-01 | Phase 6 | Pending |
+| ORDER-01 | Phase 6 | Complete |
+| ORDER-02 | Phase 6 | Complete |
+| ORDER-03 | Phase 6 | Complete |
+| ORDER-04 | Phase 6 | Complete |
+| ORDER-05 | Phase 6 | Complete |
+| INFRA-01 | Phase 6 | Complete |
 | WEBHOOK-04 | Phase 7 | Pending |
 | WEBHOOK-05 | Phase 7 | Pending |
 | WEBHOOK-06 | Phase 7 | Pending |
