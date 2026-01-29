@@ -203,14 +203,23 @@ class SettingsPage
                         <ul>
                             <li>
                                 <strong><?php echo esc_html__('商店代號 (MerID):', 'fluentcart-payuni'); ?></strong>
+                                <span class="payuni-tooltip" title="<?php echo esc_attr__('從 PayUNi 商戶後台「商店設定」取得，用於識別您的商店', 'fluentcart-payuni'); ?>">
+                                    <span class="dashicons dashicons-info-outline"></span>
+                                </span>
                                 <?php echo $testStatus['mer_id'] ? esc_html($testStatus['mer_id']) : '<em>' . esc_html__('未填寫', 'fluentcart-payuni') . '</em>'; ?>
                             </li>
                             <li>
                                 <strong><?php echo esc_html__('Hash Key:', 'fluentcart-payuni'); ?></strong>
+                                <span class="payuni-tooltip" title="<?php echo esc_attr__('PayUNi 提供的加密金鑰，用於交易資料加密', 'fluentcart-payuni'); ?>">
+                                    <span class="dashicons dashicons-info-outline"></span>
+                                </span>
                                 <?php echo $testStatus['hash_key_set'] ? '***' : '<em>' . esc_html__('未填寫', 'fluentcart-payuni') . '</em>'; ?>
                             </li>
                             <li>
                                 <strong><?php echo esc_html__('Hash IV:', 'fluentcart-payuni'); ?></strong>
+                                <span class="payuni-tooltip" title="<?php echo esc_attr__('PayUNi 提供的初始向量，與 Hash Key 配合使用', 'fluentcart-payuni'); ?>">
+                                    <span class="dashicons dashicons-info-outline"></span>
+                                </span>
                                 <?php echo $testStatus['hash_iv_set'] ? '***' : '<em>' . esc_html__('未填寫', 'fluentcart-payuni') . '</em>'; ?>
                             </li>
                         </ul>
@@ -222,14 +231,23 @@ class SettingsPage
                         <ul>
                             <li>
                                 <strong><?php echo esc_html__('商店代號 (MerID):', 'fluentcart-payuni'); ?></strong>
+                                <span class="payuni-tooltip" title="<?php echo esc_attr__('從 PayUNi 商戶後台「商店設定」取得，用於識別您的商店', 'fluentcart-payuni'); ?>">
+                                    <span class="dashicons dashicons-info-outline"></span>
+                                </span>
                                 <?php echo $liveStatus['mer_id'] ? esc_html($liveStatus['mer_id']) : '<em>' . esc_html__('未填寫', 'fluentcart-payuni') . '</em>'; ?>
                             </li>
                             <li>
                                 <strong><?php echo esc_html__('Hash Key:', 'fluentcart-payuni'); ?></strong>
+                                <span class="payuni-tooltip" title="<?php echo esc_attr__('PayUNi 提供的加密金鑰，用於交易資料加密', 'fluentcart-payuni'); ?>">
+                                    <span class="dashicons dashicons-info-outline"></span>
+                                </span>
                                 <?php echo $liveStatus['hash_key_set'] ? '***' : '<em>' . esc_html__('未填寫', 'fluentcart-payuni') . '</em>'; ?>
                             </li>
                             <li>
                                 <strong><?php echo esc_html__('Hash IV:', 'fluentcart-payuni'); ?></strong>
+                                <span class="payuni-tooltip" title="<?php echo esc_attr__('PayUNi 提供的初始向量，與 Hash Key 配合使用', 'fluentcart-payuni'); ?>">
+                                    <span class="dashicons dashicons-info-outline"></span>
+                                </span>
                                 <?php echo $liveStatus['hash_iv_set'] ? '***' : '<em>' . esc_html__('未填寫', 'fluentcart-payuni') . '</em>'; ?>
                             </li>
                         </ul>
@@ -245,6 +263,9 @@ class SettingsPage
                 <div class="webhook-url-row">
                     <label>
                         <strong><?php echo esc_html__('NotifyURL:', 'fluentcart-payuni'); ?></strong>
+                        <span class="payuni-tooltip" title="<?php echo esc_attr__('PayUNi 付款完成後會發送通知到此網址', 'fluentcart-payuni'); ?>">
+                            <span class="dashicons dashicons-info-outline"></span>
+                        </span>
                     </label>
                     <input type="text" value="<?php echo esc_attr($webhookUrls['notify']); ?>" readonly>
                     <button type="button" class="button copy-url-btn"><?php echo esc_html__('複製', 'fluentcart-payuni'); ?></button>
@@ -253,6 +274,9 @@ class SettingsPage
                 <div class="webhook-url-row">
                     <label>
                         <strong><?php echo esc_html__('ReturnURL:', 'fluentcart-payuni'); ?></strong>
+                        <span class="payuni-tooltip" title="<?php echo esc_attr__('客戶完成付款後會被導向到此網址', 'fluentcart-payuni'); ?>">
+                            <span class="dashicons dashicons-info-outline"></span>
+                        </span>
                     </label>
                     <input type="text" value="<?php echo esc_attr($webhookUrls['return']); ?>" readonly>
                     <button type="button" class="button copy-url-btn"><?php echo esc_html__('複製', 'fluentcart-payuni'); ?></button>
@@ -311,6 +335,14 @@ class SettingsPage
                         <div>
                             <strong><?php echo esc_html__('訂閱列表', 'fluentcart-payuni'); ?></strong>
                             <p><?php echo esc_html__('管理自動續扣訂閱', 'fluentcart-payuni'); ?></p>
+                        </div>
+                    </a>
+
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=payuni-user-guide')); ?>" class="quick-link-card">
+                        <span class="dashicons dashicons-book"></span>
+                        <div>
+                            <strong><?php echo esc_html__('使用指南', 'fluentcart-payuni'); ?></strong>
+                            <p><?php echo esc_html__('查看 FAQ 和疑難排解', 'fluentcart-payuni'); ?></p>
                         </div>
                     </a>
                 </div>

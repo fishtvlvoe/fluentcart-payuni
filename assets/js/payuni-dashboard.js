@@ -21,6 +21,24 @@
         $('#refresh-stats').on('click', function() {
             loadDashboardStats(true);
         });
+
+        // Welcome banner dismissal
+        $('#dismiss-welcome').on('click', function() {
+            var $banner = $('#payuni-welcome-banner');
+
+            $.ajax({
+                url: payuniDashboard.dismissWelcomeUrl,
+                method: 'POST',
+                headers: {
+                    'X-WP-Nonce': payuniDashboard.nonce
+                },
+                success: function() {
+                    $banner.fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                }
+            });
+        });
     });
 
     /**

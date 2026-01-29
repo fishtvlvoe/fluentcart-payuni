@@ -128,6 +128,21 @@ class UserGuidePage
     }
 
     /**
+     * Get navigation items for sidebar.
+     *
+     * @return array Array of navigation items with id and label.
+     */
+    public function getNavigationItems(): array
+    {
+        return [
+            ['id' => 'quick-start', 'label' => __('快速開始', 'fluentcart-payuni')],
+            ['id' => 'feature-locations', 'label' => __('功能位置', 'fluentcart-payuni')],
+            ['id' => 'faq', 'label' => __('常見問題', 'fluentcart-payuni')],
+            ['id' => 'troubleshooting', 'label' => __('疑難排解', 'fluentcart-payuni')],
+        ];
+    }
+
+    /**
      * Render Quick Start section.
      *
      * @return string HTML content.

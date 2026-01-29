@@ -38,6 +38,7 @@ class DashboardWidget
             // Use priority 99 to ensure FluentCart menu exists first
             add_action('admin_menu', [$this, 'registerAdminPage'], 99);
             add_action('admin_enqueue_scripts', [$this, 'enqueueAssets']);
+            add_action('rest_api_init', [$this, 'registerRestRoutes']);
         }
     }
 
@@ -115,6 +116,7 @@ class DashboardWidget
         // Localize script
         wp_localize_script('payuni-dashboard', 'payuniDashboard', [
             'restUrl' => rest_url('fluentcart-payuni/v1/dashboard/stats'),
+            'dismissWelcomeUrl' => rest_url('fluentcart-payuni/v1/dismiss-welcome'),
             'nonce' => wp_create_nonce('wp_rest'),
             'labels' => [
                 'paymentDistribution' => __('支付方式分布', 'fluentcart-payuni'),
@@ -134,14 +136,58 @@ class DashboardWidget
     }
 
     /**
+     * Register REST API routes.
+     */
+    public function registerRestRoutes(): void
+    {
+        register_rest_route('fluentcart-payuni/v1', '/dismiss-welcome', [
+            'methods' => 'POST',
+            'permission_callback' => function () {
+                return current_user_can('manage_fluentcart');
+            },
+            'callback' => function () {
+                $user_id = get_current_user_id();
+                update_user_meta($user_id, 'payuni_dashboard_welcome_seen', '1');
+                return new \WP_REST_Response(['success' => true], 200);
+            },
+        ]);
+    }
+
+    /**
      * Render admin page HTML.
      */
     public function renderPage(): void
     {
+        // Check if first visit
+        $user_id = get_current_user_id();
+        $has_seen_welcome = get_user_meta($user_id, 'payuni_dashboard_welcome_seen', true);
+
         ?>
         <div class="wrap payuni-dashboard">
-            <h1>PayUNi Dashboard <button id="refresh-stats" class="button">重新整理</button></h1>
+            <div class="dashboard-header">
+                <h1>PayUNi Dashboard <button id="refresh-stats" class="button">重新整理</button></h1>
+                <a href="<?php echo esc_url(admin_url('admin.php?page=payuni-user-guide')); ?>"
+                   class="page-help-button"
+                   title="<?php echo esc_attr__('查看使用指南', 'fluentcart-payuni'); ?>">
+                    <span class="dashicons dashicons-editor-help"></span>
+                </a>
+            </div>
             <p class="last-updated">最後更新: <span id="generated-at">-</span></p>
+
+            <?php if (!$has_seen_welcome) : ?>
+            <div class="payuni-welcome-banner" id="payuni-welcome-banner">
+                <p>
+                    <strong><?php echo esc_html__('歡迎使用 PayUNi！', 'fluentcart-payuni'); ?></strong>
+                    <?php echo esc_html__('第一次使用嗎？', 'fluentcart-payuni'); ?>
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=payuni-user-guide#quick-start')); ?>">
+                        <?php echo esc_html__('點擊此處查看快速開始指南', 'fluentcart-payuni'); ?>
+                    </a>
+                </p>
+                <button type="button" class="notice-dismiss" id="dismiss-welcome">
+                    <span class="screen-reader-text"><?php echo esc_html__('關閉', 'fluentcart-payuni'); ?></span>
+                </button>
+            </div>
+            <?php endif; ?>
 
             <!-- Error message container for user-visible API errors -->
             <div id="dashboard-error" class="notice notice-error" style="display:none;">
