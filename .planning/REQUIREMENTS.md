@@ -60,7 +60,7 @@ FluentCart 後台完整整合 — 在 FluentCart 後台頁面中顯示 PayUNi �
 - [x] **INFRA-02**: 所有 REST API endpoint 加入 permission_callback(管理員或 shop_manager)
 - [x] **INFRA-03**: 列表查詢使用 eager loading(避免 N+1 查詢)
 - [x] **INFRA-04**: admin_enqueue_scripts 只在相關頁面載入資源(避免全域載入)
-- [ ] **INFRA-05**: 使用 Vue 3 + Element Plus(與 FluentCart 後台一致)
+- [ ] **INFRA-05**: 資料管理頁面使用 Vue 3 + Element Plus(Dashboard/Webhook Logs 一致性,User Guide 使用 WordPress 傳統 admin UI)
 
 ## v1.2 Requirements (Deferred)
 
@@ -127,7 +127,7 @@ FluentCart 後台完整整合 — 在 FluentCart 後台頁面中顯示 PayUNi �
 | GUIDE-03 | Phase 11 | Pending |
 | GUIDE-04 | Phase 11 | Pending |
 | GUIDE-05 | Phase 11 | Pending |
-| INFRA-05 | Phase 11 | Pending |
+| INFRA-05 | Phase 11 | Partial (Dashboard/Webhook Logs complete, User Guide uses WordPress admin UI) |
 
 **Coverage:** 30/30 requirements mapped (100%)
 
