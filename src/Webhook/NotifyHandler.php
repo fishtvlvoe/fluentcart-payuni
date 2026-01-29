@@ -110,7 +110,21 @@ final class NotifyHandler
 
         // 去重檢查：使用資料庫服務檢查此 transaction 是否已處理過 notify
         $deduplicationService = new WebhookDeduplicationService();
+        $payloadHash = hash('sha256', wp_json_encode($decrypted));
+        $tradeNo = (string) ($decrypted['TradeNo'] ?? '');
+
         if ($deduplicationService->isProcessed($transaction->uuid, 'notify')) {
+            // Mark as duplicate for logging purposes (don't store payload to save space)
+            $deduplicationService->markProcessed(
+                $transaction->uuid,
+                'notify',
+                $tradeNo,
+                $payloadHash,
+                'duplicate',
+                null,
+                'Duplicate webhook skipped'
+            );
+
             Logger::info('Skip notify: already processed', [
                 'transaction_uuid' => $transaction->uuid,
             ]);
@@ -119,9 +133,15 @@ final class NotifyHandler
         }
 
         // 標記為已處理（在處理前先標記，避免並發重複處理）
-        $payloadHash = hash('sha256', wp_json_encode($decrypted));
-        $tradeNo = (string) ($decrypted['TradeNo'] ?? '');
-        $deduplicationService->markProcessed($transaction->uuid, 'notify', $tradeNo, $payloadHash);
+        $deduplicationService->markProcessed(
+            $transaction->uuid,
+            'notify',
+            $tradeNo,
+            $payloadHash,
+            'pending',
+            null,
+            'Processing webhook'
+        );
 
         $processor = new PaymentProcessor($settings);
 
@@ -139,8 +159,30 @@ final class NotifyHandler
 
             if ($status === 'SUCCESS') {
                 $processor->confirmPaymentSuccess($transaction, $decrypted, 'notify_' . $tradeType);
+
+                // Update webhook log as processed
+                $deduplicationService->markProcessed(
+                    $transaction->uuid,
+                    'notify',
+                    $tradeNo,
+                    $payloadHash,
+                    'processed',
+                    wp_json_encode($decrypted, JSON_UNESCAPED_UNICODE),
+                    'Successfully processed ' . $tradeType . ' payment'
+                );
             } else {
                 $processor->processFailedPayment($transaction, $decrypted, 'notify_' . $tradeType);
+
+                // Update webhook log as failed
+                $deduplicationService->markProcessed(
+                    $transaction->uuid,
+                    'notify',
+                    $tradeNo,
+                    $payloadHash,
+                    'failed',
+                    wp_json_encode($decrypted, JSON_UNESCAPED_UNICODE),
+                    substr('Payment failed: ' . ($decrypted['Message'] ?? 'Unknown error'), 0, 255)
+                );
             }
 
             $this->sendResponse('SUCCESS');
@@ -154,8 +196,30 @@ final class NotifyHandler
             $status = (string) ($decrypted['Status'] ?? '');
             if ($status === 'SUCCESS') {
                 $processor->confirmCreditPaymentSuccess($transaction, $decrypted, 'notify_credit');
+
+                // Update webhook log as processed
+                $deduplicationService->markProcessed(
+                    $transaction->uuid,
+                    'notify',
+                    $tradeNo,
+                    $payloadHash,
+                    'processed',
+                    wp_json_encode($decrypted, JSON_UNESCAPED_UNICODE),
+                    'Successfully processed credit payment'
+                );
             } else {
                 $processor->processFailedPayment($transaction, $decrypted, 'notify_credit');
+
+                // Update webhook log as failed
+                $deduplicationService->markProcessed(
+                    $transaction->uuid,
+                    'notify',
+                    $tradeNo,
+                    $payloadHash,
+                    'failed',
+                    wp_json_encode($decrypted, JSON_UNESCAPED_UNICODE),
+                    substr('Credit payment failed: ' . ($decrypted['Message'] ?? 'Unknown error'), 0, 255)
+                );
             }
 
             $this->sendResponse('SUCCESS');
@@ -165,6 +229,17 @@ final class NotifyHandler
         // TradeStatus: 0 待付款 / 1 已付款 / 2 付款失敗 / 3 付款取消
         if ($tradeStatus === '1') {
             $processor->confirmPaymentSuccess($transaction, $decrypted, 'notify');
+
+            // Update webhook log as processed
+            $deduplicationService->markProcessed(
+                $transaction->uuid,
+                'notify',
+                $tradeNo,
+                $payloadHash,
+                'processed',
+                wp_json_encode($decrypted, JSON_UNESCAPED_UNICODE),
+                'Successfully processed payment'
+            );
         } elseif ($tradeStatus === '0') {
             $transaction->meta = array_merge($transaction->meta ?? [], [
                 'payuni' => array_merge(($transaction->meta['payuni'] ?? []), [
@@ -181,8 +256,30 @@ final class NotifyHandler
                 ]),
             ]);
             $transaction->save();
+
+            // Update webhook log as processed (pending payment)
+            $deduplicationService->markProcessed(
+                $transaction->uuid,
+                'notify',
+                $tradeNo,
+                $payloadHash,
+                'processed',
+                wp_json_encode($decrypted, JSON_UNESCAPED_UNICODE),
+                'Payment pending (awaiting customer action)'
+            );
         } else {
             $processor->processFailedPayment($transaction, $decrypted, 'notify');
+
+            // Update webhook log as failed
+            $deduplicationService->markProcessed(
+                $transaction->uuid,
+                'notify',
+                $tradeNo,
+                $payloadHash,
+                'failed',
+                wp_json_encode($decrypted, JSON_UNESCAPED_UNICODE),
+                substr('Payment failed: TradeStatus=' . $tradeStatus . ', Message=' . ($decrypted['Message'] ?? 'Unknown'), 0, 255)
+            );
         }
 
         $this->sendResponse('SUCCESS');
