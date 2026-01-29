@@ -1,0 +1,137 @@
+# Requirements: FluentCart PayUNi v1.1
+
+**Defined:** 2026-01-29
+**Core Value:** 讓 FluentCart 使用者能夠透過台灣在地化的支付方式收款,特別是訂閱制商品的自動續扣功能
+
+## v1.1 Requirements
+
+FluentCart 後台完整整合 — 在 FluentCart 後台頁面中顯示 PayUNi 交易資訊、Webhook 日誌、訂閱續扣歷史、支付統計,並提供 WordPress 後台使用指南。
+
+### 訂單頁面整合
+
+- [ ] **ORDER-01**: 在 FluentCart 訂單詳情頁面顯示 PayUNi 交易狀態(成功/失敗/處理中)
+- [ ] **ORDER-02**: 在訂單詳情頁面顯示 ATM 虛擬帳號資訊(帳號、銀行代碼、到期日)
+- [ ] **ORDER-03**: 在訂單詳情頁面顯示超商繳費代碼資訊(代碼、超商類型、到期日)
+- [ ] **ORDER-04**: 在訂單詳情頁面顯示信用卡資訊(末四碼、到期日、3D 驗證狀態)
+- [ ] **ORDER-05**: 使用 FluentCart filter 注入 PayUNi meta box(不修改核心檔案)
+
+### Webhook 日誌查看器
+
+- [ ] **WEBHOOK-04**: 在 WP 後台建立「PayUNi → Webhook 日誌」選單頁面
+- [ ] **WEBHOOK-05**: 列表顯示 Webhook 事件(時間、類型、transaction_id、狀態)
+- [ ] **WEBHOOK-06**: 提供搜尋和篩選功能(日期範圍、webhook 類型、狀態)
+- [ ] **WEBHOOK-07**: 點擊事件可查看完整 payload 和回應(modal 或詳情頁)
+- [ ] **WEBHOOK-08**: 列表使用分頁和 eager loading(避免 N+1 查詢問題)
+
+### 訂閱頁面整合
+
+- [ ] **SUB-06**: 在 FluentCart 訂閱詳情頁面顯示續扣歷史(日期、金額、狀態、重試次數)
+- [ ] **SUB-07**: 顯示下次扣款日期和預計金額
+- [ ] **SUB-08**: 顯示綁定的付款卡片資訊(末四碼、到期日)
+- [ ] **SUB-09**: 使用 FluentCart filter 注入訂閱 meta box
+
+### Dashboard 統計
+
+- [ ] **DASH-01**: 在 FluentCart Dashboard 加入 PayUNi 統計 widget
+- [ ] **DASH-02**: 顯示支付方式分布圖表(信用卡/ATM/超商比例,使用 Chart.js)
+- [ ] **DASH-03**: 顯示訂閱續扣成功率趨勢(最近 30 天)
+- [ ] **DASH-04**: 顯示最近 Webhook 事件摘要(最新 5 筆)
+- [ ] **DASH-05**: 統計資料使用 transient cache(避免重複查詢)
+
+### 設定頁面整合
+
+- [ ] **SETTING-01**: 在 WP 後台建立「PayUNi → 設定」選單頁面
+- [ ] **SETTING-02**: 提供測試/正式環境快速切換介面
+- [ ] **SETTING-03**: 顯示 Webhook URL 並提供可達性測試按鈕
+- [ ] **SETTING-04**: 提供 API 金鑰管理介面(顯示/隱藏、重新生成)
+- [ ] **SETTING-05**: 設定檢查功能(檢查必要欄位是否填寫、Webhook URL 是否可達)
+
+### 使用者引導和說明
+
+- [ ] **GUIDE-01**: 在 WP 後台建立「PayUNi → 使用指南」選單頁面
+- [ ] **GUIDE-02**: 提供快速開始區塊(如何查看訂單交易資訊、Webhook 日誌、訂閱狀態)
+- [ ] **GUIDE-03**: 提供功能位置對照表(說明各功能在 FluentCart 的位置,附螢幕截圖)
+- [ ] **GUIDE-04**: 提供常見問題 FAQ(ATM 虛擬帳號在哪、訂閱續扣失敗處理、Webhook 未觸發排查)
+- [ ] **GUIDE-05**: 在整合點加入提示文字(tooltip)和說明連結
+
+### 基礎設施和效能
+
+- [ ] **INFRA-01**: 確保 hook priority 正確(FluentCart 載入後再初始化整合)
+- [ ] **INFRA-02**: 所有 REST API endpoint 加入 permission_callback(管理員或 shop_manager)
+- [ ] **INFRA-03**: 列表查詢使用 eager loading(避免 N+1 查詢)
+- [ ] **INFRA-04**: admin_enqueue_scripts 只在相關頁面載入資源(避免全域載入)
+- [ ] **INFRA-05**: 使用 Vue 3 + Element Plus(與 FluentCart 後台一致)
+
+## v1.2 Requirements (Deferred)
+
+延後到下一個 milestone 的功能:
+
+### 進階功能
+
+- **REFUND-02**: 在訂單詳情頁面提供退款按鈕(整合 PayUNi Refund API)
+- **BATCH-01**: 批次操作功能(批次檢查 Webhook 狀態、批次重試失敗續扣)
+- **ALERT-01**: 訂閱續扣失敗告警(Email 通知商家)
+- **PERF-01**: 批次續扣效能優化(Action Scheduler 批次處理)
+
+### 測試項目
+
+- **ATM-03**: ATM 實際付款端到端測試(延續 v1.0)
+- **CVS-03**: 超商實際付款端到端測試(延續 v1.0)
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| 修改 FluentCart 核心檔案 | 升級安全性考量,使用 filter 整合 |
+| 即時推送通知 | 實作複雜度高,使用 Email 通知即可 |
+| 手動修改訂閱金額 | 風險高,應由 FluentCart 本身處理 |
+| 完全自訂 Dashboard | 使用 FluentCart 既有 Dashboard,加入 widget 即可 |
+| 多金流架構重構 | v2.0 |
+| 綠界/藍新金流支援 | v2.0 |
+| ezPay 發票整合 | v3.0(獨立外掛)|
+
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| ORDER-01 | Phase 6 | Pending |
+| ORDER-02 | Phase 6 | Pending |
+| ORDER-03 | Phase 6 | Pending |
+| ORDER-04 | Phase 6 | Pending |
+| ORDER-05 | Phase 6 | Pending |
+| INFRA-01 | Phase 6 | Pending |
+| WEBHOOK-04 | Phase 7 | Pending |
+| WEBHOOK-05 | Phase 7 | Pending |
+| WEBHOOK-06 | Phase 7 | Pending |
+| WEBHOOK-07 | Phase 7 | Pending |
+| WEBHOOK-08 | Phase 7 | Pending |
+| INFRA-02 | Phase 7 | Pending |
+| INFRA-03 | Phase 7 | Pending |
+| SETTING-01 | Phase 8 | Pending |
+| SETTING-02 | Phase 8 | Pending |
+| SETTING-03 | Phase 8 | Pending |
+| SETTING-04 | Phase 8 | Pending |
+| SETTING-05 | Phase 8 | Pending |
+| SUB-06 | Phase 9 | Pending |
+| SUB-07 | Phase 9 | Pending |
+| SUB-08 | Phase 9 | Pending |
+| SUB-09 | Phase 9 | Pending |
+| DASH-01 | Phase 10 | Pending |
+| DASH-02 | Phase 10 | Pending |
+| DASH-03 | Phase 10 | Pending |
+| DASH-04 | Phase 10 | Pending |
+| DASH-05 | Phase 10 | Pending |
+| INFRA-04 | Phase 10 | Pending |
+| GUIDE-01 | Phase 11 | Pending |
+| GUIDE-02 | Phase 11 | Pending |
+| GUIDE-03 | Phase 11 | Pending |
+| GUIDE-04 | Phase 11 | Pending |
+| GUIDE-05 | Phase 11 | Pending |
+| INFRA-05 | Phase 11 | Pending |
+
+**Coverage:** 30/30 requirements mapped (100%)
+
+---
+
+*Requirements defined: 2026-01-29*
+*Traceability updated: 2026-01-29*
