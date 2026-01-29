@@ -38,7 +38,11 @@ class PayUNiMenuManager
     }
 
     /**
-     * Register PayUNi main menu and all subpages.
+     * Register PayUNi main menu.
+     *
+     * Note: Submenus are registered by their respective Admin classes
+     * (DashboardWidget, WebhookLogPage, SettingsPage, UserGuidePage).
+     * This class only creates the top-level menu.
      */
     public function registerMenus(): void
     {
@@ -48,68 +52,16 @@ class PayUNiMenuManager
         }
 
         // 建立主選單 (PayUNi)
+        // 注意：使用 'payuni-dashboard' 作為 menu_slug，這樣點擊主選單時會顯示 Dashboard
         add_menu_page(
             __('PayUNi 統一金流', 'fluentcart-payuni'),           // Page title
             __('PayUNi', 'fluentcart-payuni'),                     // Menu title
             'manage_fluentcart',                                   // Capability
-            self::MENU_SLUG,                                       // Menu slug
-            [$this, 'renderDashboardRedirect'],                    // Callback (redirect to dashboard)
+            'payuni-dashboard',                                    // Menu slug (使用 dashboard 的 slug)
+            '__return_null',                                       // Callback (由 DashboardWidget 處理)
             $this->getMenuIcon(),                                  // Icon
             56                                                     // Position (after FluentCart)
         );
-
-        // 子選單 1: Dashboard (統計儀表板)
-        add_submenu_page(
-            self::MENU_SLUG,
-            __('PayUNi Dashboard', 'fluentcart-payuni'),
-            __('Dashboard', 'fluentcart-payuni'),
-            'manage_fluentcart',
-            'payuni-dashboard',
-            '__return_null'  // 由 DashboardWidget 處理
-        );
-
-        // 子選單 2: Webhook 記錄
-        add_submenu_page(
-            self::MENU_SLUG,
-            __('Webhook 記錄', 'fluentcart-payuni'),
-            __('Webhook 記錄', 'fluentcart-payuni'),
-            'manage_fluentcart',
-            'payuni-webhook-logs',
-            '__return_null'  // 由 WebhookLogPage 處理
-        );
-
-        // 子選單 3: 設定
-        add_submenu_page(
-            self::MENU_SLUG,
-            __('PayUNi 設定', 'fluentcart-payuni'),
-            __('設定', 'fluentcart-payuni'),
-            'manage_fluentcart',
-            'payuni-settings',
-            '__return_null'  // 由 SettingsPage 處理
-        );
-
-        // 子選單 4: 使用指南
-        add_submenu_page(
-            self::MENU_SLUG,
-            __('PayUNi 使用指南', 'fluentcart-payuni'),
-            __('使用指南', 'fluentcart-payuni'),
-            'manage_fluentcart',
-            'payuni-user-guide',
-            '__return_null'  // 由 UserGuidePage 處理
-        );
-
-        // 移除第一個子選單 (重複的主選單項目)
-        remove_submenu_page(self::MENU_SLUG, self::MENU_SLUG);
-    }
-
-    /**
-     * Redirect main menu to dashboard.
-     * This is called when clicking the main PayUNi menu item.
-     */
-    public function renderDashboardRedirect(): void
-    {
-        wp_redirect(admin_url('admin.php?page=payuni-dashboard'));
-        exit;
     }
 
     /**
