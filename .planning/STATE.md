@@ -2,9 +2,9 @@
 
 ## Current Status
 
-**Phase**: 4 (Webhook 可靠性)
-**Status**: ✅ Completed (All Plans Complete)
-**Last Updated**: 2026-01-29 17:20
+**Phase**: 5 (測試覆蓋率提升)
+**Status**: 🔄 In Progress (2/5 plans complete)
+**Last Updated**: 2026-01-29 17:47
 
 ## Progress
 
@@ -14,9 +14,14 @@
 | 2: 訂閱重試機制 | ✅ Completed | 100% |
 | 3: ATM/CVS 測試 | ⏸️ Paused (Webhook Issue) | 80% |
 | 4: Webhook 可靠性 | ✅ Completed | 100% (5/5 plans) |
-| 5: 測試覆蓋率 | ⚪ Not Started | 0% |
+| 5: 測試覆蓋率 | 🔄 In Progress | 40% (2/5 plans) |
 
 **Overall**: 7/11 requirements completed (64%)
+
+**Test Coverage Progress**:
+- Current: 71 tests, 183 assertions
+- Previous: 28 tests, 100 assertions
+- Growth: +43 tests (+153%), +83 assertions (+83%)
 
 ## Current Phase Details
 
@@ -89,6 +94,36 @@
 2. ⏳ 聯繫 PayUNi 確認通知機制
 3. ⏳ CVS 付款測試（延後）
 
+### Phase 5: 測試覆蓋率提升 🔄 IN PROGRESS
+
+**Goal**: 達到 60% 測試覆蓋率，確保核心流程穩定
+
+**Requirements**:
+- [ ] TEST-01: 核心支付流程測試覆蓋率 60%+
+- [x] TEST-02: Webhook 處理邊界案例測試 ✅
+- [ ] TEST-03: 訂閱續扣狀態機測試
+- [x] TEST-04: 加密服務單元測試 ✅
+
+**Completed Plans**:
+1. ✅ **Plan 01: CryptoService 單元測試** (2026-01-29)
+   - 建立 PayUNiCryptoServiceTest (45 tests, 107 assertions)
+   - 測試覆蓋：加密、解密、簽章、邊界案例、安全性
+   - Commits: 36299fc, b67ef41, 416eae3
+
+2. ✅ **Plan 02: Webhook NotifyHandler 邊界案例測試** (2026-01-29)
+   - 建立 PayUNiTestHelper 共用測試輔助類別
+   - 建立 NotifyHandlerTest (19 tests, 38 assertions)
+   - 測試覆蓋：MerTradeNo 解析、簽章驗證、去重邏輯
+   - Commits: e49fcb4, 6d13270, c3dc9e2
+
+**Phase Progress**: 2/5 plans (40%)
+**Test Suite**: 71 tests, 183 assertions (+153% from Phase 4)
+
+**Next Steps**:
+1. ⏳ Plan 03: 訂閱狀態機測試（重試邏輯、狀態轉換）
+2. ⏳ Plan 04: Gateway/Processor 核心邏輯測試
+3. ⏳ Plan 05: 整合測試配置、驗證覆蓋率
+
 ### Phase 4: Webhook 可靠性 ✅ COMPLETED
 
 **Goal**: 改善 webhook 處理的可靠性和冪等性
@@ -138,6 +173,14 @@
 1. ⏳ Phase 5: 測試覆蓋率提升
 
 ## Recent Changes
+
+### 2026-01-29 (Phase 5 Plan 02 Complete)
+- ✓ **Phase 5 Plan 02: Webhook NotifyHandler 邊界案例測試 完成**
+  - 建立 PayUNiTestHelper 共用測試輔助類別（170 lines）
+  - 建立 NotifyHandlerTest（19 tests, 38 assertions）
+  - 測試覆蓋：MerTradeNo 解析、簽章驗證、去重邏輯
+  - 測試套件增至 71 tests, 183 assertions
+  - Commits: e49fcb4, 6d13270, c3dc9e2
 
 ### 2026-01-29 (Phase 4 Complete)
 - ✓ **Phase 4: Webhook 可靠性 完成**
