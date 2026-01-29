@@ -3,8 +3,8 @@
 ## Current Status
 
 **Phase**: 5 (測試覆蓋率提升)
-**Status**: 🔄 In Progress (4/5 plans complete)
-**Last Updated**: 2026-01-29 17:51
+**Status**: ✅ Completed (5/5 plans complete)
+**Last Updated**: 2026-01-29 18:01
 
 ## Progress
 
@@ -14,9 +14,9 @@
 | 2: 訂閱重試機制 | ✅ Completed | 100% |
 | 3: ATM/CVS 測試 | ⏸️ Paused (Webhook Issue) | 80% |
 | 4: Webhook 可靠性 | ✅ Completed | 100% (5/5 plans) |
-| 5: 測試覆蓋率 | 🔄 In Progress | 80% (4/5 plans) |
+| 5: 測試覆蓋率 | ✅ Completed | 100% (5/5 plans) |
 
-**Overall**: 8/11 requirements completed (73%)
+**Overall**: 9/11 requirements completed (82%)
 
 **Test Coverage Progress**:
 - Current: 47 tests → 139 tests (+92 tests, +196%)
@@ -136,11 +136,20 @@
    - 邏輯提取模式：重新實作可測試的純 PHP 邏輯
    - Commits: 98c266c, 5e9d67b
 
-**Phase Progress**: 4/5 plans (80%)
+**Phase Progress**: 5/5 plans (100%) ✅ PHASE COMPLETE
+
 **Test Suite**: 139 tests, 385 assertions (+96% tests from Phase 4 end)
 
-**Next Steps**:
-1. ⏳ Plan 05: 整合測試配置、驗證覆蓋率
+**Completed Plans**:
+1. ✅ Plan 01: CryptoService 單元測試
+2. ✅ Plan 02: NotifyHandler 邊界案例測試
+3. ✅ Plan 03: SubscriptionStateMachine 測試
+4. ✅ Plan 04: Gateway/Processor 核心邏輯測試
+5. ✅ Plan 05: 測試整合與文件 (2026-01-29)
+   - 更新 phpunit-unit.xml (coverage: includes/ → src/)
+   - 建立 tests/Unit/README.md (365 行完整文件)
+   - 驗證 139 tests, 385 assertions 全數通過
+   - Commits: b3fc61f, 0f9ae86
 
 ### Phase 4: Webhook 可靠性 ✅ COMPLETED
 
@@ -191,6 +200,28 @@
 1. ⏳ Phase 5: 測試覆蓋率提升
 
 ## Recent Changes
+
+### 2026-01-29 (Phase 5 Complete)
+- ✓ **Phase 5: 測試覆蓋率提升 完成**
+  - **所有 5 個 plans 完成**
+  - Plan 01: CryptoService 單元測試 (24 tests)
+  - Plan 02: NotifyHandler 邊界案例 (3 tests)
+  - Plan 03: SubscriptionStateMachine 測試 (32 tests)
+  - Plan 04: Gateway/Processor 核心邏輯 (36 tests)
+  - Plan 05: 測試整合與文件 ⭐ NEW
+  - 測試套件：47 → 139 tests (+196%), 138 → 385 assertions (+179%)
+  - phpunit-unit.xml 修正 coverage 目錄為 src/
+  - 建立完整測試文件 (tests/Unit/README.md, 365 行)
+
+### 2026-01-29 (Phase 5 Plan 05 Complete)
+- ✓ **Phase 5 Plan 05: 測試整合與文件 完成**
+  - 更新 phpunit-unit.xml（coverage: includes/ → src/）
+  - 加入 coverage report 配置（HTML + text）
+  - 加入 testdox logging
+  - 建立 tests/Unit/README.md（365 行）
+  - 文件包含：測試結構、執行指令、分類、模式、fixtures、troubleshooting
+  - 驗證全部 139 tests, 385 assertions 通過
+  - Commits: b3fc61f, 0f9ae86
 
 ### 2026-01-29 (Phase 5 Plan 03 Complete)
 - ✓ **Phase 5 Plan 03: SubscriptionStateMachine 測試 完成**
