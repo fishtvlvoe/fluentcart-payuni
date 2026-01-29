@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 7 of 11 (Webhook Log Viewer UI)
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-01-29 — Completed Phase 6 (Meta Storage & Order Detail Integration)
+Plan: 1 of 2 complete (07-01 ✓)
+Status: In progress
+Last activity: 2026-01-29 — Completed 07-01-PLAN.md (Webhook Log Viewer 基礎架構)
 
-Progress: [█████████░] 18% (v1.1 - 2/11 plans complete, 1/6 phases complete)
+Progress: [█████████░] 23% (v1.1 - 3/13 plans complete, 1/6 phases complete)
 
 ## Performance Metrics
 
@@ -39,9 +39,9 @@ Progress: [█████████░] 18% (v1.1 - 2/11 plans complete, 1/6 
 - 81 commits across 5 phases
 
 **v1.1 Progress:**
-- Plans completed: 2/11
-- Average duration: 2.5 min (06-01: 2 min, 06-02: 3 min)
-- Phases completed: 1/6 (Phase 6: 2/2 plans complete)
+- Plans completed: 3/13
+- Average duration: 3 min (06-01: 2 min, 06-02: 3 min, 07-01: 3.5 min)
+- Phases completed: 1/6 (Phase 6: 2/2 plans complete, Phase 7: 1/2 plans complete)
 
 ## Accumulated Context
 
@@ -60,6 +60,9 @@ Recent decisions affecting v1.1 work:
 - **Credit card info by payment type (06-02)**: Subscription has card_last4 + card_expiry, one-time only has card_last4 (PayUNi security)
 - **Card brand detection (06-02)**: Client-side pattern matching from first digits, no API call needed
 - **SPA-aware JavaScript (06-02)**: FluentCart uses Vue.js hash routing, listen to hashchange event for re-rendering
+- **LONGTEXT for raw_payload (07-01)**: Use LONGTEXT instead of TEXT/MEDIUMTEXT for webhook payloads (4GB limit ensures no truncation)
+- **webhook_status column (07-01)**: Single enum column ('processed', 'duplicate', 'failed', 'pending') instead of multiple boolean flags (easier to query and extend)
+- **manage_fluentcart capability (07-01)**: Allow FluentCart shop managers webhook log access without full admin privileges
 
 Full decision log: PROJECT.md Key Decisions table
 
@@ -85,11 +88,11 @@ None yet (v1.1 just started)
 
 ## Session Continuity
 
-Last session: 2026-01-29 20:27
-Stopped at: Completed Phase 6 (2 plans, 5 min total, goal verified)
+Last session: 2026-01-29 21:05
+Stopped at: Completed 07-01-PLAN.md (Webhook Log Viewer 基礎架構)
 Resume file: None
 
-**Next action:** Plan Phase 7 (Webhook Log Viewer UI) via `/gsd:plan-phase 7`
+**Next action:** Execute 07-02-PLAN.md (Webhook Log Viewer 前端實作)
 
 ---
 
