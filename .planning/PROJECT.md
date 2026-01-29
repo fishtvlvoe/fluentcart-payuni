@@ -10,25 +10,28 @@ FluentCart 的台灣統一金流（PayUNi）整合外掛，提供完整的支付
 
 FluentCart 是優秀的 WordPress 電商平台，但缺乏台灣在地支付方式。此外掛透過逆向工程其他外掛（特別是 woomp），實現與 PayUNi（統一金流）的完整整合。
 
-## Current State (v1.0 Shipped - 2026-01-29)
+## Current State (v1.1 Shipped - 2026-01-30)
 
-**Status:** ✅ **PRODUCTION READY**
+**Status:** ✅ **PRODUCTION READY - Backend Integration Complete**
 
-**Milestone v1.0 Achievements:**
-- ✅ **Webhook 可靠性** — 資料庫去重（24h TTL）+ idempotency key 機制
-- ✅ **測試覆蓋率** — 從 0% → 67%（139 tests, 385 assertions）
-- ✅ **訂閱功能修復** — 卡片更換 3D 驗證 + 帳單日期同步 + 續扣重試機制
-- ✅ **核心流程穩定** — 支付處理、加密服務、Webhook 處理全部經過測試驗證
+**Milestone v1.1 Achievements:**
+- ✅ **FluentCart 後台完整整合** — 4 個新管理頁面（Dashboard、Webhook 日誌、設定、使用指南）
+- ✅ **訂單/訂閱資訊展示** — PayUNi 交易狀態、ATM/CVS/信用卡資訊、續扣歷史、失敗診斷
+- ✅ **Webhook 除錯工具** — 完整的日誌查看器，支援搜尋、過濾、Payload 查看
+- ✅ **統計儀表板** — Chart.js 視覺化、支付分布、續扣成功率趨勢
+- ✅ **商家使用指南** — 快速開始、功能位置、FAQ、故障排查（8 個問題文件化）
+- ✅ **測試覆蓋率** — 177 tests, 498 assertions（從 v1.0 的 139/385 提升）
 
 **Known Issues:**
-- ⚠️ ATM webhook 自動觸發（PayUNi 測試環境問題，已有 workaround）
-- ⏸️ CVS 付款測試（延後至 v1.1）
+- ⚠️ ATM webhook 自動觸發（PayUNi 測試環境問題，已有 workaround）— 延續自 v1.0
+- ⏸️ CVS 付款測試（測試環境限制）— 延續自 v1.0
 
-**Next Goals (v1.1):**
-1. 完成 ATM/CVS 真實交易測試
-2. 前端 Dashboard UI 整合
-3. 監控和告警機制
-4. 效能優化（批次續扣）
+**Next Goals (v1.2):**
+1. 退款按鈕整合（PayUNi Refund API）
+2. 批次操作功能（批次 Webhook 檢查、批次重試失敗續扣）
+3. 訂閱續扣失敗告警（Email 通知）
+4. 效能優化（Action Scheduler 批次處理）
+5. 完成 ATM/CVS 真實交易測試
 
 ## Who This Is For
 
@@ -51,11 +54,20 @@ FluentCart 是優秀的 WordPress 電商平台，但缺乏台灣在地支付方�
 5. ✅ 測試覆蓋率達到 67%（超越 60% 目標）
 6. ✅ Webhook 去重機制可靠（資料庫 + idempotency key）
 
-**v1.1 目標（規劃中）**：
+**v1.1 目標（✅ 已完成 - 2026-01-30）**：
+1. ✅ FluentCart 後台完整整合（4 個管理頁面）
+2. ✅ 訂單/訂閱交易資訊展示
+3. ✅ Webhook 日誌查看器和除錯工具
+4. ✅ Dashboard 統計儀表板（Chart.js）
+5. ✅ 商家使用指南和文件
+6. ✅ 30/30 requirements 完成（100%）
+
+**v1.2 目標（規劃中）**：
+- 退款按鈕整合（PayUNi Refund API）
+- 批次操作功能
+- 訂閱續扣失敗告警（Email）
+- 效能優化（Action Scheduler）
 - ATM/CVS 真實交易測試完成
-- 前端 Dashboard 整合
-- 監控和告警系統
-- 效能優化
 
 **未來 milestone**：
 - v2: 多金流架構重構（抽象層 + PayUNi adapter）
@@ -80,20 +92,34 @@ FluentCart 是優秀的 WordPress 電商平台，但缺乏台灣在地支付方�
 
 ### Completed in v1.0 (2026-01-29)
 
-- [x] **SUB-03**: 訂閱卡片更換功能（✅ 修復 3D 驗證參數遺失）
-- [x] **SUB-04**: 訂閱帳單日期自動同步（✅ 驗證功能正常）
-- [x] **SUB-05**: 訂閱續扣失敗重試機制（✅ 24h/48h/72h 間隔）
-- [x] **WEBHOOK-03**: Webhook 去重機制（✅ 資料庫 + 24h TTL）
-- [x] **API-01**: PayUNi API idempotency key（✅ UUID-based）
-- [x] **TEST-01**: 核心支付流程測試（✅ 67% 覆蓋率）
-- [x] **TEST-02**: Webhook 邊界案例測試（✅ 15 tests）
-- [x] **TEST-03**: 訂閱狀態機測試（✅ 32 tests）
-- [x] **TEST-04**: 加密服務單元測試（✅ 24 tests）
+- ✓ **SUB-03**: 訂閱卡片更換功能 — v1.0（修復 3D 驗證參數遺失）
+- ✓ **SUB-04**: 訂閱帳單日期自動同步 — v1.0（驗證功能正常）
+- ✓ **SUB-05**: 訂閱續扣失敗重試機制 — v1.0（24h/48h/72h 間隔）
+- ✓ **WEBHOOK-03**: Webhook 去重機制 — v1.0（資料庫 + 24h TTL）
+- ✓ **API-01**: PayUNi API idempotency key — v1.0（UUID-based）
+- ✓ **TEST-01**: 核心支付流程測試 — v1.0（67% 覆蓋率）
+- ✓ **TEST-02**: Webhook 邊界案例測試 — v1.0（15 tests）
+- ✓ **TEST-03**: 訂閱狀態機測試 — v1.0（32 tests）
+- ✓ **TEST-04**: 加密服務單元測試 — v1.0（24 tests）
 
-### Deferred to v1.1
+### Completed in v1.1 (2026-01-30)
+
+- ✓ **ORDER-01~05**: 訂單頁面整合 — v1.1（交易狀態、ATM/CVS/信用卡資訊展示）
+- ✓ **WEBHOOK-04~08**: Webhook 日誌查看器 — v1.1（管理頁面、搜尋過濾、Payload 查看）
+- ✓ **SUB-06~09**: 訂閱頁面整合 — v1.1（續扣歷史、卡片資訊、失敗診斷）
+- ✓ **DASH-01~05**: Dashboard 統計 — v1.1（Chart.js 圖表、支付分布、續扣成功率）
+- ✓ **SETTING-01~05**: 設定頁面整合 — v1.1（憑證狀態、Webhook 測試、快速連結）
+- ✓ **GUIDE-01~05**: 使用者引導 — v1.1（使用指南、FAQ、故障排查、Tooltips）
+- ✓ **INFRA-01~05**: 基礎設施 — v1.1（Hook priority、權限、Eager loading、資源隔離）
+
+### Deferred to v1.2
 
 - [ ] **ATM-03**: ATM 實際付款端到端測試（⏸️ 外部服務問題）
 - [ ] **CVS-03**: 超商實際付款端到端測試（⏸️ 測試環境限制）
+- [ ] **REFUND-02**: 退款按鈕整合（PayUNi Refund API）
+- [ ] **BATCH-01**: 批次操作功能
+- [ ] **ALERT-01**: 訂閱續扣失敗告警（Email）
+- [ ] **PERF-01**: 批次續扣效能優化（Action Scheduler）
 
 ### Out of Scope（明確排除）
 
@@ -131,7 +157,11 @@ FluentCart 是優秀的 WordPress 電商平台，但缺乏台灣在地支付方�
 | 訂閱 bug 修復優先於 ATM 測試 | 自動續扣對商家更關鍵 | ✓ 訂閱功能全部修復完成 |
 | 測試覆蓋率目標 60%（非 80%+）| 平衡品質與開發效率 | ✓ 達成 67%（超越目標）|
 | Webhook 去重改用資料庫 | Transient TTL 10 分鐘不可靠 | ✓ payuni_webhook_log 資料表建立 |
-| Phase-based GSD workflow | 系統化執行計畫和驗證 | ✓ 5 phases, 10 plans, 81 commits |
+| Phase-based GSD workflow | 系統化執行計畫和驗證 | ✓ v1.0: 5 phases, v1.1: 6 phases |
+| Filter-based integration (v1.1) | 使用 FluentCart hooks/filters 而非修改核心 | ✓ 升級安全性、無破壞性變更 |
+| WordPress Codex-style documentation (v1.1) | 使用 WordPress Codex 視覺風格 | ✓ 與 WordPress 生態系一致性 |
+| Chart.js CDN + local fallback (v1.1) | CDN 載入 + 本地備援 | ✓ 網路受限環境支援 |
+| 15-min transient caching (v1.1) | WordPress transients 快取統計 | ✓ 降低資料庫負載 |
 
 ## Architecture Notes
 
@@ -189,8 +219,11 @@ FluentCart 是優秀的 WordPress 電商平台，但缺乏台灣在地支付方�
 詳細的 milestone 記錄請參閱：
 - [v1.0 Roadmap Archive](.planning/milestones/v1.0-ROADMAP.md)
 - [v1.0 Requirements Archive](.planning/milestones/v1.0-REQUIREMENTS.md)
-- [v1.0 Audit Report](.planning/v1.0-MILESTONE-AUDIT.md)
+- [v1.0 Audit Report](.planning/milestones/v1.0-MILESTONE-AUDIT.md)
+- [v1.1 Roadmap Archive](.planning/milestones/v1.1-ROADMAP.md)
+- [v1.1 Requirements Archive](.planning/milestones/v1.1-REQUIREMENTS.md)
+- [v1.1 Audit Report](.planning/milestones/v1.1-MILESTONE-AUDIT.md)
 
 ---
 
-*Last updated: 2026-01-29 after v1.0 milestone completion*
+*Last updated: 2026-01-30 after v1.1 milestone completion*
