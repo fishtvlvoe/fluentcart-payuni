@@ -2,8 +2,8 @@
 
 ## Current Status
 
-**Phase**: 2 (訂閱重試機制)
-**Status**: ✅ Completed → Phase 3 Ready
+**Phase**: 4 (Webhook 可靠性)
+**Status**: 🔵 In Progress (Plan 01 完成)
 **Last Updated**: 2026-01-29
 
 ## Progress
@@ -12,11 +12,11 @@
 |-------|--------|------------|
 | 1: 訂閱核心修復 | ✅ Completed | 100% |
 | 2: 訂閱重試機制 | ✅ Completed | 100% |
-| 3: ATM/CVS 測試 | 🔵 Ready to Start | 0% |
-| 4: Webhook 可靠性 | ⚪ Not Started | 0% |
+| 3: ATM/CVS 測試 | ⏸️ Paused (Webhook Issue) | 80% |
+| 4: Webhook 可靠性 | 🔵 In Progress | 33% (1/3 plans) |
 | 5: 測試覆蓋率 | ⚪ Not Started | 0% |
 
-**Overall**: 3/11 requirements completed (27%)
+**Overall**: 4/11 requirements completed (36%)
 
 ## Current Phase Details
 
@@ -89,7 +89,36 @@
 2. ⏳ 聯繫 PayUNi 確認通知機制
 3. ⏳ CVS 付款測試（延後）
 
+### Phase 4: Webhook 可靠性 🔵 IN PROGRESS
+
+**Goal**: 改善 webhook 處理的可靠性和冪等性
+
+**Requirements**:
+- [x] WEBHOOK-03: Webhook 去重機制改為資料庫實作 ✅
+- [ ] API-01: PayUNi API 呼叫加入 idempotency key
+- [ ] TEST-02: Webhook 處理邊界案例測試
+
+**Completed Plans**:
+1. ✅ **Plan 01: Webhook 去重基礎設施** (2026-01-29)
+   - 建立 `payuni_webhook_log` 資料表
+   - 實作 `WebhookDeduplicationService` (isProcessed, markProcessed, cleanup)
+   - 外掛啟用/升級時自動建立資料表
+   - Commits: f70c570, 6b9496c, c5c2996
+
+**Next Steps**:
+1. ⏳ Plan 02: 整合去重服務到 NotifyHandler 和 ReturnHandler
+2. ⏳ Plan 03: 實作排程清理任務
+
 ## Recent Changes
+
+### 2026-01-29 (Phase 4 Plan 01 Complete)
+- ✓ **Phase 4 Plan 01: Webhook 去重基礎設施 完成**
+  - 建立 `payuni_webhook_log` 資料表（transaction_id + webhook_type unique key）
+  - 實作 `WebhookDeduplicationService`（isProcessed, markProcessed, cleanup）
+  - 外掛啟用時自動建立資料表
+  - 版本升級時自動更新 schema
+  - 取代不可靠的 transient (10 分鐘 TTL) → 資料庫 (24 小時 TTL)
+  - Commits: f70c570, 6b9496c, c5c2996
 
 ### 2026-01-29 (Phase 3 Partial - ATM Testing)
 - ⚠️ **Phase 3: ATM 測試發現 Webhook 問題**
@@ -153,10 +182,10 @@
    - Document: `.planning/ATM-WEBHOOK-ISSUE.md`
 
 ### Medium (P2)
-5. **Webhook 去重不可靠**
-   - Current: Transient (10 min TTL)
-   - Impact: 高負載可能重複處理
-   - Status: Planned in Phase 4
+5. **Webhook 去重不可靠** ✅ FIXED
+   - Current: Database-driven (24h TTL)
+   - Status: ✅ Implemented in Phase 4 Plan 01
+   - Commits: f70c570, 6b9496c, c5c2996
 
 6. **無 API idempotency key**
    - Impact: 重試可能重複扣款
