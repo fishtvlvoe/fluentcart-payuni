@@ -48,8 +48,6 @@ class SettingsPage
      */
     public function registerAdminPage(): void
     {
-        }
-
         add_submenu_page(
             'payuni',
             __('PayUNi 設定', 'fluentcart-payuni'),

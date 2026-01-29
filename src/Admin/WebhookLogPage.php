@@ -44,8 +44,6 @@ class WebhookLogPage
      */
     public function registerAdminPage(): void
     {
-        }
-
         add_submenu_page(
             'payuni',
             __('Webhook 記錄', 'fluentcart-payuni'),

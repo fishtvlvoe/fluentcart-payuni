@@ -45,8 +45,6 @@ class UserGuidePage
      */
     public function registerAdminPage(): void
     {
-        }
-
         add_submenu_page(
             'payuni',
             __('PayUNi 使用指南', 'fluentcart-payuni'),
