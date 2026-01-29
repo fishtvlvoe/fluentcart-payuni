@@ -131,6 +131,11 @@ function buygo_fc_payuni_bootstrap(): void
         new \BuyGoFluentCart\PayUNi\Admin\SettingsPage();
     }
 
+    // PayUNi Dashboard Widget：後台統計面板
+    if (class_exists('BuyGoFluentCart\\PayUNi\\Admin\\DashboardWidget')) {
+        new \BuyGoFluentCart\PayUNi\Admin\DashboardWidget();
+    }
+
     // Webhook Log API：提供 REST API 查詢 webhook 處理記錄
     add_action('rest_api_init', function () {
         $api = new \BuyGoFluentCart\PayUNi\API\WebhookLogAPI();

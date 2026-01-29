@@ -1,0 +1,163 @@
+/* Dashboard Layout */
+.payuni-dashboard {
+    max-width: 1200px;
+}
+
+.payuni-dashboard h1 {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.payuni-dashboard .last-updated {
+    color: #909399;
+    margin-bottom: 20px;
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+@media (max-width: 1024px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+    background: #fff;
+    border: 1px solid #e4e7ed;
+    border-radius: 4px;
+    padding: 20px;
+}
+
+.dashboard-card.wide {
+    grid-column: span 2;
+}
+
+@media (max-width: 1024px) {
+    .dashboard-card.wide {
+        grid-column: span 1;
+    }
+}
+
+.dashboard-card h2 {
+    margin: 0 0 15px 0;
+    font-size: 16px;
+    color: #303133;
+    border-bottom: 1px solid #e4e7ed;
+    padding-bottom: 10px;
+}
+
+/* Chart Container */
+.chart-container {
+    position: relative;
+    height: 250px;
+}
+
+/* Stat Highlight */
+.stat-highlight {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.stat-value {
+    font-size: 36px;
+    font-weight: 600;
+    color: #67c23a;
+}
+
+.stat-label {
+    display: block;
+    font-size: 14px;
+    color: #909399;
+}
+
+/* Payment Distribution Legend */
+#payment-distribution-legend {
+    margin-top: 15px;
+}
+
+#payment-distribution-legend .legend-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f6fc;
+}
+
+#payment-distribution-legend .legend-item:last-child {
+    border-bottom: none;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.legend-label {
+    color: #606266;
+}
+
+.legend-value {
+    color: #303133;
+    font-weight: 500;
+}
+
+/* Recent Webhooks Table */
+.dashboard-card table {
+    margin-top: 0;
+}
+
+.dashboard-card .card-footer {
+    margin: 15px 0 0 0;
+    text-align: right;
+}
+
+/* Status Badges */
+.webhook-status {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.webhook-status.processed {
+    background: #f0f9eb;
+    color: #67c23a;
+}
+
+.webhook-status.duplicate {
+    background: #fdf6ec;
+    color: #e6a23c;
+}
+
+.webhook-status.failed {
+    background: #fef0f0;
+    color: #f56c6c;
+}
+
+.webhook-status.pending {
+    background: #f4f4f5;
+    color: #909399;
+}
+
+/* Loading State */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #909399;
+}
