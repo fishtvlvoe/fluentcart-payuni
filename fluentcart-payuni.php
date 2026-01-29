@@ -121,6 +121,11 @@ function buygo_fc_payuni_bootstrap(): void
         new \BuyGoFluentCart\PayUNi\Admin\SubscriptionPayUNiMetaBox();
     }
 
+    // PayUNi Menu Manager：建立獨立的 PayUNi 主選單（不依附於 FluentCart）
+    if (class_exists('BuyGoFluentCart\\PayUNi\\Admin\\PayUNiMenuManager')) {
+        new \BuyGoFluentCart\PayUNi\Admin\PayUNiMenuManager();
+    }
+
     // Webhook Log Viewer Admin Page：後台 Webhook 記錄檢視頁面
     if (class_exists('BuyGoFluentCart\\PayUNi\\Admin\\WebhookLogPage')) {
         new \BuyGoFluentCart\PayUNi\Admin\WebhookLogPage();

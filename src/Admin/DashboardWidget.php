@@ -43,7 +43,7 @@ class DashboardWidget
     }
 
     /**
-     * Register admin page under FluentCart menu.
+     * Register admin page under PayUNi menu.
      */
     public function registerAdminPage(): void
     {
@@ -53,13 +53,13 @@ class DashboardWidget
         }
 
         add_submenu_page(
-            'fluent-cart',
+            'payuni',
             __('PayUNi Dashboard', 'fluentcart-payuni'),
-            __('PayUNi Dashboard', 'fluentcart-payuni'),
+            __('Dashboard', 'fluentcart-payuni'),
             'manage_fluentcart',
             self::PAGE_SLUG,
             [$this, 'renderPage'],
-            5 // Position before Webhook Logs
+            1 // Position at top
         );
     }
 

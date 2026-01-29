@@ -40,7 +40,7 @@ class WebhookLogPage
     }
 
     /**
-     * Register admin page under FluentCart menu.
+     * Register admin page under PayUNi menu.
      */
     public function registerAdminPage(): void
     {
@@ -50,7 +50,7 @@ class WebhookLogPage
         }
 
         add_submenu_page(
-            'fluent-cart',
+            'payuni',
             __('Webhook 記錄', 'fluentcart-payuni'),
             __('Webhook 記錄', 'fluentcart-payuni'),
             'manage_fluentcart',

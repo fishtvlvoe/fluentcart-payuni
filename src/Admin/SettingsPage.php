@@ -44,7 +44,7 @@ class SettingsPage
     }
 
     /**
-     * Register admin page under FluentCart menu.
+     * Register admin page under PayUNi menu.
      */
     public function registerAdminPage(): void
     {
@@ -54,7 +54,7 @@ class SettingsPage
         }
 
         add_submenu_page(
-            'fluent-cart',
+            'payuni',
             __('PayUNi 設定', 'fluentcart-payuni'),
             __('PayUNi 設定', 'fluentcart-payuni'),
             'manage_fluentcart',
