@@ -121,6 +121,11 @@ function buygo_fc_payuni_bootstrap(): void
         new \BuyGoFluentCart\PayUNi\Admin\WebhookLogPage();
     }
 
+    // PayUNi Settings Page：後台設定頁面（憑證狀態、Webhook URL、連線測試）
+    if (class_exists('BuyGoFluentCart\\PayUNi\\Admin\\SettingsPage')) {
+        new \BuyGoFluentCart\PayUNi\Admin\SettingsPage();
+    }
+
     // Webhook Log API：提供 REST API 查詢 webhook 處理記錄
     add_action('rest_api_init', function () {
         $api = new \BuyGoFluentCart\PayUNi\API\WebhookLogAPI();

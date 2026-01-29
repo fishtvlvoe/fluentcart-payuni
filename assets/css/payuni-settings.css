@@ -1,0 +1,131 @@
+/**
+ * PayUNi Settings Page Styles
+ *
+ * @since 1.1.0
+ */
+
+.payuni-settings-page {
+    max-width: 1200px;
+}
+
+.settings-section {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+
+.settings-section h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.credential-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.credential-card {
+    border: 2px solid #ddd;
+    padding: 15px;
+    border-radius: 4px;
+}
+
+.credential-card.active {
+    border-color: #2271b1;
+    background: #f0f6fc;
+}
+
+.credential-card.filled {
+    border-left: 4px solid #46b450;
+}
+
+.credential-card.empty {
+    border-left: 4px solid #dc3232;
+}
+
+.credential-card h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 15px;
+}
+
+.credential-card ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.credential-card li {
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.credential-card li:last-child {
+    margin-bottom: 0;
+}
+
+.webhook-url-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.webhook-url-row label {
+    min-width: 100px;
+    font-weight: 600;
+}
+
+.webhook-url-row input {
+    flex: 1;
+    font-family: monospace;
+    font-size: 13px;
+    padding: 5px 10px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 3px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.status-badge.mode-test {
+    background: #f0f6fc;
+    color: #2271b1;
+}
+
+.status-badge.mode-live {
+    background: #d4f4dd;
+    color: #00a32a;
+}
+
+.status-success {
+    color: #46b450;
+    font-weight: 600;
+}
+
+.status-error {
+    color: #dc3232;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .credential-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .webhook-url-row {
+        flex-wrap: wrap;
+    }
+
+    .webhook-url-row label {
+        width: 100%;
+    }
+}
