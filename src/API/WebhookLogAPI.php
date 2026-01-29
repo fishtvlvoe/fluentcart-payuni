@@ -155,13 +155,13 @@ final class WebhookLogAPI
     }
 
     /**
-     * 權限檢查：允許管理員和 FluentCart 商店管理員查詢
+     * 權限檢查：只允許管理員查詢
      *
      * @return bool 是否有權限
      */
     public function permission_check(): bool
     {
-        // 允許管理員或 FluentCart 商店管理員查詢
-        return current_user_can('manage_options') || current_user_can('manage_fluentcart');
+        // 只允許管理員查詢
+        return current_user_can('manage_options');
     }
 }

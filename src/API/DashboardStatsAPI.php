@@ -56,15 +56,15 @@ final class DashboardStatsAPI
     }
 
     /**
-     * 權限檢查：允許管理員和 FluentCart 商店管理員查詢
+     * 權限檢查：只允許管理員查詢
      *
-     * 白話：只有具備 manage_options 或 manage_fluentcart 權限的使用者才能查詢統計資料。
+     * 白話：只有具備 manage_options 權限的使用者（管理員）才能查詢統計資料。
      *
      * @return bool 是否有權限
      */
     public function permission_check(): bool
     {
-        // 允許管理員或 FluentCart 商店管理員查詢
-        return current_user_can('manage_options') || current_user_can('manage_fluentcart');
+        // 只允許管理員查詢
+        return current_user_can('manage_options');
     }
 }
