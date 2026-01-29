@@ -36,15 +36,17 @@
 
 ### 可靠性提升（Reliability）
 
-- [ ] **WEBHOOK-03**: Webhook 去重機制使用資料庫記錄
+- [x] **WEBHOOK-03**: Webhook 去重機制使用資料庫記錄 ✅
   - 接受標準：同一 transaction_id 在 24 小時內只處理一次，高負載下不重複
   - 技術細節：新增 `payuni_webhook_log` 資料表
   - 對應：Phase 4
+  - 完成：2026-01-29 (Commits: f70c570, 6b9496c, c5c2996, f7b3ee7)
 
-- [ ] **API-01**: PayUNi API 呼叫加入 idempotency key
+- [x] **API-01**: PayUNi API 呼叫加入 idempotency key ✅
   - 接受標準：網路重試時不會重複扣款
-  - 技術細節：在 `PayUNiCryptoService` 加入 UUID 生成
+  - 技術細節：在 `IdempotencyService` 加入 UUID 生成，`PayUNiAPI` 記錄 idempotency key
   - 對應：Phase 4
+  - 完成：2026-01-29 (Commits: c540817, aa6ccae)
 
 ### 測試覆蓋率（Test Coverage）
 
@@ -99,9 +101,9 @@
 | SUB-05 | 2 | ✅ Completed | 2026-01-29 |
 | ATM-03 | 3 | Pending | - |
 | CVS-03 | 3 | Pending | - |
-| WEBHOOK-03 | 4 | Pending | - |
-| API-01 | 4 | Pending | - |
-| TEST-01 | 5 | 🔄 Partial (16 tests) | 2026-01-29 |
+| WEBHOOK-03 | 4 | ✅ Completed | 2026-01-29 |
+| API-01 | 4 | ✅ Completed | 2026-01-29 |
+| TEST-01 | 5 | 🔄 Partial (28 tests) | 2026-01-29 |
 | TEST-02 | 5 | Pending | - |
 | TEST-03 | 5 | 🔄 Partial | 2026-01-29 |
 | TEST-04 | 5 | Pending | - |
