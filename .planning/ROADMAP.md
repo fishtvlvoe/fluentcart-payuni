@@ -124,11 +124,12 @@ Plans:
   4. Common FAQ answers provided (ATM account location, subscription renewal failure handling, webhook debugging)
   5. Integration points include tooltip and help links
   6. Vue 3 + Element Plus used consistently with FluentCart backend
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 11-01: TBD
-- [ ] 11-02: TBD
+- [ ] 11-01-PLAN.md — User Guide page with sidebar navigation and Quick Start section
+- [ ] 11-02-PLAN.md — FAQ and Troubleshooting sections with error table and checklists
+- [ ] 11-03-PLAN.md — Integration points (tooltips, help buttons) and unit tests
 
 ### 📋 v1.2 Advanced Features (Planned)
 
@@ -154,7 +155,7 @@ Phases execute in numeric order: 6 → 7 → 8 → 9 → 10 → 11
 | 8. Settings Page Integration | v1.1 | 2/2 | Complete | 2026-01-29 |
 | 9. Subscription Detail Enhancement | v1.1 | 2/2 | Complete | 2026-01-29 |
 | 10. Dashboard Statistics & Monitoring | v1.1 | 2/2 | Complete | 2026-01-29 |
-| 11. User Guidance and Documentation | v1.1 | 0/TBD | Not started | - |
+| 11. User Guidance and Documentation | v1.1 | 0/3 | Not started | - |
 
 ---
 
