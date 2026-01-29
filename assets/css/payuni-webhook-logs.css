@@ -1,0 +1,288 @@
+/**
+ * PayUNi Webhook Logs Viewer Styles
+ *
+ * @package BuyGoFluentCart\PayUNi
+ * @since 1.1.0
+ */
+
+/* Container */
+.payuni-webhook-logs-wrap {
+    max-width: 1400px;
+    margin: 20px auto;
+}
+
+.payuni-webhook-logs-wrap h1 {
+    margin-bottom: 20px;
+}
+
+/* Filters */
+.payuni-logs-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+}
+
+.payuni-logs-filters input[type="text"],
+.payuni-logs-filters input[type="date"],
+.payuni-logs-filters select {
+    padding: 6px 10px;
+    border: 1px solid #8c8f94;
+    border-radius: 4px;
+    min-height: 32px;
+}
+
+.payuni-logs-filters input[type="text"] {
+    min-width: 250px;
+}
+
+.payuni-logs-filters input[type="date"] {
+    min-width: 130px;
+}
+
+.payuni-logs-filters select {
+    min-width: 120px;
+}
+
+/* Table */
+#payuni-logs-table {
+    margin-top: 0;
+}
+
+#payuni-logs-table th.column-time {
+    width: 150px;
+}
+
+#payuni-logs-table th.column-type {
+    width: 80px;
+}
+
+#payuni-logs-table th.column-trade-no {
+    width: 180px;
+}
+
+#payuni-logs-table th.column-transaction {
+    width: 280px;
+}
+
+#payuni-logs-table th.column-status {
+    width: 100px;
+}
+
+#payuni-logs-table th.column-actions {
+    width: 100px;
+}
+
+#payuni-logs-table .payuni-logs-loading td {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+}
+
+#payuni-logs-table .payuni-logs-empty td {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+/* Status badges */
+.payuni-status-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.payuni-status-processed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.payuni-status-duplicate {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.payuni-status-failed {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.payuni-status-pending {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+/* Type badges */
+.payuni-type-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.payuni-type-notify {
+    background: #e2e3e5;
+    color: #383d41;
+}
+
+.payuni-type-return {
+    background: #cce5ff;
+    color: #004085;
+}
+
+/* Pagination */
+.payuni-logs-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+    padding: 15px;
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+}
+
+#payuni-logs-page-info {
+    color: #666;
+    font-size: 13px;
+}
+
+/* Modal */
+.payuni-modal {
+    position: fixed;
+    z-index: 100000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.payuni-modal-content {
+    background: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+}
+
+.payuni-modal-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.payuni-modal-close:hover {
+    color: #333;
+}
+
+.payuni-modal-content h2 {
+    margin: 0 0 20px 0;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+/* Detail content */
+.payuni-detail-section {
+    margin-bottom: 20px;
+}
+
+.payuni-detail-section h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 10px 0;
+    color: #333;
+}
+
+.payuni-detail-row {
+    display: flex;
+    padding: 8px 0;
+    border-bottom: 1px dashed #eee;
+}
+
+.payuni-detail-row:last-child {
+    border-bottom: none;
+}
+
+.payuni-detail-label {
+    flex: 0 0 150px;
+    color: #666;
+    font-size: 13px;
+}
+
+.payuni-detail-value {
+    flex: 1;
+    font-size: 13px;
+    word-break: break-all;
+}
+
+.payuni-payload-block {
+    background: #f5f5f5;
+    padding: 15px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* View details button */
+.payuni-view-detail-btn {
+    background: #0073aa;
+    color: #fff;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.payuni-view-detail-btn:hover {
+    background: #005a87;
+}
+
+/* Responsive */
+@media screen and (max-width: 782px) {
+    .payuni-logs-filters {
+        flex-direction: column;
+    }
+
+    .payuni-logs-filters input[type="text"],
+    .payuni-logs-filters input[type="date"],
+    .payuni-logs-filters select {
+        width: 100%;
+        min-width: unset;
+    }
+
+    #payuni-logs-table th.column-transaction {
+        display: none;
+    }
+
+    #payuni-logs-table td:nth-child(4) {
+        display: none;
+    }
+}
