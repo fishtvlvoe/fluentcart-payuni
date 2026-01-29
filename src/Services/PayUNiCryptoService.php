@@ -72,7 +72,8 @@ final class PayUNiCryptoService
         $hashIV = trim($this->settings->getHashIV($mode ?: $this->settings->getMode()));
 
         // Validate hex string before calling hex2bin to prevent warnings
-        if (!ctype_xdigit($encryptInfo)) {
+        // Must be hexadecimal and have even length
+        if (!ctype_xdigit($encryptInfo) || strlen($encryptInfo) % 2 !== 0) {
             return [];
         }
 
