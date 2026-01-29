@@ -102,6 +102,11 @@ function buygo_fc_payuni_bootstrap(): void
         update_option('buygo_fc_payuni_db_version', BUYGO_FC_PAYUNI_VERSION);
     }
 
+    // PayUNi Order Meta Box：在 FluentCart 訂單詳情頁顯示 PayUNi 交易資訊
+    if (class_exists('BuyGoFluentCart\\PayUNi\\Admin\\OrderPayUNiMetaBox')) {
+        new \BuyGoFluentCart\PayUNi\Admin\OrderPayUNiMetaBox();
+    }
+
     // Webhook Log API：提供 REST API 查詢 webhook 處理記錄
     add_action('rest_api_init', function () {
         $api = new \BuyGoFluentCart\PayUNi\API\WebhookLogAPI();
