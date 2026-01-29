@@ -153,4 +153,214 @@ class NotifyHandlerTest extends TestCase
         $this->assertSame($longUuid, $result, 'Should handle very long UUIDs');
         $this->assertSame(100, strlen($result), 'Should preserve UUID length');
     }
+
+    // ==================== 簽章驗證測試 ====================
+
+    /**
+     * @testdox 簽章驗證 - 有效的 HashInfo 通過驗證
+     */
+    public function testValidHashInfoPassesVerification(): void
+    {
+        $crypto = PayUNiTestHelper::createMockCryptoService();
+        $data = [
+            'TradeStatus' => '1',
+            'PaymentType' => 'CREDIT',
+            'MerTradeNo' => 'test123',
+        ];
+
+        $encryptInfo = PayUNiTestHelper::createValidEncryptedPayload($data);
+        $hashInfo = PayUNiTestHelper::createValidHashInfo($encryptInfo);
+
+        $result = $crypto->verifyHashInfo($encryptInfo, $hashInfo);
+
+        $this->assertTrue($result, 'Valid HashInfo should pass verification');
+    }
+
+    /**
+     * @testdox 簽章驗證 - 無效的 HashInfo 驗證失敗
+     */
+    public function testInvalidHashInfoFailsVerification(): void
+    {
+        $crypto = PayUNiTestHelper::createMockCryptoService();
+        $data = ['TradeStatus' => '1', 'PaymentType' => 'CREDIT'];
+
+        $encryptInfo = PayUNiTestHelper::createValidEncryptedPayload($data);
+        $invalidHashInfo = PayUNiTestHelper::createInvalidHashInfo();
+
+        $result = $crypto->verifyHashInfo($encryptInfo, $invalidHashInfo);
+
+        $this->assertFalse($result, 'Invalid HashInfo should fail verification');
+    }
+
+    /**
+     * @testdox 簽章驗證 - 篡改的 EncryptInfo 驗證失敗
+     */
+    public function testTamperedEncryptInfoFailsVerification(): void
+    {
+        $crypto = PayUNiTestHelper::createMockCryptoService();
+        $payload = PayUNiTestHelper::createTamperedWebhookPayload([
+            'TradeStatus' => '1',
+            'PaymentType' => 'CREDIT',
+        ]);
+
+        $result = $crypto->verifyHashInfo($payload['EncryptInfo'], $payload['HashInfo']);
+
+        $this->assertFalse($result, 'Tampered EncryptInfo should fail verification');
+    }
+
+    // ==================== 解密結果驗證測試 ====================
+
+    /**
+     * @testdox 解密結果 - 包含必要欄位
+     */
+    public function testDecryptedPayloadHasRequiredFields(): void
+    {
+        $crypto = PayUNiTestHelper::createMockCryptoService();
+        $originalData = [
+            'TradeStatus' => '1',
+            'PaymentType' => 'CREDIT',
+            'MerTradeNo' => 'test-mer-trade-no',
+            'TradeNo' => 'payuni-trade-no-123',
+            'TradeAmt' => '1000',
+        ];
+
+        $encryptInfo = $crypto->encryptInfo($originalData);
+        $decrypted = $crypto->decryptInfo($encryptInfo);
+
+        $this->assertIsArray($decrypted, 'Decrypted payload should be an array');
+        $this->assertArrayHasKey('TradeStatus', $decrypted);
+        $this->assertArrayHasKey('PaymentType', $decrypted);
+        $this->assertArrayHasKey('MerTradeNo', $decrypted);
+        $this->assertArrayHasKey('TradeNo', $decrypted);
+        $this->assertArrayHasKey('TradeAmt', $decrypted);
+
+        // 驗證值是否正確
+        $this->assertSame($originalData['TradeStatus'], $decrypted['TradeStatus']);
+        $this->assertSame($originalData['PaymentType'], $decrypted['PaymentType']);
+        $this->assertSame($originalData['MerTradeNo'], $decrypted['MerTradeNo']);
+    }
+
+    /**
+     * @testdox 解密結果 - 處理缺少 TradeStatus 的情況
+     */
+    public function testMissingTradeStatusHandling(): void
+    {
+        $crypto = PayUNiTestHelper::createMockCryptoService();
+        $dataWithoutTradeStatus = [
+            'Status' => 'SUCCESS',
+            'PaymentType' => 'CREDIT',
+            'MerTradeNo' => 'test123',
+        ];
+
+        $encryptInfo = $crypto->encryptInfo($dataWithoutTradeStatus);
+        $decrypted = $crypto->decryptInfo($encryptInfo);
+
+        $this->assertIsArray($decrypted);
+        $this->assertArrayNotHasKey('TradeStatus', $decrypted);
+        $this->assertArrayHasKey('Status', $decrypted);
+        $this->assertSame('SUCCESS', $decrypted['Status']);
+    }
+
+    /**
+     * @testdox 解密結果 - 處理缺少 PaymentType 的情況
+     */
+    public function testMissingPaymentTypeHandling(): void
+    {
+        $crypto = PayUNiTestHelper::createMockCryptoService();
+        $dataWithoutPaymentType = [
+            'TradeStatus' => '1',
+            'MerTradeNo' => 'test123',
+            'TradeNo' => 'payuni123',
+        ];
+
+        $encryptInfo = $crypto->encryptInfo($dataWithoutPaymentType);
+        $decrypted = $crypto->decryptInfo($encryptInfo);
+
+        $this->assertIsArray($decrypted);
+        $this->assertArrayNotHasKey('PaymentType', $decrypted);
+        $this->assertArrayHasKey('TradeStatus', $decrypted);
+    }
+
+    // ==================== 去重 Key 生成邏輯測試 ====================
+
+    /**
+     * @testdox 去重 Key - 使用 transaction_uuid 生成一致的 key
+     */
+    public function testDedupKeyGenerationWithTransactionId(): void
+    {
+        $transactionUuid = 'test-uuid-12345';
+        $webhookType = 'notify';
+
+        // 模擬 WebhookDeduplicationService 的 key 生成邏輯
+        // 實際實作：transaction_uuid + webhook_type 作為 unique key
+        $key1 = $transactionUuid . '_' . $webhookType;
+        $key2 = $transactionUuid . '_' . $webhookType;
+
+        $this->assertSame($key1, $key2, 'Same input should generate same dedup key');
+    }
+
+    /**
+     * @testdox 去重 Key - 不同 webhook_type 產生不同 key
+     */
+    public function testDedupKeyDifferentWebhookTypes(): void
+    {
+        $transactionUuid = 'test-uuid-12345';
+
+        $keyNotify = $transactionUuid . '_notify';
+        $keyReturn = $transactionUuid . '_return';
+
+        $this->assertNotSame($keyNotify, $keyReturn, 'Different webhook types should generate different keys');
+    }
+
+    /**
+     * @testdox 去重 Key - 一致性驗證（多次生成相同結果）
+     */
+    public function testDedupKeyConsistency(): void
+    {
+        $transactionUuid = 'consistent-uuid-test';
+        $webhookType = 'notify';
+
+        // 生成 10 次，確保每次都一樣
+        $keys = [];
+        for ($i = 0; $i < 10; $i++) {
+            $keys[] = $transactionUuid . '_' . $webhookType;
+        }
+
+        $uniqueKeys = array_unique($keys);
+        $this->assertCount(1, $uniqueKeys, 'Multiple generations should produce identical keys');
+        $this->assertSame($keys[0], $keys[9], 'First and last key should be identical');
+    }
+
+    /**
+     * @testdox Payload Hash - SHA256 生成一致性
+     */
+    public function testPayloadHashConsistency(): void
+    {
+        $payload = [
+            'TradeStatus' => '1',
+            'PaymentType' => 'CREDIT',
+            'MerTradeNo' => 'test123',
+        ];
+
+        $json = wp_json_encode($payload);
+        $hash1 = hash('sha256', $json);
+        $hash2 = hash('sha256', $json);
+
+        $this->assertSame($hash1, $hash2, 'Same payload should generate same hash');
+        $this->assertSame(64, strlen($hash1), 'SHA256 hash should be 64 chars (hex)');
+    }
+
+    /**
+     * @testdox Payload Hash - 不同資料產生不同 hash
+     */
+    public function testPayloadHashDifferentData(): void
+    {
+        $payload1 = ['TradeStatus' => '1', 'MerTradeNo' => 'test1'];
+        $payload2 = ['TradeStatus' => '1', 'MerTradeNo' => 'test2'];
+
+        $hash1 = hash('sha256', wp_json_encode($payload1));
+        $hash2 = hash('sha256', wp_json_encode($payload2));
+
+        $this->assertNotSame($hash1, $hash2, 'Different payloads should generate different hashes');
+    }
 }

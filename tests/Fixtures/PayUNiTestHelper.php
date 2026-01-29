@@ -3,13 +3,14 @@
 namespace BuyGoFluentCart\PayUNi\Tests\Fixtures;
 
 use BuyGoFluentCart\PayUNi\Services\PayUNiCryptoService;
+use BuyGoFluentCart\PayUNi\Gateway\PayUNiSettingsBase;
 
 /**
  * MockPayUNiSettings
  *
  * 提供測試用的固定設定值（避免依賴實際的 WordPress 設定）
  */
-class MockPayUNiSettings
+class MockPayUNiSettings extends PayUNiSettingsBase
 {
     public const TEST_HASH_KEY = 'abcdefghij1234567890abcdefghij12';
     public const TEST_HASH_IV = '123456789012';
