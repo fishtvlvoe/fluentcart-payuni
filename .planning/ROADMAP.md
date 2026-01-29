@@ -58,11 +58,11 @@ Plans:
   4. Clicking event opens modal/detail page showing complete payload and response
   5. List uses pagination and eager loading (no N+1 query issues)
   6. Duplicate webhook events visually marked as "Duplicate (skipped)"
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 07-01: TBD
-- [ ] 07-02: TBD
+- [x] 07-01-PLAN.md — Admin page infrastructure, database schema enhancement, REST API filters
+- [x] 07-02-PLAN.md — Frontend JavaScript/CSS with table, pagination, filters, and modal
 
 #### Phase 8: Settings Page Integration
 **Goal**: Merchants can configure PayUNi settings and verify connection health
@@ -150,7 +150,7 @@ Phases execute in numeric order: 6 → 7 → 8 → 9 → 10 → 11
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 6. Meta Storage & Order Detail | v1.1 | 2/2 | Complete | 2026-01-29 |
-| 7. Webhook Log Viewer UI | v1.1 | 0/TBD | Not started | - |
+| 7. Webhook Log Viewer UI | v1.1 | 2/2 | Complete | 2026-01-29 |
 | 8. Settings Page Integration | v1.1 | 0/TBD | Not started | - |
 | 9. Subscription Detail Enhancement | v1.1 | 0/TBD | Not started | - |
 | 10. Dashboard Statistics & Monitoring | v1.1 | 0/TBD | Not started | - |
