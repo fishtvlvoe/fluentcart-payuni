@@ -26,6 +26,165 @@
     }
   }
 
+  function renderCardInfo(cardInfo) {
+    if (!cardInfo || !cardInfo.card_last4) {
+      return null;
+    }
+
+    var section = document.createElement('div');
+    section.className = 'payuni-info-section';
+
+    var title = document.createElement('h4');
+    title.textContent = '綁定信用卡';
+    section.appendChild(title);
+
+    var cardBox = document.createElement('div');
+    cardBox.className = 'payuni-card-info';
+
+    var brand = document.createElement('span');
+    brand.className = 'payuni-card-brand';
+    brand.textContent = cardInfo.card_brand || '信用卡';
+    cardBox.appendChild(brand);
+
+    var number = document.createElement('span');
+    number.className = 'payuni-card-number';
+    number.textContent = '**** **** **** ' + cardInfo.card_last4;
+    cardBox.appendChild(number);
+
+    if (cardInfo.card_expiry) {
+      var expiry = document.createElement('span');
+      expiry.className = 'payuni-card-expiry';
+      expiry.textContent = '有效期限 ' + cardInfo.card_expiry;
+      cardBox.appendChild(expiry);
+    }
+
+    var tokenBadge = document.createElement('span');
+    tokenBadge.className = 'payuni-card-token-badge ' + (cardInfo.has_token ? 'has-token' : 'no-token');
+    tokenBadge.textContent = cardInfo.has_token ? 'Token 已儲存' : '無 Token';
+    cardBox.appendChild(tokenBadge);
+
+    section.appendChild(cardBox);
+    return section;
+  }
+
+  function renderBillingInfo(billingInfo) {
+    if (!billingInfo) {
+      return null;
+    }
+
+    var section = document.createElement('div');
+    section.className = 'payuni-info-section';
+
+    var title = document.createElement('h4');
+    title.textContent = '下次扣款資訊';
+    section.appendChild(title);
+
+    var grid = document.createElement('div');
+    grid.className = 'payuni-billing-info';
+
+    // Next billing date
+    var dateItem = document.createElement('div');
+    dateItem.className = 'payuni-billing-item';
+    dateItem.innerHTML = '<label>下次扣款日</label><div class="value">' +
+      (billingInfo.next_billing_date_formatted || '未設定') + '</div>';
+    grid.appendChild(dateItem);
+
+    // Expected amount
+    var amountItem = document.createElement('div');
+    amountItem.className = 'payuni-billing-item';
+    amountItem.innerHTML = '<label>預計金額</label><div class="value">' +
+      (billingInfo.expected_amount || '-') + '</div>';
+    grid.appendChild(amountItem);
+
+    section.appendChild(grid);
+    return section;
+  }
+
+  function renderFailureInfo(failureInfo) {
+    if (!failureInfo || !failureInfo.message) {
+      return null;
+    }
+
+    var section = document.createElement('div');
+    section.className = 'payuni-info-section';
+
+    var alert = document.createElement('div');
+    alert.className = 'payuni-failure-alert';
+
+    var titleDiv = document.createElement('div');
+    titleDiv.className = 'failure-title';
+    titleDiv.textContent = '續扣失敗';
+    alert.appendChild(titleDiv);
+
+    var details = document.createElement('div');
+    details.className = 'failure-details';
+    details.innerHTML = '<p><strong>原因：</strong>' + (failureInfo.message_label || failureInfo.message) + '</p>' +
+      '<p><strong>發生時間：</strong>' + (failureInfo.at || '-') + '</p>';
+    alert.appendChild(details);
+
+    if (failureInfo.retry_count > 0 || failureInfo.next_retry_at) {
+      var retryDiv = document.createElement('div');
+      retryDiv.className = 'retry-info';
+      var retryText = '重試次數：' + (failureInfo.retry_count || 0) + ' / ' + (failureInfo.max_retries || 3);
+      if (failureInfo.exhausted) {
+        retryText += ' (已達上限)';
+      } else if (failureInfo.next_retry_at) {
+        retryText += ' | 下次重試：' + failureInfo.next_retry_at;
+      }
+      retryDiv.textContent = retryText;
+      alert.appendChild(retryDiv);
+    }
+
+    section.appendChild(alert);
+    return section;
+  }
+
+  function renderRenewalHistory(history) {
+    var section = document.createElement('div');
+    section.className = 'payuni-info-section';
+
+    var title = document.createElement('h4');
+    title.textContent = '續扣紀錄';
+    section.appendChild(title);
+
+    var container = document.createElement('div');
+    container.className = 'payuni-renewal-history';
+
+    if (!history || history.length === 0) {
+      var noHistory = document.createElement('div');
+      noHistory.className = 'no-history';
+      noHistory.textContent = '尚無續扣紀錄';
+      container.appendChild(noHistory);
+    } else {
+      var table = document.createElement('table');
+
+      var thead = document.createElement('thead');
+      thead.innerHTML = '<tr><th>日期</th><th>金額</th><th>狀態</th><th>交易編號</th></tr>';
+      table.appendChild(thead);
+
+      var tbody = document.createElement('tbody');
+      history.forEach(function(item) {
+        var tr = document.createElement('tr');
+
+        var statusClass = item.status === 'succeeded' ? 'succeeded' :
+                         item.status === 'failed' ? 'failed' : 'pending';
+
+        tr.innerHTML =
+          '<td>' + (item.date || '-') + '</td>' +
+          '<td>' + (item.amount || '-') + '</td>' +
+          '<td><span class="status-badge ' + statusClass + '">' + (item.status_label || item.status) + '</span></td>' +
+          '<td style="font-family:monospace;font-size:12px;">' + (item.trade_no || '-') + '</td>';
+
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      container.appendChild(table);
+    }
+
+    section.appendChild(container);
+    return section;
+  }
+
   function injectUI(actions, subscription) {
     removeInjectedUI();
 
@@ -165,6 +324,34 @@
 
       nextBillingRow.appendChild(inputGroup);
       body.appendChild(nextBillingRow);
+    }
+
+    // Render PayUNi subscription info sections (from Plan 09-01)
+    var subInfo = subscription.payuni_subscription_info;
+    if (subInfo) {
+      // Card info section
+      var cardSection = renderCardInfo(subInfo.card_info);
+      if (cardSection) {
+        body.appendChild(cardSection);
+      }
+
+      // Failure info section (if failing)
+      var failureSection = renderFailureInfo(subInfo.failure_info);
+      if (failureSection) {
+        body.appendChild(failureSection);
+      }
+
+      // Billing info section
+      var billingSection = renderBillingInfo(subInfo.next_billing_info);
+      if (billingSection) {
+        body.appendChild(billingSection);
+      }
+
+      // Renewal history section
+      var historySection = renderRenewalHistory(subInfo.renewal_history);
+      if (historySection) {
+        body.appendChild(historySection);
+      }
     }
 
     container.appendChild(body);
