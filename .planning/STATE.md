@@ -3,8 +3,8 @@
 ## Current Status
 
 **Phase**: 5 (測試覆蓋率提升)
-**Status**: 🔄 In Progress (2/5 plans complete)
-**Last Updated**: 2026-01-29 17:47
+**Status**: 🔄 In Progress (1/5 plans complete)
+**Last Updated**: 2026-01-29 17:40
 
 ## Progress
 
@@ -14,14 +14,14 @@
 | 2: 訂閱重試機制 | ✅ Completed | 100% |
 | 3: ATM/CVS 測試 | ⏸️ Paused (Webhook Issue) | 80% |
 | 4: Webhook 可靠性 | ✅ Completed | 100% (5/5 plans) |
-| 5: 測試覆蓋率 | 🔄 In Progress | 40% (2/5 plans) |
+| 5: 測試覆蓋率 | 🔄 In Progress | 20% (1/5 plans) |
 
 **Overall**: 7/11 requirements completed (64%)
 
 **Test Coverage Progress**:
-- Current: 71 tests, 183 assertions
-- Previous: 28 tests, 100 assertions
-- Growth: +43 tests (+153%), +83 assertions (+83%)
+- Current: 47 tests → 71 tests (+24 tests, +51%)
+- Assertions: 138 → 183 (+45 assertions, +33%)
+- Phase 5 Plan 01 added: PayUNiCryptoService (24 tests, 45 assertions)
 
 ## Current Phase Details
 
@@ -106,18 +106,14 @@
 
 **Completed Plans**:
 1. ✅ **Plan 01: CryptoService 單元測試** (2026-01-29)
-   - 建立 PayUNiCryptoServiceTest (45 tests, 107 assertions)
+   - 建立 PayUNiCryptoServiceTest (24 tests, 45 assertions)
+   - 建立 MockPayUNiSettings 測試輔助類別
    - 測試覆蓋：加密、解密、簽章、邊界案例、安全性
+   - 發現並修復 2 個 hex 驗證 bug（非 hex 字元、奇數長度）
    - Commits: 36299fc, b67ef41, 416eae3
 
-2. ✅ **Plan 02: Webhook NotifyHandler 邊界案例測試** (2026-01-29)
-   - 建立 PayUNiTestHelper 共用測試輔助類別
-   - 建立 NotifyHandlerTest (19 tests, 38 assertions)
-   - 測試覆蓋：MerTradeNo 解析、簽章驗證、去重邏輯
-   - Commits: e49fcb4, 6d13270, c3dc9e2
-
-**Phase Progress**: 2/5 plans (40%)
-**Test Suite**: 71 tests, 183 assertions (+153% from Phase 4)
+**Phase Progress**: 1/5 plans (20%)
+**Test Suite**: 71 tests, 183 assertions (+51% tests from Phase 4 end)
 
 **Next Steps**:
 1. ⏳ Plan 03: 訂閱狀態機測試（重試邏輯、狀態轉換）
@@ -174,13 +170,14 @@
 
 ## Recent Changes
 
-### 2026-01-29 (Phase 5 Plan 02 Complete)
-- ✓ **Phase 5 Plan 02: Webhook NotifyHandler 邊界案例測試 完成**
-  - 建立 PayUNiTestHelper 共用測試輔助類別（170 lines）
-  - 建立 NotifyHandlerTest（19 tests, 38 assertions）
-  - 測試覆蓋：MerTradeNo 解析、簽章驗證、去重邏輯
-  - 測試套件增至 71 tests, 183 assertions
-  - Commits: e49fcb4, 6d13270, c3dc9e2
+### 2026-01-29 (Phase 5 Plan 01 Complete)
+- ✓ **Phase 5 Plan 01: CryptoService 單元測試 完成**
+  - 建立 PayUNiCryptoServiceTest（24 tests, 45 assertions, 446 lines）
+  - 建立 MockPayUNiSettings 測試輔助類別
+  - 測試覆蓋：加密、解密、簽章、邊界案例、安全性
+  - 發現並修復 2 個 hex 驗證 bug（非 hex 字元、奇數長度）
+  - 測試套件增至 71 tests, 183 assertions（+24 tests, +45 assertions）
+  - Commits: 36299fc, b67ef41, 416eae3
 
 ### 2026-01-29 (Phase 4 Complete)
 - ✓ **Phase 4: Webhook 可靠性 完成**
