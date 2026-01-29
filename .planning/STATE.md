@@ -4,7 +4,7 @@
 
 **Phase**: 4 (Webhook 可靠性)
 **Status**: ✅ Completed (All Plans Complete)
-**Last Updated**: 2026-01-29 17:18
+**Last Updated**: 2026-01-29 17:20
 
 ## Progress
 
@@ -13,7 +13,7 @@
 | 1: 訂閱核心修復 | ✅ Completed | 100% |
 | 2: 訂閱重試機制 | ✅ Completed | 100% |
 | 3: ATM/CVS 測試 | ⏸️ Paused (Webhook Issue) | 80% |
-| 4: Webhook 可靠性 | ✅ Completed | 100% (3/3 plans) |
+| 4: Webhook 可靠性 | ✅ Completed | 100% (5/5 plans) |
 | 5: 測試覆蓋率 | ⚪ Not Started | 0% |
 
 **Overall**: 6/11 requirements completed (55%)
@@ -118,7 +118,14 @@
    - 驗證 MerTradeNo 格式符合規範（≤20 字元）
    - Commits: c540817, aa6ccae
 
-4. ✅ **Plan 05: Webhook 日誌查詢 API** (2026-01-29)
+4. ✅ **Plan 04: 去重機制單元測試** (2026-01-29)
+   - 建立 `IdempotencyServiceTest` (7 tests, 13 assertions)
+   - 建立 `WebhookDeduplicationServiceTest` (5 tests, 12 assertions)
+   - 驗證 key 生成符合 PayUNi 規範（≤20 字元）
+   - 統計驗證唯一性（100 次迭代）
+   - Commits: df16f58, 7f3da08, 3286d75
+
+5. ✅ **Plan 05: Webhook 日誌查詢 API** (2026-01-29)
    - 建立 `WebhookLogAPI` REST endpoint
    - 支援 transaction_id、trade_no、webhook_type 過濾
    - 分頁功能（預設 20 筆，最多 100 筆）
@@ -132,6 +139,24 @@
 
 ## Recent Changes
 
+### 2026-01-29 (Phase 4 Complete)
+- ✓ **Phase 4: Webhook 可靠性 完成**
+  - **所有 5 個 plans 完成**
+  - Plan 01: Webhook 去重基礎設施
+  - Plan 02: Webhook Handler 整合
+  - Plan 03: API Idempotency Key
+  - Plan 04: 去重機制單元測試 ⭐ NEW
+  - Plan 05: Webhook 日誌查詢 API
+  - 測試套件增至 28 tests, 100 assertions
+
+### 2026-01-29 (Phase 4 Plan 04 Complete)
+- ✓ **Phase 4 Plan 04: 去重機制單元測試 完成**
+  - 建立 IdempotencyServiceTest（7 tests, 13 assertions）
+  - 建立 WebhookDeduplicationServiceTest（5 tests, 12 assertions）
+  - 使用 reflection 測試驗證 API 契約（避免 $wpdb 依賴）
+  - 統計方法驗證唯一性（100 次迭代）
+  - Commits: df16f58, 7f3da08, 3286d75
+
 ### 2026-01-29 (Phase 4 Plan 05 Complete)
 - ✓ **Phase 4 Plan 05: Webhook 日誌查詢 API 完成**
   - 建立 `WebhookLogAPI` REST endpoint (`/fluentcart-payuni/v1/webhook-logs`)
@@ -140,7 +165,6 @@
   - 管理員專用（requires manage_options capability）
   - 建立測試腳本和驗證文件
   - Commits: 901165b, a11a330, 5fbcd86
-  - **Phase 4 完成**: 所有 4 個 plans 完成
 
 ### 2026-01-29 (Phase 4 Plans 01-03 Complete)
 - ✓ **Phase 4: Webhook 可靠性 (Plans 01-03)**
@@ -298,7 +322,7 @@ Services (Crypto, Logger)
 - Exception-based error handling
 
 **Testing**:
-- Current: 1 sample test
+- Current: 28 tests, 100 assertions
 - Target: 60% coverage
 - Framework: PHPUnit + Yoast Polyfills
 
