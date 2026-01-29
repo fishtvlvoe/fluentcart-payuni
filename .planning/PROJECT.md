@@ -10,16 +10,25 @@ FluentCart 的台灣統一金流（PayUNi）整合外掛，提供完整的支付
 
 FluentCart 是優秀的 WordPress 電商平台，但缺乏台灣在地支付方式。此外掛透過逆向工程其他外掛（特別是 woomp），實現與 PayUNi（統一金流）的完整整合。
 
-**問題現狀**：
-- 訂閱功能已實作但存在 bug（卡片更換 3D 驗證流程、帳單日期同步）
-- ATM/超商付款已實作但未經過實際支付測試
-- 測試覆蓋率極低（僅 1 個範例測試）
-- Webhook 去重機制不可靠（使用 transient，10 分鐘 TTL）
+## Current State (v1.0 Shipped - 2026-01-29)
 
-**使用者需求**：
-1. 穩定現有 PayUNi 外掛，讓它能可靠地收款（優先）
-2. 未來擴展為「多金流外掛」架構（支援藍新、綠界等）
-3. 未來整合 ezPay 電子發票（獨立外掛）
+**Status:** ✅ **PRODUCTION READY**
+
+**Milestone v1.0 Achievements:**
+- ✅ **Webhook 可靠性** — 資料庫去重（24h TTL）+ idempotency key 機制
+- ✅ **測試覆蓋率** — 從 0% → 67%（139 tests, 385 assertions）
+- ✅ **訂閱功能修復** — 卡片更換 3D 驗證 + 帳單日期同步 + 續扣重試機制
+- ✅ **核心流程穩定** — 支付處理、加密服務、Webhook 處理全部經過測試驗證
+
+**Known Issues:**
+- ⚠️ ATM webhook 自動觸發（PayUNi 測試環境問題，已有 workaround）
+- ⏸️ CVS 付款測試（延後至 v1.1）
+
+**Next Goals (v1.1):**
+1. 完成 ATM/CVS 真實交易測試
+2. 前端 Dashboard UI 整合
+3. 監控和告警機制
+4. 效能優化（批次續扣）
 
 ## Who This Is For
 
@@ -34,13 +43,19 @@ FluentCart 是優秀的 WordPress 電商平台，但缺乏台灣在地支付方�
 
 ## What Success Looks Like
 
-**v1 目標（當前 milestone）**：
+**v1.0 目標（✅ 已完成 - 2026-01-29）**：
 1. ✅ 信用卡一次性付款可靠運作（實體/虛擬商品）
-2. 🔧 訂閱自動續扣無 bug（卡片更換、帳單日期正確）
-3. ✅ ATM 轉帳完整測試（包含實際付款）
-4. ✅ 超商代碼完整測試（包含實際付款）
-5. 📈 測試覆蓋率達到 60%+（核心流程）
-6. 🔒 Webhook 去重機制可靠（使用資料庫而非 transient）
+2. ✅ 訂閱自動續扣無 bug（卡片更換、帳單日期正確、重試機制）
+3. ⏸️ ATM 轉帳完整測試（部分完成 - 外部服務問題）
+4. ⏸️ 超商代碼完整測試（延後至 v1.1）
+5. ✅ 測試覆蓋率達到 67%（超越 60% 目標）
+6. ✅ Webhook 去重機制可靠（資料庫 + idempotency key）
+
+**v1.1 目標（規劃中）**：
+- ATM/CVS 真實交易測試完成
+- 前端 Dashboard 整合
+- 監控和告警系統
+- 效能優化
 
 **未來 milestone**：
 - v2: 多金流架構重構（抽象層 + PayUNi adapter）
@@ -63,19 +78,22 @@ FluentCart 是優秀的 WordPress 電商平台，但缺乏台灣在地支付方�
 - ✓ **WEBHOOK-01**: 非同步通知處理（NotifyURL）— existing
 - ✓ **WEBHOOK-02**: 同步回傳處理（ReturnURL）— existing
 
-### Active（當前要修復/完成）
+### Completed in v1.0 (2026-01-29)
 
-- [ ] **SUB-03**: 訂閱卡片更換功能（修復 3D 驗證參數遺失問題）
-- [ ] **SUB-04**: 訂閱帳單日期自動同步（避免後台顯示 Invalid Date）
-- [ ] **SUB-05**: 訂閱續扣失敗重試機制
-- [ ] **ATM-03**: ATM 實際付款端到端測試（含通知格式驗證）
-- [ ] **CVS-03**: 超商實際付款端到端測試（含通知格式驗證）
-- [ ] **WEBHOOK-03**: Webhook 去重機制改為資料庫實作
-- [ ] **API-01**: PayUNi API 呼叫加入 idempotency key
-- [ ] **TEST-01**: 核心支付流程測試覆蓋率 60%+
-- [ ] **TEST-02**: Webhook 處理邊界案例測試
-- [ ] **TEST-03**: 訂閱續扣狀態機測試
-- [ ] **TEST-04**: 加密服務單元測試
+- [x] **SUB-03**: 訂閱卡片更換功能（✅ 修復 3D 驗證參數遺失）
+- [x] **SUB-04**: 訂閱帳單日期自動同步（✅ 驗證功能正常）
+- [x] **SUB-05**: 訂閱續扣失敗重試機制（✅ 24h/48h/72h 間隔）
+- [x] **WEBHOOK-03**: Webhook 去重機制（✅ 資料庫 + 24h TTL）
+- [x] **API-01**: PayUNi API idempotency key（✅ UUID-based）
+- [x] **TEST-01**: 核心支付流程測試（✅ 67% 覆蓋率）
+- [x] **TEST-02**: Webhook 邊界案例測試（✅ 15 tests）
+- [x] **TEST-03**: 訂閱狀態機測試（✅ 32 tests）
+- [x] **TEST-04**: 加密服務單元測試（✅ 24 tests）
+
+### Deferred to v1.1
+
+- [ ] **ATM-03**: ATM 實際付款端到端測試（⏸️ 外部服務問題）
+- [ ] **CVS-03**: 超商實際付款端到端測試（⏸️ 測試環境限制）
 
 ### Out of Scope（明確排除）
 
@@ -109,10 +127,11 @@ FluentCart 是優秀的 WordPress 電商平台，但缺乏台灣在地支付方�
 |----------|-----------|---------|
 | 使用 Codebase Mapping 分析現狀 | 系統化理解技術債和架構 | ✓ 完成 7 份文件（1572 行） |
 | 分析 woomp 外掛參考模式 | 學習成熟的台灣金流整合模式 | ✓ 完成架構分析 |
-| 穩定現有功能優先於重構 | 讓商家能先收款 | — 進行中 |
-| 訂閱 bug 修復優先於 ATM 測試 | 自動續扣對商家更關鍵 | — Pending |
-| 測試覆蓋率目標 60%（非 80%+）| 平衡品質與開發效率 | — Pending |
-| Webhook 去重改用資料庫 | Transient TTL 10 分鐘不可靠 | — Pending |
+| 穩定現有功能優先於重構 | 讓商家能先收款 | ✓ v1.0 達成（67% 測試覆蓋率）|
+| 訂閱 bug 修復優先於 ATM 測試 | 自動續扣對商家更關鍵 | ✓ 訂閱功能全部修復完成 |
+| 測試覆蓋率目標 60%（非 80%+）| 平衡品質與開發效率 | ✓ 達成 67%（超越目標）|
+| Webhook 去重改用資料庫 | Transient TTL 10 分鐘不可靠 | ✓ payuni_webhook_log 資料表建立 |
+| Phase-based GSD workflow | 系統化執行計畫和驗證 | ✓ 5 phases, 10 plans, 81 commits |
 
 ## Architecture Notes
 
@@ -165,4 +184,13 @@ FluentCart 是優秀的 WordPress 電商平台，但缺乏台灣在地支付方�
 
 ---
 
-*Last updated: 2026-01-29 after project initialization*
+## Milestone Archive
+
+詳細的 milestone 記錄請參閱：
+- [v1.0 Roadmap Archive](.planning/milestones/v1.0-ROADMAP.md)
+- [v1.0 Requirements Archive](.planning/milestones/v1.0-REQUIREMENTS.md)
+- [v1.0 Audit Report](.planning/v1.0-MILESTONE-AUDIT.md)
+
+---
+
+*Last updated: 2026-01-29 after v1.0 milestone completion*
