@@ -545,6 +545,14 @@ function buygo_fc_payuni_bootstrap(): void
             return;
         }
 
+        // Subscription detail page styles
+        wp_enqueue_style(
+            'buygo-fc-payuni-subscription-detail',
+            BUYGO_FC_PAYUNI_URL . 'assets/css/payuni-subscription-detail.css',
+            [],
+            BUYGO_FC_PAYUNI_VERSION
+        );
+
         $script_url = BUYGO_FC_PAYUNI_URL . 'assets/js/payuni-subscription-detail.js';
         wp_enqueue_script(
             'buygo-fc-payuni-subscription-detail',
