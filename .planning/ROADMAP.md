@@ -114,6 +114,15 @@ Plans:
 
 **Priority**: P2
 
+**Plans**: 5 plans
+
+Plans:
+- [ ] 05-01-PLAN.md — CryptoService 單元測試（TDD，加解密、簽章）
+- [ ] 05-02-PLAN.md — Webhook NotifyHandler 邊界案例測試
+- [ ] 05-03-PLAN.md — 訂閱狀態機測試（重試邏輯、狀態轉換）
+- [ ] 05-04-PLAN.md — Gateway/Processor 核心邏輯測試
+- [ ] 05-05-PLAN.md — 整合測試配置、驗證覆蓋率、測試文件
+
 ---
 
 ## Coverage Matrix
