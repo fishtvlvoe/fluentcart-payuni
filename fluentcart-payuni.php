@@ -137,6 +137,14 @@ function buygo_fc_payuni_bootstrap(): void
         $api->register_routes();
     });
 
+    // Dashboard Stats API：提供 Dashboard 統計資料查詢
+    add_action('rest_api_init', function () {
+        if (class_exists('BuyGoFluentCart\\PayUNi\\API\\DashboardStatsAPI')) {
+            $api = new \BuyGoFluentCart\PayUNi\API\DashboardStatsAPI();
+            $api->register_routes();
+        }
+    });
+
     // Phase 4：管理員可修改訂閱下次扣款日（next_billing_date），與續扣邏輯一致。
     add_action('rest_api_init', function () {
         if (!class_exists(\FluentCart\App\Models\Subscription::class) || !class_exists(\FluentCart\App\Modules\Subscriptions\Services\SubscriptionService::class)) {
