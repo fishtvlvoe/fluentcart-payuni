@@ -31,6 +31,14 @@ final class PayUNiSubscriptionRenewalRunner
 {
     private PayUNiSettingsBase $settings;
 
+    // 重試策略常數
+    private const MAX_RETRY_ATTEMPTS = 3;
+    private const RETRY_INTERVALS = [
+        1 => 24,  // 首次失敗：24 小時後重試
+        2 => 48,  // 第二次失敗：48 小時後重試
+        3 => 72,  // 第三次失敗：72 小時後重試
+    ];
+
     public function __construct()
     {
         $this->settings = new PayUNiSettingsBase();
@@ -74,13 +82,14 @@ final class PayUNiSubscriptionRenewalRunner
 
         $creditHash = (string) $subscription->getMeta('payuni_credit_hash', '');
         if (!$creditHash) {
-            // 沒 token 不能扣款 → 標記 failing 讓後台/前台能看出需要更新付款方式
+            // 沒 token 不能扣款 → 直接標記 failing（不重試，因為需要使用者手動更新卡片）
             SubscriptionService::syncSubscriptionStates($subscription, [
                 'status' => Status::SUBSCRIPTION_FAILING,
                 'meta' => [
                     'payuni_last_error' => [
                         'message' => 'missing_credit_hash',
                         'at' => current_time('mysql'),
+                        'no_retry' => true,  // 標記為不可重試
                     ],
                 ],
             ]);
@@ -88,12 +97,14 @@ final class PayUNiSubscriptionRenewalRunner
         }
 
         if (!$email) {
+            // 缺少 email → 直接標記 failing（不重試）
             SubscriptionService::syncSubscriptionStates($subscription, [
                 'status' => Status::SUBSCRIPTION_FAILING,
                 'meta' => [
                     'payuni_last_error' => [
                         'message' => 'missing_customer_email',
                         'at' => current_time('mysql'),
+                        'no_retry' => true,
                     ],
                 ],
             ]);
@@ -144,42 +155,30 @@ final class PayUNiSubscriptionRenewalRunner
         $resp = $api->post('credit', $encryptInfo, '1.0', $mode);
 
         if (is_wp_error($resp)) {
-            SubscriptionService::syncSubscriptionStates($subscription, [
-                'status' => Status::SUBSCRIPTION_FAILING,
-                'meta' => [
-                    'payuni_last_error' => [
-                        'message' => $resp->get_error_message(),
-                        'at' => current_time('mysql'),
-                    ],
-                ],
+            // API 錯誤 → 使用重試機制
+            $this->handleRenewalFailure($subscription, $resp->get_error_message(), [
+                'error_type' => 'api_error',
+                'mer_trade_no' => $merchantTradeNo,
             ]);
             return;
         }
 
         if (empty($resp['EncryptInfo']) || empty($resp['HashInfo'])) {
-            SubscriptionService::syncSubscriptionStates($subscription, [
-                'status' => Status::SUBSCRIPTION_FAILING,
-                'meta' => [
-                    'payuni_last_error' => [
-                        'message' => 'invalid_response_missing_encryptinfo',
-                        'at' => current_time('mysql'),
-                        'raw' => $resp,
-                    ],
-                ],
+            // 回應格式錯誤 → 使用重試機制
+            $this->handleRenewalFailure($subscription, 'invalid_response_missing_encryptinfo', [
+                'error_type' => 'invalid_response',
+                'mer_trade_no' => $merchantTradeNo,
+                'raw' => $resp,
             ]);
             return;
         }
 
         $crypto = new PayUNiCryptoService($this->settings);
         if (!$crypto->verifyHashInfo((string) $resp['EncryptInfo'], (string) $resp['HashInfo'], $mode)) {
-            SubscriptionService::syncSubscriptionStates($subscription, [
-                'status' => Status::SUBSCRIPTION_FAILING,
-                'meta' => [
-                    'payuni_last_error' => [
-                        'message' => 'hash_mismatch',
-                        'at' => current_time('mysql'),
-                    ],
-                ],
+            // 簽章驗證失敗 → 使用重試機制
+            $this->handleRenewalFailure($subscription, 'hash_mismatch', [
+                'error_type' => 'verification_failed',
+                'mer_trade_no' => $merchantTradeNo,
             ]);
             return;
         }
@@ -187,7 +186,7 @@ final class PayUNiSubscriptionRenewalRunner
         $decrypted = $crypto->decryptInfo((string) $resp['EncryptInfo'], $mode);
         $status = (string) Arr::get($decrypted, 'Status', '');
 
-        // 若 PayUNi 要求 3D（回傳 URL），代表客戶需要重新驗證 → 標 failing 並留 URL
+        // 若 PayUNi 要求 3D（回傳 URL），代表客戶需要重新驗證 → 直接標 failing（不重試，需要使用者重新驗證）
         $url = (string) Arr::get($decrypted, 'URL', '');
         if ($url) {
             SubscriptionService::syncSubscriptionStates($subscription, [
@@ -198,6 +197,7 @@ final class PayUNiSubscriptionRenewalRunner
                         'url' => $url,
                         'at' => current_time('mysql'),
                         'raw' => $decrypted,
+                        'no_retry' => true,  // 需要使用者手動驗證
                     ],
                 ],
             ]);
@@ -205,15 +205,12 @@ final class PayUNiSubscriptionRenewalRunner
         }
 
         if ($status !== 'SUCCESS') {
-            SubscriptionService::syncSubscriptionStates($subscription, [
-                'status' => Status::SUBSCRIPTION_FAILING,
-                'meta' => [
-                    'payuni_last_error' => [
-                        'message' => (string) Arr::get($decrypted, 'Message', $status),
-                        'at' => current_time('mysql'),
-                        'raw' => $decrypted,
-                    ],
-                ],
+            // 扣款失敗 → 使用重試機制
+            $this->handleRenewalFailure($subscription, (string) Arr::get($decrypted, 'Message', $status), [
+                'error_type' => 'payment_declined',
+                'status' => $status,
+                'mer_trade_no' => $merchantTradeNo,
+                'raw' => $decrypted,
             ]);
             return;
         }
@@ -240,14 +237,11 @@ final class PayUNiSubscriptionRenewalRunner
         ]);
 
         if (is_wp_error($result)) {
-            SubscriptionService::syncSubscriptionStates($subscription, [
-                'status' => Status::SUBSCRIPTION_FAILING,
-                'meta' => [
-                    'payuni_last_error' => [
-                        'message' => $result->get_error_message(),
-                        'at' => current_time('mysql'),
-                    ],
-                ],
+            // FluentCart recordRenewalPayment 失敗 → 使用重試機制
+            $this->handleRenewalFailure($subscription, $result->get_error_message(), [
+                'error_type' => 'record_renewal_failed',
+                'trade_no' => $tradeNo,
+                'mer_trade_no' => $merchantTradeNo,
             ]);
             return;
         }
@@ -288,8 +282,8 @@ final class PayUNiSubscriptionRenewalRunner
             'next_billing_date' => $nextBillingDate,
         ]);
 
-        // 清掉錯誤標記（如果有）
-        $subscription->updateMeta('payuni_last_error', null);
+        // 成功續扣：清除重試資訊和錯誤標記
+        $this->clearRetryInfo($subscription);
     }
 
     private function normalizeTradeAmount($rawAmount): int
@@ -314,6 +308,122 @@ final class PayUNiSubscriptionRenewalRunner
         $randPart = substr(md5(wp_generate_password(12, false, false)), 0, 2);
         // 盡量短，避免 PayUNi 長度限制
         return 'S' . $subscriptionId . 'A' . $timePart . $randPart;
+    }
+
+    /**
+     * 處理續扣失敗，實作重試邏輯
+     *
+     * @param Subscription $subscription 訂閱物件
+     * @param string $errorMessage 錯誤訊息
+     * @param array $errorData 額外錯誤資料
+     * @return void
+     */
+    private function handleRenewalFailure(Subscription $subscription, string $errorMessage, array $errorData = []): void
+    {
+        // 取得當前重試資訊
+        $retryInfo = $subscription->getMeta('payuni_renewal_retry', []);
+        $currentRetryCount = (int) ($retryInfo['count'] ?? 0);
+
+        // 記錄錯誤歷史
+        $history = $retryInfo['history'] ?? [];
+        $history[] = [
+            'attempt' => $currentRetryCount + 1,
+            'at' => current_time('mysql'),
+            'error' => $errorMessage,
+            'data' => $errorData,
+        ];
+
+        // 如果還沒超過最大重試次數，排程下次重試
+        if ($currentRetryCount < self::MAX_RETRY_ATTEMPTS) {
+            $newRetryCount = $currentRetryCount + 1;
+            $retryHours = self::RETRY_INTERVALS[$newRetryCount];
+            $nextRetryAt = gmdate('Y-m-d H:i:s', time() + ($retryHours * HOUR_IN_SECONDS));
+
+            Logger::info('PayUNi subscription renewal: scheduling retry', [
+                'subscription_id' => $subscription->id,
+                'retry_count' => $newRetryCount,
+                'max_attempts' => self::MAX_RETRY_ATTEMPTS,
+                'next_retry_at' => $nextRetryAt,
+                'retry_in_hours' => $retryHours,
+            ]);
+
+            // 更新重試資訊，但保持訂閱為 active 狀態（只有超過最大重試才改 failing）
+            $subscription->updateMeta('payuni_renewal_retry', [
+                'count' => $newRetryCount,
+                'max' => self::MAX_RETRY_ATTEMPTS,
+                'next_retry_at' => $nextRetryAt,
+                'last_error' => [
+                    'message' => $errorMessage,
+                    'at' => current_time('mysql'),
+                    'data' => $errorData,
+                ],
+                'history' => $history,
+            ]);
+
+            // 將 next_billing_date 設定為下次重試時間
+            // 這樣 runner 在重試時間到時會重新處理
+            SubscriptionService::syncSubscriptionStates($subscription, [
+                'next_billing_date' => $nextRetryAt,
+            ]);
+
+            return;
+        }
+
+        // 已達最大重試次數，標記為 failing
+        Logger::warning('PayUNi subscription renewal: max retry attempts reached', [
+            'subscription_id' => $subscription->id,
+            'retry_count' => $currentRetryCount,
+            'max_attempts' => self::MAX_RETRY_ATTEMPTS,
+        ]);
+
+        SubscriptionService::syncSubscriptionStates($subscription, [
+            'status' => Status::SUBSCRIPTION_FAILING,
+            'meta' => [
+                'payuni_last_error' => [
+                    'message' => $errorMessage,
+                    'at' => current_time('mysql'),
+                    'data' => $errorData,
+                    'retry_exhausted' => true,
+                ],
+            ],
+        ]);
+
+        // 保留重試歷史作為除錯參考
+        $subscription->updateMeta('payuni_renewal_retry', [
+            'count' => $currentRetryCount + 1,
+            'max' => self::MAX_RETRY_ATTEMPTS,
+            'exhausted' => true,
+            'exhausted_at' => current_time('mysql'),
+            'last_error' => [
+                'message' => $errorMessage,
+                'at' => current_time('mysql'),
+                'data' => $errorData,
+            ],
+            'history' => $history,
+        ]);
+    }
+
+    /**
+     * 清除重試資訊（續扣成功時呼叫）
+     *
+     * @param Subscription $subscription 訂閱物件
+     * @return void
+     */
+    private function clearRetryInfo(Subscription $subscription): void
+    {
+        $retryInfo = $subscription->getMeta('payuni_renewal_retry', null);
+
+        if ($retryInfo) {
+            Logger::info('PayUNi subscription renewal: clearing retry info after success', [
+                'subscription_id' => $subscription->id,
+                'previous_retry_count' => $retryInfo['count'] ?? 0,
+            ]);
+
+            $subscription->updateMeta('payuni_renewal_retry', null);
+        }
+
+        // 同時清除舊的錯誤記錄
+        $subscription->updateMeta('payuni_last_error', null);
     }
 }
 
