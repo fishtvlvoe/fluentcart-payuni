@@ -73,5 +73,27 @@
                 $nav.find('a[href="#' + hash + '"]').trigger('click');
             }
         });
+
+        // FAQ Accordion functionality
+        $('.faq-question').on('click', function() {
+            var $item = $(this).closest('.faq-item');
+            var wasOpen = $item.hasClass('open');
+
+            // Optional: Close other items in same category (accordion behavior)
+            // $item.siblings('.faq-item').removeClass('open');
+
+            // Toggle current item
+            $item.toggleClass('open');
+        });
+
+        // Expand FAQ if linked directly with hash like #faq-webhook
+        var hash = window.location.hash;
+        if (hash && hash.startsWith('#faq-')) {
+            var faqId = hash.substring(5);  // Remove '#faq-'
+            var $targetFaq = $('[data-faq-id="' + faqId + '"]');
+            if ($targetFaq.length) {
+                $targetFaq.closest('.faq-item').addClass('open');
+            }
+        }
     });
 })(jQuery);

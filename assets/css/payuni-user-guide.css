@@ -221,6 +221,79 @@
     line-height: 1.6;
 }
 
+/* FAQ Section */
+.payuni-user-guide .faq-category {
+    margin-bottom: 24px;
+}
+
+.payuni-user-guide .faq-category h3 {
+    font-size: 16px;
+    color: #1d2327;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #2271b1;
+}
+
+.payuni-user-guide .faq-item {
+    margin-bottom: 8px;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.payuni-user-guide .faq-question {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 12px 16px;
+    background: #f6f7f7;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: #1d2327;
+    transition: background-color 0.2s;
+}
+
+.payuni-user-guide .faq-question::before {
+    content: '+';
+    margin-right: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #2271b1;
+    transition: transform 0.2s;
+}
+
+.payuni-user-guide .faq-item.open .faq-question::before {
+    content: '−';
+}
+
+.payuni-user-guide .faq-question:hover {
+    background: #eaebec;
+}
+
+.payuni-user-guide .faq-answer {
+    display: none;
+    padding: 16px;
+    background: #fff;
+    border-top: 1px solid #dcdcde;
+}
+
+.payuni-user-guide .faq-item.open .faq-answer {
+    display: block;
+}
+
+.payuni-user-guide .faq-answer ol,
+.payuni-user-guide .faq-answer ul {
+    margin: 12px 0;
+    padding-left: 24px;
+}
+
+.payuni-user-guide .faq-answer li {
+    margin-bottom: 8px;
+}
+
 /* Responsive */
 @media (max-width: 782px) {
     .payuni-user-guide .guide-container {

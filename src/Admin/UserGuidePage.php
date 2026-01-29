@@ -272,7 +272,131 @@ class UserGuidePage
         ?>
         <section id="faq" class="guide-section">
             <h2><?php echo esc_html__('常見問題', 'fluentcart-payuni'); ?></h2>
-            <p><?php echo esc_html__('此區段將在 Plan 11-02 中填入內容。', 'fluentcart-payuni'); ?></p>
+
+            <!-- Category 1: 金流設定 -->
+            <div class="faq-category">
+                <h3><?php echo esc_html__('金流設定', 'fluentcart-payuni'); ?></h3>
+                <div class="faq-item">
+                    <button class="faq-question"><?php echo esc_html__('如何獲取 PayUNi 商店代號 (MerID)?', 'fluentcart-payuni'); ?></button>
+                    <div class="faq-answer">
+                        <ol>
+                            <li><?php echo sprintf(
+                                esc_html__('登入 %s', 'fluentcart-payuni'),
+                                '<a href="https://www.payuni.com.tw" target="_blank">PayUNi 商戶後台</a>'
+                            ); ?></li>
+                            <li><?php echo esc_html__('進入「商店管理」→「商店設定」', 'fluentcart-payuni'); ?></li>
+                            <li><?php echo esc_html__('複製「商店代號」欄位的值', 'fluentcart-payuni'); ?></li>
+                            <li><?php echo esc_html__('在 FluentCart 付款設定中填入此代號', 'fluentcart-payuni'); ?></li>
+                        </ol>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question"><?php echo esc_html__('如何切換測試/正式環境?', 'fluentcart-payuni'); ?></button>
+                    <div class="faq-answer">
+                        <p><?php echo esc_html__('PayUNi 使用不同的 API 端點和憑證區分測試/正式環境：', 'fluentcart-payuni'); ?></p>
+                        <ol>
+                            <li><?php echo esc_html__('進入 FluentCart → 付款設定 → PayUNi 信用卡', 'fluentcart-payuni'); ?></li>
+                            <li><?php echo esc_html__('選擇「環境」欄位 (測試/正式)', 'fluentcart-payuni'); ?></li>
+                            <li><?php echo esc_html__('填入對應環境的 MerID、Hash Key、Hash IV', 'fluentcart-payuni'); ?></li>
+                            <li><strong><?php echo esc_html__('注意：', 'fluentcart-payuni'); ?></strong><?php echo esc_html__('測試環境使用測試用憑證，正式環境使用正式憑證', 'fluentcart-payuni'); ?></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category 2: Webhook 調試 -->
+            <div class="faq-category">
+                <h3><?php echo esc_html__('Webhook 調試', 'fluentcart-payuni'); ?></h3>
+                <div class="faq-item">
+                    <button class="faq-question"><?php echo esc_html__('Webhook 沒有觸發怎麼辦?', 'fluentcart-payuni'); ?></button>
+                    <div class="faq-answer">
+                        <p><?php echo esc_html__('請依序檢查以下項目：', 'fluentcart-payuni'); ?></p>
+                        <ol>
+                            <li><strong><?php echo esc_html__('確認 URL 設定', 'fluentcart-payuni'); ?></strong><?php echo esc_html__('：在 PayUNi 後台確認 NotifyURL 已正確設定', 'fluentcart-payuni'); ?></li>
+                            <li><strong><?php echo esc_html__('SSL 憑證', 'fluentcart-payuni'); ?></strong><?php echo esc_html__('：PayUNi 要求 HTTPS，確認網站有有效的 SSL 憑證', 'fluentcart-payuni'); ?></li>
+                            <li><strong><?php echo esc_html__('防火牆', 'fluentcart-payuni'); ?></strong><?php echo esc_html__('：確認伺服器防火牆允許 PayUNi IP 範圍的請求', 'fluentcart-payuni'); ?></li>
+                            <li><strong><?php echo esc_html__('查看日誌', 'fluentcart-payuni'); ?></strong><?php echo esc_html__('：進入 PayUNi Webhook 記錄頁面檢視是否有接收到請求', 'fluentcart-payuni'); ?></li>
+                        </ol>
+                        <p><?php echo sprintf(
+                            esc_html__('詳細排查步驟請參閱 %s 區塊。', 'fluentcart-payuni'),
+                            '<a href="#troubleshooting">' . esc_html__('疑難排解', 'fluentcart-payuni') . '</a>'
+                        ); ?></p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question"><?php echo esc_html__('如何驗證 Webhook 運作正常?', 'fluentcart-payuni'); ?></button>
+                    <div class="faq-answer">
+                        <ol>
+                            <li><?php echo esc_html__('進入 PayUNi 設定頁面', 'fluentcart-payuni'); ?></li>
+                            <li><?php echo esc_html__('點擊「測試連線」按鈕', 'fluentcart-payuni'); ?></li>
+                            <li><?php echo esc_html__('如顯示「Webhook URL 可連線」表示基本連線正常', 'fluentcart-payuni'); ?></li>
+                            <li><?php echo esc_html__('實際付款測試：完成一筆測試交易後，檢查 Webhook 記錄是否有新紀錄', 'fluentcart-payuni'); ?></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category 3: 訂閱續扣問題 -->
+            <div class="faq-category">
+                <h3><?php echo esc_html__('訂閱續扣問題', 'fluentcart-payuni'); ?></h3>
+                <div class="faq-item">
+                    <button class="faq-question"><?php echo esc_html__('訂閱續扣失敗怎麼辦?', 'fluentcart-payuni'); ?></button>
+                    <div class="faq-answer">
+                        <p><?php echo esc_html__('續扣失敗通常有以下原因：', 'fluentcart-payuni'); ?></p>
+                        <ul>
+                            <li><strong><?php echo esc_html__('餘額不足', 'fluentcart-payuni'); ?></strong><?php echo esc_html__('：提醒客戶補充信用卡額度', 'fluentcart-payuni'); ?></li>
+                            <li><strong><?php echo esc_html__('卡片過期', 'fluentcart-payuni'); ?></strong><?php echo esc_html__('：請客戶更新付款卡片', 'fluentcart-payuni'); ?></li>
+                            <li><strong><?php echo esc_html__('銀行拒絕', 'fluentcart-payuni'); ?></strong><?php echo esc_html__('：請客戶聯繫發卡銀行', 'fluentcart-payuni'); ?></li>
+                        </ul>
+                        <p><strong><?php echo esc_html__('系統自動重試機制：', 'fluentcart-payuni'); ?></strong></p>
+                        <ul>
+                            <li><?php echo esc_html__('首次失敗後 24 小時重試', 'fluentcart-payuni'); ?></li>
+                            <li><?php echo esc_html__('第二次失敗後 48 小時重試', 'fluentcart-payuni'); ?></li>
+                            <li><?php echo esc_html__('第三次失敗後 72 小時重試', 'fluentcart-payuni'); ?></li>
+                        </ul>
+                        <p><?php echo esc_html__('如需手動處理，請在訂閱詳情頁查看失敗原因。', 'fluentcart-payuni'); ?></p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question"><?php echo esc_html__('如何更新信用卡資訊?', 'fluentcart-payuni'); ?></button>
+                    <div class="faq-answer">
+                        <p><?php echo esc_html__('目前版本客戶需透過以下方式更新：', 'fluentcart-payuni'); ?></p>
+                        <ol>
+                            <li><?php echo esc_html__('客戶登入網站進入「我的帳戶」→「訂閱」', 'fluentcart-payuni'); ?></li>
+                            <li><?php echo esc_html__('選擇要更新的訂閱', 'fluentcart-payuni'); ?></li>
+                            <li><?php echo esc_html__('點擊「更新付款方式」', 'fluentcart-payuni'); ?></li>
+                            <li><?php echo esc_html__('輸入新的信用卡資訊並完成 3D 驗證', 'fluentcart-payuni'); ?></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category 4: ATM 虛擬帳號 -->
+            <div class="faq-category">
+                <h3><?php echo esc_html__('ATM 虛擬帳號', 'fluentcart-payuni'); ?></h3>
+                <div class="faq-item">
+                    <button class="faq-question"><?php echo esc_html__('客戶問我 ATM 虛擬帳號在哪裡?', 'fluentcart-payuni'); ?></button>
+                    <div class="faq-answer">
+                        <p><?php echo esc_html__('ATM 虛擬帳號可在以下位置查看：', 'fluentcart-payuni'); ?></p>
+                        <ol>
+                            <li><strong><?php echo esc_html__('訂單確認郵件', 'fluentcart-payuni'); ?></strong><?php echo esc_html__('：客戶下單後會收到包含帳號的確認信', 'fluentcart-payuni'); ?></li>
+                            <li><strong><?php echo esc_html__('訂單詳情頁', 'fluentcart-payuni'); ?></strong><?php echo esc_html__('：客戶登入網站 →「我的訂單」→ 點擊該訂單', 'fluentcart-payuni'); ?></li>
+                            <li><strong><?php echo esc_html__('後台查詢', 'fluentcart-payuni'); ?></strong><?php echo esc_html__('：FluentCart 訂單 → 點擊訂單 → PayUNi 交易資訊區塊', 'fluentcart-payuni'); ?></li>
+                        </ol>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question"><?php echo esc_html__('ATM 付款期限多久?', 'fluentcart-payuni'); ?></button>
+                    <div class="faq-answer">
+                        <p><?php echo sprintf(
+                            esc_html__('ATM 虛擬帳號預設有效期限為 %s（PayUNi 預設值）。', 'fluentcart-payuni'),
+                            '<strong>' . esc_html__('7 天', 'fluentcart-payuni') . '</strong>'
+                        ); ?></p>
+                        <p><?php echo esc_html__('過期後帳號失效，訂單會自動標記為「已取消」。', 'fluentcart-payuni'); ?></p>
+                        <p><?php echo esc_html__('如需調整期限，請聯繫 PayUNi 客服設定。', 'fluentcart-payuni'); ?></p>
+                    </div>
+                </div>
+            </div>
         </section>
         <?php
         return ob_get_clean();
