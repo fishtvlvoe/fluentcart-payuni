@@ -46,17 +46,12 @@ class PayUNiMenuManager
      */
     public function registerMenus(): void
     {
-        // Check if user has permission
-        if (!current_user_can('manage_options') && !current_user_can('manage_fluentcart')) {
-            return;
-        }
-
         // 建立主選單 (PayUNi)
         // 注意：使用 'payuni-dashboard' 作為 menu_slug，這樣點擊主選單時會顯示 Dashboard
         add_menu_page(
             __('PayUNi 統一金流', 'fluentcart-payuni'),           // Page title
             __('PayUNi', 'fluentcart-payuni'),                     // Menu title
-            'manage_fluentcart',                                   // Capability
+            'manage_options',                                      // Capability
             'payuni-dashboard',                                    // Menu slug (使用 dashboard 的 slug)
             '__return_null',                                       // Callback (由 DashboardWidget 處理)
             $this->getMenuIcon(),                                  // Icon

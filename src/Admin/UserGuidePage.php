@@ -45,16 +45,13 @@ class UserGuidePage
      */
     public function registerAdminPage(): void
     {
-        // Check if user has permission
-        if (!current_user_can('manage_options') && !current_user_can('manage_fluentcart')) {
-            return;
         }
 
         add_submenu_page(
             'payuni',
             __('PayUNi 使用指南', 'fluentcart-payuni'),
             __('PayUNi 使用指南', 'fluentcart-payuni'),
-            'manage_fluentcart',
+            'manage_options',
             self::PAGE_SLUG,
             [$this, 'renderPage'],
             10  // Position after Dashboard (5) and Webhook Logs

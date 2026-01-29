@@ -47,16 +47,11 @@ class DashboardWidget
      */
     public function registerAdminPage(): void
     {
-        // Check if user has permission
-        if (!current_user_can('manage_options') && !current_user_can('manage_fluentcart')) {
-            return;
-        }
-
         add_submenu_page(
             'payuni',
             __('PayUNi Dashboard', 'fluentcart-payuni'),
             __('Dashboard', 'fluentcart-payuni'),
-            'manage_fluentcart',
+            'manage_options',
             self::PAGE_SLUG,
             [$this, 'renderPage'],
             1 // Position at top
@@ -143,7 +138,7 @@ class DashboardWidget
         register_rest_route('fluentcart-payuni/v1', '/dismiss-welcome', [
             'methods' => 'POST',
             'permission_callback' => function () {
-                return current_user_can('manage_fluentcart');
+                return current_user_can('manage_options');
             },
             'callback' => function () {
                 $user_id = get_current_user_id();

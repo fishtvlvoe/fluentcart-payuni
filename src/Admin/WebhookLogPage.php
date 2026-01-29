@@ -44,16 +44,13 @@ class WebhookLogPage
      */
     public function registerAdminPage(): void
     {
-        // Check if user has permission
-        if (!current_user_can('manage_options') && !current_user_can('manage_fluentcart')) {
-            return;
         }
 
         add_submenu_page(
             'payuni',
             __('Webhook 記錄', 'fluentcart-payuni'),
             __('Webhook 記錄', 'fluentcart-payuni'),
-            'manage_fluentcart',
+            'manage_options',
             self::PAGE_SLUG,
             [$this, 'renderPage']
         );

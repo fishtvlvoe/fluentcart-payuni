@@ -48,16 +48,13 @@ class SettingsPage
      */
     public function registerAdminPage(): void
     {
-        // Check if user has permission
-        if (!current_user_can('manage_options') && !current_user_can('manage_fluentcart')) {
-            return;
         }
 
         add_submenu_page(
             'payuni',
             __('PayUNi 設定', 'fluentcart-payuni'),
             __('PayUNi 設定', 'fluentcart-payuni'),
-            'manage_fluentcart',
+            'manage_options',
             self::PAGE_SLUG,
             [$this, 'renderPage']
         );
@@ -111,7 +108,7 @@ class SettingsPage
         register_rest_route('fluentcart-payuni/v1', '/settings/test-webhook', [
             'methods' => 'POST',
             'permission_callback' => function () {
-                return current_user_can('manage_fluentcart');
+                return current_user_can('manage_options');
             },
             'callback' => [$this, 'testWebhookReachability'],
         ]);
