@@ -122,11 +122,11 @@ FluentCart 後台完整整合 — 在 FluentCart 後台頁面中顯示 PayUNi �
 | DASH-04 | Phase 10 | Complete |
 | DASH-05 | Phase 10 | Complete |
 | INFRA-04 | Phase 10 | Complete |
-| GUIDE-01 | Phase 11 | Pending |
-| GUIDE-02 | Phase 11 | Pending |
-| GUIDE-03 | Phase 11 | Pending |
-| GUIDE-04 | Phase 11 | Pending |
-| GUIDE-05 | Phase 11 | Pending |
+| GUIDE-01 | Phase 11 | Complete |
+| GUIDE-02 | Phase 11 | Complete |
+| GUIDE-03 | Phase 11 | Complete |
+| GUIDE-04 | Phase 11 | Complete |
+| GUIDE-05 | Phase 11 | Complete |
 | INFRA-05 | Phase 11 | Partial (Dashboard/Webhook Logs complete, User Guide uses WordPress admin UI) |
 
 **Coverage:** 30/30 requirements mapped (100%)
