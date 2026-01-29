@@ -9,6 +9,7 @@ use BuyGoFluentCart\PayUNi\Gateway\PayUNiSettingsBase;
 use BuyGoFluentCart\PayUNi\Processor\PaymentProcessor;
 use BuyGoFluentCart\PayUNi\Processor\SubscriptionPaymentProcessor;
 use BuyGoFluentCart\PayUNi\Services\PayUNiCryptoService;
+use BuyGoFluentCart\PayUNi\Services\WebhookDeduplicationService;
 use BuyGoFluentCart\PayUNi\Utils\Logger;
 
 /**
@@ -93,6 +94,20 @@ final class ReturnHandler
         Logger::info('PayUNi return received', [
             'transaction_uuid' => $trxHash,
         ]);
+
+        // 去重檢查：使用資料庫服務檢查此 transaction 是否已處理過 return
+        $deduplicationService = new WebhookDeduplicationService();
+        if ($deduplicationService->isProcessed($transaction->uuid, 'return')) {
+            Logger::info('Skip return: already processed', [
+                'transaction_uuid' => $transaction->uuid,
+            ]);
+            return $trxHash;
+        }
+
+        // 標記為已處理（在處理前先標記，避免並發重複處理）
+        $payloadHash = hash('sha256', wp_json_encode($decrypted));
+        $tradeNo = (string) ($decrypted['TradeNo'] ?? '');
+        $deduplicationService->markProcessed($transaction->uuid, 'return', $tradeNo, $payloadHash);
 
         // 這裡不要用「有沒有 TradeStatus」來猜是哪一種回傳，
         // 直接以 FluentCart 這筆 transaction 的 payment_method 作為準據，避免誤判導致訂閱永遠卡未付款。

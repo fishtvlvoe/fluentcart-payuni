@@ -8,6 +8,7 @@ use FluentCart\App\Helpers\Status;
 use BuyGoFluentCart\PayUNi\Gateway\PayUNiSettingsBase;
 use BuyGoFluentCart\PayUNi\Processor\PaymentProcessor;
 use BuyGoFluentCart\PayUNi\Services\PayUNiCryptoService;
+use BuyGoFluentCart\PayUNi\Services\WebhookDeduplicationService;
 use BuyGoFluentCart\PayUNi\Utils\Logger;
 
 /**
@@ -33,17 +34,8 @@ final class NotifyHandler
             return;
         }
 
-        $notifyId = isset($data['notify_id']) ? (string) $data['notify_id'] : '';
         $encryptInfo = isset($data['EncryptInfo']) ? (string) $data['EncryptInfo'] : '';
         $hashInfo = isset($data['HashInfo']) ? (string) $data['HashInfo'] : '';
-
-        $dedupKey = 'payuni_notify_' . md5($notifyId ?: ($encryptInfo . '|' . $hashInfo));
-        if (get_transient($dedupKey)) {
-            $this->sendResponse('SUCCESS');
-            return;
-        }
-
-        set_transient($dedupKey, true, 10 * MINUTE_IN_SECONDS);
 
         if (!$encryptInfo || !$hashInfo) {
             Logger::warning('Notify missing EncryptInfo/HashInfo', []);
@@ -107,7 +99,7 @@ final class NotifyHandler
             return;
         }
 
-        if (($transaction->payment_method ?? '') !== 'payuni') {
+        if (($transaction->payment_method ?? '') !== 'payuni' && ($transaction->payment_method ?? '') !== 'payuni_subscription') {
             Logger::warning('Skip notify: not payuni transaction', [
                 'uuid' => $transaction->uuid,
                 'payment_method' => $transaction->payment_method ?? '',
@@ -115,6 +107,21 @@ final class NotifyHandler
             $this->sendResponse('SUCCESS');
             return;
         }
+
+        // 去重檢查：使用資料庫服務檢查此 transaction 是否已處理過 notify
+        $deduplicationService = new WebhookDeduplicationService();
+        if ($deduplicationService->isProcessed($transaction->uuid, 'notify')) {
+            Logger::info('Skip notify: already processed', [
+                'transaction_uuid' => $transaction->uuid,
+            ]);
+            $this->sendResponse('SUCCESS');
+            return;
+        }
+
+        // 標記為已處理（在處理前先標記，避免並發重複處理）
+        $payloadHash = hash('sha256', wp_json_encode($decrypted));
+        $tradeNo = (string) ($decrypted['TradeNo'] ?? '');
+        $deduplicationService->markProcessed($transaction->uuid, 'notify', $tradeNo, $payloadHash);
 
         $processor = new PaymentProcessor($settings);
 
