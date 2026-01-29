@@ -17,6 +17,10 @@ define('BUYGO_FC_PAYUNI_FILE', __FILE__);
 define('BUYGO_FC_PAYUNI_PATH', plugin_dir_path(__FILE__));
 define('BUYGO_FC_PAYUNI_URL', plugin_dir_url(__FILE__));
 
+// Alternative constant names for consistency
+define('FLUENTCART_PAYUNI_VERSION', BUYGO_FC_PAYUNI_VERSION);
+define('FLUENTCART_PAYUNI_PLUGIN_URL', BUYGO_FC_PAYUNI_URL);
+
 /**
  * Check dependencies.
  */
@@ -105,6 +109,11 @@ function buygo_fc_payuni_bootstrap(): void
     // PayUNi Order Meta Box：在 FluentCart 訂單詳情頁顯示 PayUNi 交易資訊
     if (class_exists('BuyGoFluentCart\\PayUNi\\Admin\\OrderPayUNiMetaBox')) {
         new \BuyGoFluentCart\PayUNi\Admin\OrderPayUNiMetaBox();
+    }
+
+    // PayUNi Order Meta Box UI：載入前端 JavaScript/CSS 渲染 PayUNi 資訊面板
+    if (class_exists('BuyGoFluentCart\\PayUNi\\Admin\\OrderPayUNiMetaBoxUI')) {
+        new \BuyGoFluentCart\PayUNi\Admin\OrderPayUNiMetaBoxUI();
     }
 
     // Webhook Log API：提供 REST API 查詢 webhook 處理記錄

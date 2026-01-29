@@ -1,0 +1,84 @@
+.payuni-info-panel {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.payuni-info-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 12px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.payuni-info-content {
+    font-size: 13px;
+}
+
+.payuni-info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px dashed #f0f0f0;
+}
+
+.payuni-info-row:last-child {
+    border-bottom: none;
+}
+
+.payuni-info-label {
+    color: #666;
+    flex-shrink: 0;
+    margin-right: 12px;
+}
+
+.payuni-info-value {
+    color: #333;
+    font-weight: 500;
+    text-align: right;
+    word-break: break-all;
+}
+
+.payuni-info-section {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #eee;
+}
+
+.payuni-highlight {
+    font-family: 'Courier New', monospace;
+    background: #f5f5f5;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+
+.payuni-status-succeeded {
+    color: #22c55e;
+}
+
+.payuni-status-pending {
+    color: #f59e0b;
+}
+
+.payuni-status-failed {
+    color: #ef4444;
+}
+
+.payuni-3d-verified {
+    color: #22c55e;
+}
+
+.payuni-floating-panel {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    width: 300px;
+    z-index: 9999;
+}
