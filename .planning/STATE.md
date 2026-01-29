@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 11 of 11 (User Guidance and Documentation)
-Plan: 2 of 3 complete
-Status: In progress
-Last activity: 2026-01-29 — Completed 11-02-PLAN.md (FAQ and Troubleshooting)
+Plan: 3 of 3 complete
+Status: Phase complete
+Last activity: 2026-01-29 — Completed 11-03-PLAN.md (Integration points and getting help)
 
-Progress: [██████████████████] 92% (v1.1 - 12/13 plans complete, 5/6 phases complete)
+Progress: [████████████████████] 100% (v1.1 - 13/13 plans complete, 6/6 phases complete)
 
 ## Performance Metrics
 
@@ -39,10 +39,10 @@ Progress: [██████████████████] 92% (v1.1 - 1
 - 81 commits across 5 phases
 
 **v1.1 Progress:**
-- Plans completed: 12/13
-- Average duration: 2.4 min (06-01: 2 min, 06-02: 3 min, 07-01: 3.5 min, 07-02: 3 min, 08-01: 3 min, 08-02: 3 min, 09-01: 2.5 min, 09-02: 2 min, 10-01: 1.6 min, 10-02: 2.1 min, 11-01: 2.3 min, 11-02: 3 min)
-- Phases completed: 5/6 (Phase 6: 2/2 complete, Phase 7: 2/2 complete, Phase 8: 2/2 complete, Phase 9: 2/2 complete, Phase 10: 2/2 complete)
-- Phase 11: 2/3 complete (11-01: User Guide foundation ✅, 11-02: FAQ/Troubleshooting ✅, 11-03: Integration points)
+- Plans completed: 13/13 ✅
+- Average duration: 2.5 min (06-01: 2 min, 06-02: 3 min, 07-01: 3.5 min, 07-02: 3 min, 08-01: 3 min, 08-02: 3 min, 09-01: 2.5 min, 09-02: 2 min, 10-01: 1.6 min, 10-02: 2.1 min, 11-01: 2.3 min, 11-02: 3 min, 11-03: 3 min)
+- Phases completed: 6/6 ✅ (Phase 6: 2/2, Phase 7: 2/2, Phase 8: 2/2, Phase 9: 2/2, Phase 10: 2/2, Phase 11: 3/3)
+- Test coverage: 177 tests, 498 assertions (from 168/464 at start)
 
 ## Accumulated Context
 
@@ -96,6 +96,9 @@ Recent decisions affecting v1.1 work:
 - **Error table format (11-02)**: Three-column table with error code, cause, solution (structured error reference for quick troubleshooting)
 - **Webhook checklist (11-02)**: Five-item checklist with checkbox indicators (guides merchants through systematic Webhook debugging)
 - **Visual flowchart (11-02)**: Decision tree for order payment troubleshooting (visual representation helps navigate complex debugging scenarios)
+- **Tooltip pattern with dashicons (11-03)**: Use WordPress native dashicons-info-outline for consistent UI (not custom SVG/Font Awesome)
+- **User meta for welcome dismissal (11-03)**: Per-user setting allows each admin to dismiss independently (not site-wide option)
+- **REST endpoint for banner dismissal (11-03)**: AJAX-based dismissal for smooth UX without page reload
 
 Full decision log: PROJECT.md Key Decisions table
 
@@ -122,10 +125,10 @@ None yet (v1.1 just started)
 ## Session Continuity
 
 Last session: 2026-01-29
-Stopped at: Completed 11-02-PLAN.md (FAQ and Troubleshooting)
+Stopped at: Completed 11-03-PLAN.md (Integration points and getting help)
 Resume file: None
 
-**Next action:** Execute 11-03-PLAN.md (Integration points and getting help)
+**Next action:** v1.1 完成 - All 6 phases complete, ready for release
 
 ---
 
