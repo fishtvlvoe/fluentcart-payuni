@@ -212,6 +212,15 @@ class PayUNiSubscriptions extends AbstractSubscriptionModule
         $merchantTradeNo = 'CU' . $subscription->id . 'A' . base_convert((string) time(), 10, 36);
 
         $subscriptionUuid = (string) ($subscription->uuid ?? '');
+
+        // 建立 state 參數作為 subscription_uuid 的備份
+        // PayUNi 3D 驗證會保留 state 參數，即使其他 query 參數遺失
+        $state = $subscriptionUuid ? base64_encode(json_encode([
+            'type' => 'card_update',
+            'subscription_uuid' => $subscriptionUuid,
+            'timestamp' => time(),
+        ])) : '';
+
         $returnUrl = $subscriptionUuid
             ? add_query_arg([
                 'fct_payment_listener' => '1',
@@ -219,6 +228,7 @@ class PayUNiSubscriptions extends AbstractSubscriptionModule
                 'payuni_return' => '1',
                 'card_update' => '1',
                 'subscription_uuid' => $subscriptionUuid,
+                'state' => $state,
             ], site_url('/'))
             : add_query_arg([
                 'fct_payment_listener' => '1',
