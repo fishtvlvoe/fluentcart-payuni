@@ -32,19 +32,26 @@ final class Database
         // - transaction_id: FluentCart transaction UUID（去重主鍵之一）
         // - trade_no: PayUNi TradeNo（用於除錯查詢）
         // - webhook_type: 'notify' 或 'return'（去重主鍵之二）
+        // - webhook_status: 'processed', 'duplicate', 'failed', 'pending'（處理結果）
         // - processed_at: 處理時間戳（用於清理舊記錄）
         // - payload_hash: 原始 payload 的 SHA256（防止相同 transaction 但不同 payload 的情況）
+        // - raw_payload: 加密後的原始 payload（用於除錯，LONGTEXT 可儲存大型 payload）
+        // - response_message: 處理結果訊息（255 字元內）
         $sql = "CREATE TABLE $table_name (
             id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
             transaction_id VARCHAR(64) NOT NULL,
             trade_no VARCHAR(64) DEFAULT NULL,
             webhook_type VARCHAR(32) NOT NULL,
+            webhook_status VARCHAR(32) NOT NULL DEFAULT 'processed',
             processed_at DATETIME NOT NULL,
             payload_hash VARCHAR(64) NOT NULL,
+            raw_payload LONGTEXT DEFAULT NULL,
+            response_message VARCHAR(255) DEFAULT NULL,
             PRIMARY KEY (id),
             UNIQUE KEY unique_transaction (transaction_id, webhook_type),
             KEY idx_processed_at (processed_at),
-            KEY idx_trade_no (trade_no)
+            KEY idx_trade_no (trade_no),
+            KEY idx_webhook_status (webhook_status)
         ) $charset_collate;";
 
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';

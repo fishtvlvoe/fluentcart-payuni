@@ -57,17 +57,23 @@ final class WebhookDeduplicationService
      *
      * 使用 INSERT IGNORE 避免重複插入（如果 unique key 衝突則靜默失敗）。
      *
-     * @param string      $transactionId FluentCart transaction UUID
-     * @param string      $webhookType   'notify' 或 'return'
-     * @param string|null $tradeNo       PayUNi TradeNo（可選，用於除錯）
-     * @param string|null $payloadHash   原始 payload 的 SHA256（可選）
+     * @param string      $transactionId   FluentCart transaction UUID
+     * @param string      $webhookType     'notify' 或 'return'
+     * @param string|null $tradeNo         PayUNi TradeNo（可選，用於除錯）
+     * @param string|null $payloadHash     原始 payload 的 SHA256（可選）
+     * @param string      $status          處理狀態：'processed', 'duplicate', 'failed', 'pending'
+     * @param string|null $rawPayload      原始 payload（可選，用於除錯）
+     * @param string|null $responseMessage 處理結果訊息（可選）
      * @return bool true 表示成功插入，false 表示已存在（或插入失敗）
      */
     public function markProcessed(
         string $transactionId,
         string $webhookType,
         ?string $tradeNo = null,
-        ?string $payloadHash = null
+        ?string $payloadHash = null,
+        string $status = 'processed',
+        ?string $rawPayload = null,
+        ?string $responseMessage = null
     ): bool {
         if (!$transactionId || !$webhookType) {
             Logger::warning('WebhookDeduplicationService: empty transactionId or webhookType', [
@@ -85,13 +91,16 @@ final class WebhookDeduplicationService
         $result = $wpdb->query(
             $wpdb->prepare(
                 "INSERT IGNORE INTO $table
-                (transaction_id, webhook_type, trade_no, processed_at, payload_hash)
-                VALUES (%s, %s, %s, %s, %s)",
+                (transaction_id, webhook_type, trade_no, processed_at, payload_hash, webhook_status, raw_payload, response_message)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
                 $transactionId,
                 $webhookType,
                 $tradeNo ?? '',
                 gmdate('Y-m-d H:i:s'),
-                $payloadHash ?? ''
+                $payloadHash ?? '',
+                $status,
+                $rawPayload,
+                $responseMessage ?? ''
             )
         );
 
@@ -106,6 +115,32 @@ final class WebhookDeduplicationService
 
         // $result === 1 表示成功插入，0 表示 unique key 衝突（已存在）
         return $result === 1;
+    }
+
+    /**
+     * 標記重複的 webhook（快捷方法）
+     *
+     * @param string      $transactionId FluentCart transaction UUID
+     * @param string      $webhookType   'notify' 或 'return'
+     * @param string|null $tradeNo       PayUNi TradeNo（可選）
+     * @param string|null $payloadHash   原始 payload 的 SHA256（可選）
+     * @return bool 是否成功標記
+     */
+    public function markDuplicate(
+        string $transactionId,
+        string $webhookType,
+        ?string $tradeNo = null,
+        ?string $payloadHash = null
+    ): bool {
+        return $this->markProcessed(
+            $transactionId,
+            $webhookType,
+            $tradeNo,
+            $payloadHash,
+            'duplicate',
+            null,
+            'Duplicate webhook ignored'
+        );
     }
 
     /**
