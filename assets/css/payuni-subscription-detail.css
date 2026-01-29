@@ -1,0 +1,237 @@
+/**
+ * PayUNi Subscription Detail Page Styles
+ * Styling for renewal history, card info, and failure display
+ */
+
+/* Card container - matches existing el-card styling */
+.payuni-subscription-actions {
+  margin-top: 16px;
+}
+
+.payuni-subscription-actions .el-card__header {
+  background: #f5f7fa;
+  border-bottom: 1px solid #ebeef5;
+  padding: 12px 20px;
+  font-weight: 600;
+  color: #303133;
+}
+
+.payuni-subscription-actions .el-card__body {
+  padding: 20px;
+}
+
+/* Section within the card */
+.payuni-info-section {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #ebeef5;
+}
+
+.payuni-info-section:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.payuni-info-section h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #606266;
+}
+
+/* Card info display */
+.payuni-card-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f5f7fa;
+  border-radius: 4px;
+}
+
+.payuni-card-brand {
+  font-weight: 600;
+  color: #303133;
+}
+
+.payuni-card-number {
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+.payuni-card-expiry {
+  color: #909399;
+  font-size: 13px;
+}
+
+.payuni-card-token-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 12px;
+  border-radius: 4px;
+  margin-left: auto;
+}
+
+.payuni-card-token-badge.has-token {
+  background: #e1f3d8;
+  color: #67c23a;
+}
+
+.payuni-card-token-badge.no-token {
+  background: #fef0f0;
+  color: #f56c6c;
+}
+
+/* Next billing info */
+.payuni-billing-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.payuni-billing-item {
+  padding: 12px;
+  background: #f5f7fa;
+  border-radius: 4px;
+}
+
+.payuni-billing-item label {
+  display: block;
+  font-size: 12px;
+  color: #909399;
+  margin-bottom: 4px;
+}
+
+.payuni-billing-item .value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
+}
+
+/* Failure info alert */
+.payuni-failure-alert {
+  padding: 12px 16px;
+  background: #fef0f0;
+  border: 1px solid #fbc4c4;
+  border-radius: 4px;
+  color: #f56c6c;
+}
+
+.payuni-failure-alert .failure-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.payuni-failure-alert .failure-title::before {
+  content: "!";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: #f56c6c;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.payuni-failure-alert .failure-details {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.payuni-failure-alert .failure-details p {
+  margin: 4px 0;
+}
+
+.payuni-failure-alert .retry-info {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #fbc4c4;
+  font-size: 12px;
+  color: #909399;
+}
+
+/* Renewal history table */
+.payuni-renewal-history {
+  overflow-x: auto;
+}
+
+.payuni-renewal-history table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.payuni-renewal-history th,
+.payuni-renewal-history td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #ebeef5;
+}
+
+.payuni-renewal-history th {
+  background: #f5f7fa;
+  color: #909399;
+  font-weight: 500;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.payuni-renewal-history tr:hover td {
+  background: #f5f7fa;
+}
+
+.payuni-renewal-history .status-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.payuni-renewal-history .status-badge.succeeded {
+  background: #e1f3d8;
+  color: #67c23a;
+}
+
+.payuni-renewal-history .status-badge.failed {
+  background: #fef0f0;
+  color: #f56c6c;
+}
+
+.payuni-renewal-history .status-badge.pending {
+  background: #fdf6ec;
+  color: #e6a23c;
+}
+
+.payuni-renewal-history .no-history {
+  padding: 20px;
+  text-align: center;
+  color: #909399;
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .payuni-billing-info {
+    grid-template-columns: 1fr;
+  }
+
+  .payuni-card-info {
+    flex-wrap: wrap;
+  }
+
+  .payuni-card-token-badge {
+    margin-left: 0;
+    margin-top: 8px;
+    width: 100%;
+    text-align: center;
+  }
+}
