@@ -116,6 +116,11 @@ function buygo_fc_payuni_bootstrap(): void
         new \BuyGoFluentCart\PayUNi\Admin\OrderPayUNiMetaBoxUI();
     }
 
+    // PayUNi Subscription Meta Box：在 FluentCart 訂閱詳情頁注入 PayUNi 訂閱資料
+    if (class_exists('BuyGoFluentCart\\PayUNi\\Admin\\SubscriptionPayUNiMetaBox')) {
+        new \BuyGoFluentCart\PayUNi\Admin\SubscriptionPayUNiMetaBox();
+    }
+
     // Webhook Log Viewer Admin Page：後台 Webhook 記錄檢視頁面
     if (class_exists('BuyGoFluentCart\\PayUNi\\Admin\\WebhookLogPage')) {
         new \BuyGoFluentCart\PayUNi\Admin\WebhookLogPage();
@@ -451,6 +456,7 @@ function buygo_fc_payuni_bootstrap(): void
 
     // 訂閱詳情頁：為 PayUNi 訂閱注入「更多操作」（同步狀態、查看 PayUNi 後台）。
     // subscription.url 已由 getSubscriptionUrl 提供；這裡補上 gateway_actions 供前端或未來擴充使用。
+    // Priority 15: 在 SubscriptionPayUNiMetaBox (priority 10) 之後執行，保持向後相容性。
     add_filter('fluent_cart/subscription/view', function ($subscription, $args) {
         if (!is_object($subscription) || (string) ($subscription->current_payment_method ?? '') !== 'payuni_subscription') {
             return $subscription;
@@ -501,7 +507,7 @@ function buygo_fc_payuni_bootstrap(): void
         ];
 
         return $subscription;
-    }, 10, 2);
+    }, 15, 2);
 
     /**
      * 前台會員訂閱頁「更新付款」：若為 PayUNi 訂閱，modal 打開時載入換卡表單並由本外掛 API 處理送出。
