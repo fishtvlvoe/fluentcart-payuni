@@ -100,6 +100,45 @@ class OrderPayUNiMetaBox
             ];
         }
 
+        // Credit card payment info
+        if (($payuniMeta['trade_type'] ?? '') === 'credit') {
+            $cardLast4 = '';
+            $cardExpiry = '';
+
+            // For subscription orders, get card info from subscription meta
+            $subscription = $orderModel->currentSubscription();
+            if ($subscription) {
+                $activePaymentMethod = $subscription->getMeta('active_payment_method', []);
+                $cardLast4 = $activePaymentMethod['details']['last_4'] ?? '';
+                $cardExpiry = $activePaymentMethod['details']['card_expiry'] ?? '';
+
+                // CRITICAL: Check for payuni_credit_hash - this is the key_link pattern
+                $hasToken = !empty($subscription->getMeta('payuni_credit_hash'));
+            }
+
+            // For one-time credit card payments, extract from PayUNi webhook response
+            if (empty($cardLast4)) {
+                // Check transaction meta for card info
+                $creditInfo = $payuniMeta['credit'] ?? [];
+                $cardLast4 = $creditInfo['card_4no'] ?? '';
+                // Note: card_expiry is only available for subscription orders (stored during token creation)
+                // For one-time payments, expiry is not returned by PayUNi API
+            }
+
+            // Extract 3D verification status
+            $creditInit = $payuniMeta['credit_init'] ?? [];
+            $is3D = !empty($creditInit['is_3d']);
+
+            $payuniInfo['credit'] = [
+                'card_last4' => $cardLast4,
+                'card_brand' => $this->detectCardBrand($cardLast4),
+                'card_expiry' => $cardExpiry,  // Empty for one-time payments (by design)
+                'is_3d_verified' => $is3D,
+                '3d_label' => $is3D ? '3D 驗證通過' : '非 3D 交易',
+                'has_token' => !empty($subscription ? $subscription->getMeta('payuni_credit_hash') : ''),
+            ];
+        }
+
         // Add PayUNi info to order
         $order['payuni_info'] = $payuniInfo;
 
@@ -209,5 +248,40 @@ class OrderPayUNiMetaBox
         } catch (\Exception $e) {
             return $date;
         }
+    }
+
+    /**
+     * Detect card brand from card number pattern.
+     *
+     * @param string $cardNumber Card number (last 4 digits or full prefix).
+     * @return string Card brand name.
+     */
+    public function detectCardBrand(string $cardNumber): string
+    {
+        if (empty($cardNumber)) {
+            return '信用卡';
+        }
+
+        // Based on first digit patterns (from Card4No or full card prefix)
+        $firstDigit = substr($cardNumber, 0, 1);
+        $firstTwo = strlen($cardNumber) >= 2 ? substr($cardNumber, 0, 2) : '';
+
+        if ($firstDigit === '4') {
+            return 'Visa';
+        }
+        if (in_array($firstTwo, ['51', '52', '53', '54', '55'])) {
+            return 'Mastercard';
+        }
+        if (in_array($firstTwo, ['34', '37'])) {
+            return 'American Express';
+        }
+        if ($firstTwo === '35') {
+            return 'JCB';
+        }
+        if ($firstTwo === '62') {
+            return 'UnionPay';
+        }
+
+        return '信用卡';
     }
 }
