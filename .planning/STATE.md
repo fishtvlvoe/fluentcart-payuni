@@ -3,7 +3,7 @@
 ## Current Status
 
 **Phase**: 4 (Webhook 可靠性)
-**Status**: 🔵 In Progress (Plan 01 完成)
+**Status**: 🔵 In Progress (Plan 03 完成)
 **Last Updated**: 2026-01-29
 
 ## Progress
@@ -13,10 +13,10 @@
 | 1: 訂閱核心修復 | ✅ Completed | 100% |
 | 2: 訂閱重試機制 | ✅ Completed | 100% |
 | 3: ATM/CVS 測試 | ⏸️ Paused (Webhook Issue) | 80% |
-| 4: Webhook 可靠性 | 🔵 In Progress | 33% (1/3 plans) |
+| 4: Webhook 可靠性 | 🔵 In Progress | 67% (2/3 plans) |
 | 5: 測試覆蓋率 | ⚪ Not Started | 0% |
 
-**Overall**: 4/11 requirements completed (36%)
+**Overall**: 5/11 requirements completed (45%)
 
 ## Current Phase Details
 
@@ -95,7 +95,7 @@
 
 **Requirements**:
 - [x] WEBHOOK-03: Webhook 去重機制改為資料庫實作 ✅
-- [ ] API-01: PayUNi API 呼叫加入 idempotency key
+- [x] API-01: PayUNi API 呼叫加入 idempotency key ✅
 - [ ] TEST-02: Webhook 處理邊界案例測試
 
 **Completed Plans**:
@@ -105,11 +105,25 @@
    - 外掛啟用/升級時自動建立資料表
    - Commits: f70c570, 6b9496c, c5c2996
 
+2. ✅ **Plan 03: API Idempotency Key** (2026-01-29)
+   - 建立 `IdempotencyService` (generateKey, generateUuid)
+   - PayUNiAPI 記錄 idempotency key 到 Logger
+   - 驗證 MerTradeNo 格式符合規範（≤20 字元）
+   - Commits: c540817, aa6ccae
+
 **Next Steps**:
 1. ⏳ Plan 02: 整合去重服務到 NotifyHandler 和 ReturnHandler
-2. ⏳ Plan 03: 實作排程清理任務
+2. ⏳ Phase 5: 測試覆蓋率提升
 
 ## Recent Changes
+
+### 2026-01-29 (Phase 4 Plan 03 Complete)
+- ✓ **Phase 4 Plan 03: API Idempotency Key 完成**
+  - 建立 `IdempotencyService` 服務（generateKey, generateUuid）
+  - PayUNiAPI 在每次呼叫記錄 UUID idempotency key
+  - 驗證 MerTradeNo 格式符合 PayUNi 20 字元限制
+  - 雙重追蹤機制：MerTradeNo（冪等鍵）+ idempotency_key（內部追蹤）
+  - Commits: c540817, aa6ccae
 
 ### 2026-01-29 (Phase 4 Plan 01 Complete)
 - ✓ **Phase 4 Plan 01: Webhook 去重基礎設施 完成**
@@ -187,9 +201,11 @@
    - Status: ✅ Implemented in Phase 4 Plan 01
    - Commits: f70c570, 6b9496c, c5c2996
 
-6. **無 API idempotency key**
+6. **無 API idempotency key** ✅ FIXED
    - Impact: 重試可能重複扣款
-   - Status: Planned in Phase 4
+   - Status: ✅ Implemented in Phase 4 Plan 03
+   - Solution: IdempotencyService + PayUNiAPI logging
+   - Commits: c540817, aa6ccae
 
 7. **測試覆蓋率極低**
    - Current: 僅 1 個範例測試
