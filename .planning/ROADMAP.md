@@ -41,11 +41,11 @@ See: `.planning/milestones/v1.0-ROADMAP.md` for detailed phase breakdown
   3. CVS payment code information visible (code, store type, expiry date)
   4. Credit card information visible (last 4 digits, expiry, 3D verification status)
   5. PayUNi meta box injected via FluentCart filter without modifying core files
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 06-01: TBD
-- [ ] 06-02: TBD
+- [ ] 06-01-PLAN.md — Create OrderPayUNiMetaBox with status, ATM, and CVS display
+- [ ] 06-02-PLAN.md — Add credit card info and human verification
 
 #### Phase 7: Webhook Log Viewer UI
 **Goal**: Merchants can view and debug webhook events through admin interface
@@ -149,7 +149,7 @@ Phases execute in numeric order: 6 → 7 → 8 → 9 → 10 → 11
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 6. Meta Storage & Order Detail | v1.1 | 0/TBD | Not started | - |
+| 6. Meta Storage & Order Detail | v1.1 | 0/2 | Planned | - |
 | 7. Webhook Log Viewer UI | v1.1 | 0/TBD | Not started | - |
 | 8. Settings Page Integration | v1.1 | 0/TBD | Not started | - |
 | 9. Subscription Detail Enhancement | v1.1 | 0/TBD | Not started | - |
