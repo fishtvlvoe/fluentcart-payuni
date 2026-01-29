@@ -102,6 +102,12 @@ function buygo_fc_payuni_bootstrap(): void
         update_option('buygo_fc_payuni_db_version', BUYGO_FC_PAYUNI_VERSION);
     }
 
+    // Webhook Log API：提供 REST API 查詢 webhook 處理記錄
+    add_action('rest_api_init', function () {
+        $api = new \BuyGoFluentCart\PayUNi\API\WebhookLogAPI();
+        $api->register_routes();
+    });
+
     // Phase 4：管理員可修改訂閱下次扣款日（next_billing_date），與續扣邏輯一致。
     add_action('rest_api_init', function () {
         if (!class_exists(\FluentCart\App\Models\Subscription::class) || !class_exists(\FluentCart\App\Modules\Subscriptions\Services\SubscriptionService::class)) {
