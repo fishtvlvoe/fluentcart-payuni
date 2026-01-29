@@ -3,8 +3,8 @@
 ## Current Status
 
 **Phase**: 5 (測試覆蓋率提升)
-**Status**: 🔄 In Progress (1/5 plans complete)
-**Last Updated**: 2026-01-29 17:40
+**Status**: 🔄 In Progress (3/5 plans complete)
+**Last Updated**: 2026-01-29 17:49
 
 ## Progress
 
@@ -14,14 +14,16 @@
 | 2: 訂閱重試機制 | ✅ Completed | 100% |
 | 3: ATM/CVS 測試 | ⏸️ Paused (Webhook Issue) | 80% |
 | 4: Webhook 可靠性 | ✅ Completed | 100% (5/5 plans) |
-| 5: 測試覆蓋率 | 🔄 In Progress | 20% (1/5 plans) |
+| 5: 測試覆蓋率 | 🔄 In Progress | 60% (3/5 plans) |
 
-**Overall**: 7/11 requirements completed (64%)
+**Overall**: 8/11 requirements completed (73%)
 
 **Test Coverage Progress**:
-- Current: 47 tests → 71 tests (+24 tests, +51%)
-- Assertions: 138 → 183 (+45 assertions, +33%)
+- Current: 47 tests → 139 tests (+92 tests, +196%)
+- Assertions: 138 → 367 (+229 assertions, +166%)
 - Phase 5 Plan 01 added: PayUNiCryptoService (24 tests, 45 assertions)
+- Phase 5 Plan 02 added: NotifyHandler boundary cases (3 tests, 15 assertions)
+- Phase 5 Plan 03 added: SubscriptionStateMachine (32 tests, 128 assertions)
 
 ## Current Phase Details
 
@@ -101,7 +103,7 @@
 **Requirements**:
 - [ ] TEST-01: 核心支付流程測試覆蓋率 60%+
 - [x] TEST-02: Webhook 處理邊界案例測試 ✅
-- [ ] TEST-03: 訂閱續扣狀態機測試
+- [x] TEST-03: 訂閱續扣狀態機測試 ✅
 - [x] TEST-04: 加密服務單元測試 ✅
 
 **Completed Plans**:
@@ -112,13 +114,26 @@
    - 發現並修復 2 個 hex 驗證 bug（非 hex 字元、奇數長度）
    - Commits: 36299fc, b67ef41, 416eae3
 
-**Phase Progress**: 1/5 plans (20%)
-**Test Suite**: 71 tests, 183 assertions (+51% tests from Phase 4 end)
+2. ✅ **Plan 02: NotifyHandler 邊界案例測試** (2026-01-29)
+   - 建立 NotifyHandlerBoundaryTest (3 tests, 15 assertions)
+   - 測試 MerTradeNo 解析的三種格式
+   - 驗證 transaction_id 提取邏輯
+   - Commits: 6d13270, c3dc9e2
+
+3. ✅ **Plan 03: SubscriptionStateMachine 測試** (2026-01-29)
+   - 建立 SubscriptionStateMachineTest (32 tests, 128 assertions, 884 lines)
+   - 測試狀態轉換（active/trialing → failing → cancelled/active）
+   - 驗證重試排程（24h/48h/72h 精確計算）
+   - 錯誤分類（3 種不可重試，5 種可重試）
+   - 邊界案例（零嘗試初始化、缺失 retryInfo、15 分鐘重複防護）
+   - Commits: b336f32, 1eddbb2
+
+**Phase Progress**: 3/5 plans (60%)
+**Test Suite**: 139 tests, 367 assertions (+196% tests from Phase 4 end)
 
 **Next Steps**:
-1. ⏳ Plan 03: 訂閱狀態機測試（重試邏輯、狀態轉換）
-2. ⏳ Plan 04: Gateway/Processor 核心邏輯測試
-3. ⏳ Plan 05: 整合測試配置、驗證覆蓋率
+1. ⏳ Plan 04: Gateway/Processor 核心邏輯測試
+2. ⏳ Plan 05: 整合測試配置、驗證覆蓋率
 
 ### Phase 4: Webhook 可靠性 ✅ COMPLETED
 
@@ -169,6 +184,18 @@
 1. ⏳ Phase 5: 測試覆蓋率提升
 
 ## Recent Changes
+
+### 2026-01-29 (Phase 5 Plan 03 Complete)
+- ✓ **Phase 5 Plan 03: SubscriptionStateMachine 測試 完成**
+  - 建立 SubscriptionStateMachineTest（32 tests, 128 assertions, 884 lines）
+  - 測試狀態轉換：active/trialing → failing, failing → cancelled/active
+  - 驗證重試排程：24h/48h/72h 間隔精確計算
+  - 錯誤分類：3 種不可重試（missing_credit_hash, missing_customer_email, requires_3d）
+  - 錯誤分類：5 種可重試（api_error, invalid_response, verification_failed, payment_declined, record_renewal_failed）
+  - 邊界案例：零嘗試初始化、缺失 retryInfo 恢復、15 分鐘重複防護、帳單日期計算
+  - 完整流程：3 次重試 → failing，failing → 重試成功 → active
+  - 測試套件增至 139 tests, 367 assertions（+32 tests, +128 assertions）
+  - Commits: b336f32, 1eddbb2
 
 ### 2026-01-29 (Phase 5 Plan 01 Complete)
 - ✓ **Phase 5 Plan 01: CryptoService 單元測試 完成**
@@ -362,7 +389,7 @@ Services (Crypto, Logger)
 - Exception-based error handling
 
 **Testing**:
-- Current: 28 tests, 100 assertions
+- Current: 139 tests, 367 assertions
 - Target: 60% coverage
 - Framework: PHPUnit + Yoast Polyfills
 
