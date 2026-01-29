@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 8 of 11 (Settings Page Integration)
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-01-29 — Completed Phase 7 (Webhook Log Viewer UI, 2/2 plans, goal verified)
+Plan: 2 of 2 complete
+Status: Phase complete
+Last activity: 2026-01-29 — Completed Phase 8 (Settings Page Integration, 2/2 plans, 6 min total)
 
-Progress: [███████████] 31% (v1.1 - 4/13 plans complete, 2/6 phases complete)
+Progress: [████████████] 46% (v1.1 - 6/13 plans complete, 3/6 phases complete)
 
 ## Performance Metrics
 
@@ -39,9 +39,9 @@ Progress: [███████████] 31% (v1.1 - 4/13 plans complete, 2
 - 81 commits across 5 phases
 
 **v1.1 Progress:**
-- Plans completed: 4/13
-- Average duration: 3 min (06-01: 2 min, 06-02: 3 min, 07-01: 3.5 min, 07-02: 3 min)
-- Phases completed: 2/6 (Phase 6: 2/2 complete, Phase 7: 2/2 complete)
+- Plans completed: 6/13
+- Average duration: 3 min (06-01: 2 min, 06-02: 3 min, 07-01: 3.5 min, 07-02: 3 min, 08-01: 3 min, 08-02: 3 min)
+- Phases completed: 3/6 (Phase 6: 2/2 complete, Phase 7: 2/2 complete, Phase 8: 2/2 complete)
 
 ## Accumulated Context
 
@@ -66,6 +66,12 @@ Recent decisions affecting v1.1 work:
 - **jQuery for admin UI (07-02)**: Use jQuery for WordPress admin compatibility instead of vanilla JS
 - **Store payload only for new webhooks (07-02)**: Duplicates marked but no payload stored to save database space
 - **JSON_UNESCAPED_UNICODE (07-02)**: Support Chinese characters in webhook payloads
+- **Read-only settings page (08-01)**: Settings editing in FluentCart payment gateway, this page monitors and tests only
+- **Webhook reachability accepts 405 (08-01)**: HEAD requests may get Method Not Allowed, but server is reachable
+- **Credential masking (08-01)**: MerID shows first 3 chars + ***, Hash Key/IV boolean flags only
+- **Quick links navigation (08-02)**: 4 cards for Payment Settings, Webhook Logs, Orders, Subscriptions
+- **Collapsible guidance sections (08-02)**: Configuration help and troubleshooting default to collapsed
+- **WordPress function stubs in tests (08-02)**: site_url and add_query_arg mocked in bootstrap-unit.php
 
 Full decision log: PROJECT.md Key Decisions table
 
@@ -91,11 +97,11 @@ None yet (v1.1 just started)
 
 ## Session Continuity
 
-Last session: 2026-01-29 21:15
-Stopped at: Completed Phase 7 (2 plans executed, goal verified)
+Last session: 2026-01-29 21:42
+Stopped at: Completed Phase 8 (2 plans executed, 6 min total)
 Resume file: None
 
-**Next action:** Plan Phase 8 (Settings Page Integration) via `/gsd:plan-phase 8`
+**Next action:** Plan Phase 9 (Subscription Management UI) via `/gsd:plan-phase 9`
 
 ---
 
