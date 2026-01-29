@@ -36,6 +36,27 @@ final class WebhookLogAPI
                     'enum'              => ['notify', 'return'],
                     'sanitize_callback' => 'sanitize_text_field',
                 ],
+                'date_from' => [
+                    'type'              => 'string',
+                    'sanitize_callback' => 'sanitize_text_field',
+                    'description'       => 'Filter logs from this date (Y-m-d format)',
+                ],
+                'date_to' => [
+                    'type'              => 'string',
+                    'sanitize_callback' => 'sanitize_text_field',
+                    'description'       => 'Filter logs until this date (Y-m-d format)',
+                ],
+                'status' => [
+                    'type'              => 'string',
+                    'enum'              => ['processed', 'duplicate', 'failed', 'pending'],
+                    'sanitize_callback' => 'sanitize_text_field',
+                    'description'       => 'Filter by webhook status',
+                ],
+                'search' => [
+                    'type'              => 'string',
+                    'sanitize_callback' => 'sanitize_text_field',
+                    'description'       => 'Search in trade_no or transaction_id',
+                ],
                 'per_page' => [
                     'type'    => 'integer',
                     'default' => 20,
@@ -85,6 +106,30 @@ final class WebhookLogAPI
             $values[] = $webhook_type;
         }
 
+        // Date range filter
+        if ($date_from = $request->get_param('date_from')) {
+            $where[] = 'processed_at >= %s';
+            $values[] = $date_from . ' 00:00:00';
+        }
+
+        if ($date_to = $request->get_param('date_to')) {
+            $where[] = 'processed_at <= %s';
+            $values[] = $date_to . ' 23:59:59';
+        }
+
+        // Status filter
+        if ($status = $request->get_param('status')) {
+            $where[] = 'webhook_status = %s';
+            $values[] = $status;
+        }
+
+        // Search filter
+        if ($search = $request->get_param('search')) {
+            $where[] = '(trade_no LIKE %s OR transaction_id LIKE %s)';
+            $values[] = '%' . $wpdb->esc_like($search) . '%';
+            $values[] = '%' . $wpdb->esc_like($search) . '%';
+        }
+
         $where_clause = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
         // 計算總數
@@ -110,13 +155,13 @@ final class WebhookLogAPI
     }
 
     /**
-     * 權限檢查：只允許管理員查詢
+     * 權限檢查：允許管理員和 FluentCart 商店管理員查詢
      *
      * @return bool 是否有權限
      */
     public function permission_check(): bool
     {
-        // 只允許管理員查詢
-        return current_user_can('manage_options');
+        // 允許管理員或 FluentCart 商店管理員查詢
+        return current_user_can('manage_options') || current_user_can('manage_fluentcart');
     }
 }
