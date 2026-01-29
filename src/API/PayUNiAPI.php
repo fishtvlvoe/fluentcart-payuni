@@ -4,6 +4,7 @@ namespace BuyGoFluentCart\PayUNi\API;
 
 use BuyGoFluentCart\PayUNi\Gateway\PayUNiSettingsBase;
 use BuyGoFluentCart\PayUNi\Services\PayUNiCryptoService;
+use BuyGoFluentCart\PayUNi\Services\IdempotencyService;
 use BuyGoFluentCart\PayUNi\Utils\Logger;
 
 /**
@@ -82,6 +83,17 @@ final class PayUNiAPI
     {
         $mode = $mode ?: $this->settings->getMode();
 
+        // 記錄 idempotency key（MerTradeNo）
+        $merTradeNo = $encryptInfo['MerTradeNo'] ?? '';
+        $idempotencyKey = IdempotencyService::generateUuid();
+
+        Logger::info('PayUNi API call initiated', [
+            'trade_type' => $tradeType,
+            'mer_trade_no' => $merTradeNo,
+            'idempotency_key' => $idempotencyKey,
+            'mode' => $mode,
+        ]);
+
         $params = $this->buildParams($encryptInfo, $tradeType, $version, $mode);
 
         // _trade_type/_mode are internal only
@@ -100,6 +112,8 @@ final class PayUNiAPI
                 'trade_type' => $tradeType,
                 'url' => $url,
                 'mode' => $mode,
+                'mer_trade_no' => $merTradeNo,
+                'idempotency_key' => $idempotencyKey,
                 'error_message' => $resp->get_error_message(),
                 'error_code' => $resp->get_error_code(),
             ]);
@@ -121,6 +135,8 @@ final class PayUNiAPI
                 'trade_type' => $tradeType,
                 'url' => $url,
                 'mode' => $mode,
+                'mer_trade_no' => $merTradeNo,
+                'idempotency_key' => $idempotencyKey,
                 'http_code' => $httpCode,
                 'http_message' => $httpMessage,
                 'response_body' => $body,
@@ -153,6 +169,14 @@ final class PayUNiAPI
                 'body' => $body,
             ]);
         }
+
+        // 成功時記錄
+        Logger::info('PayUNi API call succeeded', [
+            'trade_type' => $tradeType,
+            'mer_trade_no' => $merTradeNo,
+            'idempotency_key' => $idempotencyKey,
+            'response_status' => $decoded['Status'] ?? 'unknown',
+        ]);
 
         return $decoded;
     }
