@@ -294,7 +294,154 @@
     margin-bottom: 8px;
 }
 
+/* Troubleshooting Section */
+.payuni-user-guide .troubleshooting-section {
+    margin-bottom: 32px;
+}
+
+.payuni-user-guide .troubleshooting-section h3 {
+    font-size: 16px;
+    color: #1d2327;
+    margin-bottom: 16px;
+}
+
+/* Error Table */
+.payuni-user-guide .error-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.payuni-user-guide .error-table th,
+.payuni-user-guide .error-table td {
+    padding: 12px;
+    border: 1px solid #dcdcde;
+    text-align: left;
+    vertical-align: top;
+}
+
+.payuni-user-guide .error-table th {
+    background: #f6f7f7;
+    font-weight: 600;
+}
+
+.payuni-user-guide .error-table code {
+    background: #f0f0f1;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: #d63638;
+}
+
+/* Checklist */
+.payuni-user-guide .checklist {
+    background: #f6f7f7;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    padding: 20px;
+}
+
+.payuni-user-guide .checklist-intro {
+    margin-bottom: 16px;
+}
+
+.payuni-user-guide .checklist-items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.payuni-user-guide .checklist-items li {
+    display: flex;
+    align-items: flex-start;
+    padding: 12px;
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.payuni-user-guide .checklist-checkbox {
+    font-size: 18px;
+    margin-right: 12px;
+    color: #2271b1;
+}
+
+.payuni-user-guide .checklist-text {
+    flex: 1;
+}
+
+.payuni-user-guide .checklist-text small {
+    color: #646970;
+}
+
+/* Flowchart */
+.payuni-user-guide .flowchart {
+    text-align: center;
+    padding: 20px;
+    background: #f6f7f7;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+}
+
+.payuni-user-guide .flowchart-step,
+.payuni-user-guide .flowchart-decision,
+.payuni-user-guide .flowchart-action {
+    display: inline-block;
+    padding: 12px 24px;
+    margin: 8px;
+    border-radius: 4px;
+}
+
+.payuni-user-guide .flowchart-step.start {
+    background: #2271b1;
+    color: #fff;
+    border-radius: 20px;
+}
+
+.payuni-user-guide .flowchart-decision {
+    background: #fff;
+    border: 2px solid #2271b1;
+    transform: rotate(0deg);
+}
+
+.payuni-user-guide .flowchart-action {
+    background: #fff;
+    border: 1px solid #dcdcde;
+}
+
+.payuni-user-guide .flowchart-arrow {
+    font-size: 20px;
+    color: #646970;
+}
+
+.payuni-user-guide .flowchart-branches {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 16px;
+}
+
+.payuni-user-guide .flowchart-branch {
+    text-align: center;
+}
+
+.payuni-user-guide .branch-label {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #dcdcde;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
 /* Responsive */
+@media (max-width: 782px) {
+    .payuni-user-guide .flowchart-branches {
+        flex-direction: column;
+        gap: 16px;
+    }
+}
 @media (max-width: 782px) {
     .payuni-user-guide .guide-container {
         flex-direction: column;

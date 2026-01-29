@@ -413,7 +413,145 @@ class UserGuidePage
         ?>
         <section id="troubleshooting" class="guide-section">
             <h2><?php echo esc_html__('疑難排解', 'fluentcart-payuni'); ?></h2>
-            <p><?php echo esc_html__('此區段將在 Plan 11-02 中填入內容。', 'fluentcart-payuni'); ?></p>
+
+            <!-- 1. 錯誤訊息對照表 -->
+            <div class="troubleshooting-section">
+                <h3><?php echo esc_html__('常見錯誤訊息對照表', 'fluentcart-payuni'); ?></h3>
+                <table class="error-table">
+                    <thead>
+                        <tr>
+                            <th><?php echo esc_html__('錯誤代碼/訊息', 'fluentcart-payuni'); ?></th>
+                            <th><?php echo esc_html__('可能原因', 'fluentcart-payuni'); ?></th>
+                            <th><?php echo esc_html__('解決方法', 'fluentcart-payuni'); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code><?php echo esc_html__('Hash 驗證失敗', 'fluentcart-payuni'); ?></code></td>
+                            <td><?php echo esc_html__('Hash Key 或 Hash IV 設定錯誤', 'fluentcart-payuni'); ?></td>
+                            <td><?php echo esc_html__('確認 FluentCart 中的 Hash Key/IV 與 PayUNi 後台一致', 'fluentcart-payuni'); ?></td>
+                        </tr>
+                        <tr>
+                            <td><code><?php echo esc_html__('商店代號不存在', 'fluentcart-payuni'); ?></code></td>
+                            <td><?php echo esc_html__('MerID 設定錯誤或環境不匹配', 'fluentcart-payuni'); ?></td>
+                            <td><?php echo esc_html__('確認使用正確環境的 MerID（測試/正式）', 'fluentcart-payuni'); ?></td>
+                        </tr>
+                        <tr>
+                            <td><code><?php echo esc_html__('交易金額錯誤', 'fluentcart-payuni'); ?></code></td>
+                            <td><?php echo esc_html__('金額格式不正確或超出限制', 'fluentcart-payuni'); ?></td>
+                            <td><?php echo esc_html__('確認金額為整數且在 PayUNi 允許範圍內', 'fluentcart-payuni'); ?></td>
+                        </tr>
+                        <tr>
+                            <td><code><?php echo esc_html__('信用卡授權失敗', 'fluentcart-payuni'); ?></code></td>
+                            <td><?php echo esc_html__('卡片問題（餘額不足、過期、被鎖）', 'fluentcart-payuni'); ?></td>
+                            <td><?php echo esc_html__('請客戶確認卡片狀態或使用其他卡片', 'fluentcart-payuni'); ?></td>
+                        </tr>
+                        <tr>
+                            <td><code><?php echo esc_html__('3D 驗證失敗', 'fluentcart-payuni'); ?></code></td>
+                            <td><?php echo esc_html__('客戶未完成 3D 驗證或驗證超時', 'fluentcart-payuni'); ?></td>
+                            <td><?php echo esc_html__('請客戶重新付款並完成 3D 驗證', 'fluentcart-payuni'); ?></td>
+                        </tr>
+                        <tr>
+                            <td><code><?php echo esc_html__('Webhook 簽章驗證失敗', 'fluentcart-payuni'); ?></code></td>
+                            <td><?php echo esc_html__('Webhook 資料被竄改或 Key 不正確', 'fluentcart-payuni'); ?></td>
+                            <td><?php echo esc_html__('確認 Hash Key 正確，檢查伺服器時間是否同步', 'fluentcart-payuni'); ?></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 2. Webhook 排查檢查清單 -->
+            <div class="troubleshooting-section">
+                <h3><?php echo esc_html__('Webhook 無法運作檢查清單', 'fluentcart-payuni'); ?></h3>
+                <div class="checklist">
+                    <div class="checklist-intro">
+                        <p><?php echo esc_html__('如果 Webhook 無法正常接收，請依序檢查以下項目：', 'fluentcart-payuni'); ?></p>
+                    </div>
+                    <ul class="checklist-items">
+                        <li>
+                            <span class="checklist-checkbox">☐</span>
+                            <span class="checklist-text">
+                                <strong><?php echo esc_html__('URL 是否正確', 'fluentcart-payuni'); ?></strong><?php echo esc_html__(' - 在 PayUNi 後台確認 NotifyURL 已正確設定', 'fluentcart-payuni'); ?>
+                                <br><small><?php echo esc_html__('可在「PayUNi 設定」頁面複製正確的 Webhook URL', 'fluentcart-payuni'); ?></small>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="checklist-checkbox">☐</span>
+                            <span class="checklist-text">
+                                <strong><?php echo esc_html__('HTTPS 是否有效', 'fluentcart-payuni'); ?></strong><?php echo esc_html__(' - PayUNi 要求使用有效的 SSL 憑證', 'fluentcart-payuni'); ?>
+                                <br><small><?php echo esc_html__('使用瀏覽器確認網站顯示安全鎖頭圖示', 'fluentcart-payuni'); ?></small>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="checklist-checkbox">☐</span>
+                            <span class="checklist-text">
+                                <strong><?php echo esc_html__('防火牆是否允許', 'fluentcart-payuni'); ?></strong><?php echo esc_html__(' - 確認伺服器防火牆允許外部 POST 請求', 'fluentcart-payuni'); ?>
+                                <br><small><?php echo esc_html__('聯繫主機商確認 PayUNi 的 IP 範圍可以存取', 'fluentcart-payuni'); ?></small>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="checklist-checkbox">☐</span>
+                            <span class="checklist-text">
+                                <strong><?php echo esc_html__('網站是否可公開訪問', 'fluentcart-payuni'); ?></strong><?php echo esc_html__(' - Webhook 只能發送到公開網站', 'fluentcart-payuni'); ?>
+                                <br><small><?php echo esc_html__('localhost 或內網環境無法接收 Webhook', 'fluentcart-payuni'); ?></small>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="checklist-checkbox">☐</span>
+                            <span class="checklist-text">
+                                <strong><?php echo esc_html__('伺服器日誌有無錯誤', 'fluentcart-payuni'); ?></strong><?php echo esc_html__(' - 檢查 PHP 錯誤日誌', 'fluentcart-payuni'); ?>
+                                <br><small><?php echo esc_html__('查看 wp-content/debug.log 或主機 error_log', 'fluentcart-payuni'); ?></small>
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 3. 訂單未付款排查流程圖 -->
+            <div class="troubleshooting-section">
+                <h3><?php echo esc_html__('訂單未付款排查流程', 'fluentcart-payuni'); ?></h3>
+                <div class="flowchart">
+                    <div class="flowchart-step start">
+                        <span><?php echo esc_html__('訂單狀態為「待付款」', 'fluentcart-payuni'); ?></span>
+                    </div>
+                    <div class="flowchart-arrow">↓</div>
+                    <div class="flowchart-decision">
+                        <span><?php echo esc_html__('客戶有收到付款資訊嗎？', 'fluentcart-payuni'); ?></span>
+                    </div>
+                    <div class="flowchart-branches">
+                        <div class="flowchart-branch">
+                            <span class="branch-label"><?php echo esc_html__('否', 'fluentcart-payuni'); ?></span>
+                            <div class="flowchart-arrow">↓</div>
+                            <div class="flowchart-action">
+                                <?php echo esc_html__('檢查訂單確認郵件是否成功發送', 'fluentcart-payuni'); ?>
+                            </div>
+                        </div>
+                        <div class="flowchart-branch">
+                            <span class="branch-label"><?php echo esc_html__('是', 'fluentcart-payuni'); ?></span>
+                            <div class="flowchart-arrow">↓</div>
+                            <div class="flowchart-decision">
+                                <span><?php echo esc_html__('客戶有完成付款嗎？', 'fluentcart-payuni'); ?></span>
+                            </div>
+                            <div class="flowchart-branches nested">
+                                <div class="flowchart-branch">
+                                    <span class="branch-label"><?php echo esc_html__('否', 'fluentcart-payuni'); ?></span>
+                                    <div class="flowchart-arrow">↓</div>
+                                    <div class="flowchart-action">
+                                        <?php echo esc_html__('提醒客戶付款期限', 'fluentcart-payuni'); ?>
+                                    </div>
+                                </div>
+                                <div class="flowchart-branch">
+                                    <span class="branch-label"><?php echo esc_html__('是', 'fluentcart-payuni'); ?></span>
+                                    <div class="flowchart-arrow">↓</div>
+                                    <div class="flowchart-action">
+                                        <?php echo esc_html__('檢查 Webhook 記錄是否有收到通知', 'fluentcart-payuni'); ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
         <?php
         return ob_get_clean();
