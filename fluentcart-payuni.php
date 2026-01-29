@@ -94,6 +94,14 @@ function buygo_fc_payuni_bootstrap(): void
         return;
     }
 
+    // 檢查資料庫版本，必要時更新 schema
+    $current_db_version = get_option('buygo_fc_payuni_db_version', '0.0.0');
+    if (version_compare($current_db_version, BUYGO_FC_PAYUNI_VERSION, '<')) {
+        require_once BUYGO_FC_PAYUNI_PATH . 'includes/class-database.php';
+        \FluentcartPayuni\Database::createTables();
+        update_option('buygo_fc_payuni_db_version', BUYGO_FC_PAYUNI_VERSION);
+    }
+
     // Phase 4：管理員可修改訂閱下次扣款日（next_billing_date），與續扣邏輯一致。
     add_action('rest_api_init', function () {
         if (!class_exists(\FluentCart\App\Models\Subscription::class) || !class_exists(\FluentCart\App\Modules\Subscriptions\Services\SubscriptionService::class)) {
@@ -1035,6 +1043,13 @@ function buygo_fc_payuni_activate(): void
             ['back_link' => true]
         );
     }
+
+    // 建立資料表
+    require_once BUYGO_FC_PAYUNI_PATH . 'includes/class-database.php';
+    \FluentcartPayuni\Database::createTables();
+
+    // 記錄資料庫版本
+    update_option('buygo_fc_payuni_db_version', BUYGO_FC_PAYUNI_VERSION);
 }
 
 register_activation_hook(__FILE__, 'buygo_fc_payuni_activate');
