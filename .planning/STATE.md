@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 11 of 11 (User Guidance and Documentation)
-Plan: 1 of 3 complete
+Plan: 2 of 3 complete
 Status: In progress
-Last activity: 2026-01-29 — Completed 11-01-PLAN.md (User Guide foundation)
+Last activity: 2026-01-29 — Completed 11-02-PLAN.md (FAQ and Troubleshooting)
 
-Progress: [█████████████████] 85% (v1.1 - 11/13 plans complete, 5/6 phases complete)
+Progress: [██████████████████] 92% (v1.1 - 12/13 plans complete, 5/6 phases complete)
 
 ## Performance Metrics
 
@@ -39,10 +39,10 @@ Progress: [█████████████████] 85% (v1.1 - 11/1
 - 81 commits across 5 phases
 
 **v1.1 Progress:**
-- Plans completed: 11/13
-- Average duration: 2.4 min (06-01: 2 min, 06-02: 3 min, 07-01: 3.5 min, 07-02: 3 min, 08-01: 3 min, 08-02: 3 min, 09-01: 2.5 min, 09-02: 2 min, 10-01: 1.6 min, 10-02: 2.1 min, 11-01: 2.3 min)
+- Plans completed: 12/13
+- Average duration: 2.4 min (06-01: 2 min, 06-02: 3 min, 07-01: 3.5 min, 07-02: 3 min, 08-01: 3 min, 08-02: 3 min, 09-01: 2.5 min, 09-02: 2 min, 10-01: 1.6 min, 10-02: 2.1 min, 11-01: 2.3 min, 11-02: 3 min)
 - Phases completed: 5/6 (Phase 6: 2/2 complete, Phase 7: 2/2 complete, Phase 8: 2/2 complete, Phase 9: 2/2 complete, Phase 10: 2/2 complete)
-- Phase 11: 1/3 complete (11-01: User Guide foundation ✅, 11-02: FAQ/Troubleshooting, 11-03: Integration points)
+- Phase 11: 2/3 complete (11-01: User Guide foundation ✅, 11-02: FAQ/Troubleshooting ✅, 11-03: Integration points)
 
 ## Accumulated Context
 
@@ -91,6 +91,11 @@ Recent decisions affecting v1.1 work:
 - **WordPress Codex-style documentation (11-01)**: Use WordPress Codex visual style for user guide (consistency with WordPress ecosystem)
 - **Sidebar navigation pattern (11-01)**: Sidebar navigation for documentation pages (best practice for long-form content)
 - **Placeholder sections (11-01)**: FAQ and Troubleshooting deferred to Plan 11-02 (focus on infrastructure first)
+- **FAQ accordion pattern (11-02)**: Collapsible accordion UI for FAQ items (allows merchants to scan questions quickly)
+- **Four FAQ categories (11-02)**: 金流設定, Webhook 調試, 訂閱續扣問題, ATM 虛擬帳號 (covers most common merchant questions)
+- **Error table format (11-02)**: Three-column table with error code, cause, solution (structured error reference for quick troubleshooting)
+- **Webhook checklist (11-02)**: Five-item checklist with checkbox indicators (guides merchants through systematic Webhook debugging)
+- **Visual flowchart (11-02)**: Decision tree for order payment troubleshooting (visual representation helps navigate complex debugging scenarios)
 
 Full decision log: PROJECT.md Key Decisions table
 
@@ -117,10 +122,10 @@ None yet (v1.1 just started)
 ## Session Continuity
 
 Last session: 2026-01-29
-Stopped at: Completed 11-01-PLAN.md (User Guide foundation)
+Stopped at: Completed 11-02-PLAN.md (FAQ and Troubleshooting)
 Resume file: None
 
-**Next action:** Execute 11-02-PLAN.md (FAQ/Troubleshooting content)
+**Next action:** Execute 11-03-PLAN.md (Integration points and getting help)
 
 ---
 
