@@ -90,11 +90,11 @@ Plans:
   3. Bound payment card information displayed (last 4 digits, expiry)
   4. Failure reason displayed when renewal fails
   5. Subscription meta box injected via FluentCart filter
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 09-01: TBD
-- [ ] 09-02: TBD
+- [ ] 09-01-PLAN.md — Create SubscriptionPayUNiMetaBox with renewal history, card info, failure details
+- [ ] 09-02-PLAN.md — Enhanced subscription detail UI with renewal history table and styling
 
 #### Phase 10: Dashboard Statistics & Monitoring
 **Goal**: Merchants can monitor PayUNi performance and subscription health at a glance
@@ -152,7 +152,7 @@ Phases execute in numeric order: 6 → 7 → 8 → 9 → 10 → 11
 | 6. Meta Storage & Order Detail | v1.1 | 2/2 | Complete | 2026-01-29 |
 | 7. Webhook Log Viewer UI | v1.1 | 2/2 | Complete | 2026-01-29 |
 | 8. Settings Page Integration | v1.1 | 2/2 | Complete | 2026-01-29 |
-| 9. Subscription Detail Enhancement | v1.1 | 0/TBD | Not started | - |
+| 9. Subscription Detail Enhancement | v1.1 | 0/2 | Planned | - |
 | 10. Dashboard Statistics & Monitoring | v1.1 | 0/TBD | Not started | - |
 | 11. User Guidance and Documentation | v1.1 | 0/TBD | Not started | - |
 
