@@ -16,10 +16,11 @@
   - 對應：Phase 1
   - 完成：驗證已存在（無需新實作）
 
-- [ ] **SUB-05**: 訂閱續扣失敗時有自動重試機制
+- [x] **SUB-05**: 訂閱續扣失敗時有自動重試機制 ✅
   - 接受標準：失敗後 24/48/72 小時自動重試，3 次失敗才標記為 failing
-  - 技術細節：擴展 `PayUNiSubscriptionRenewalRunner`
+  - 技術細節：擴展 `PayUNiSubscriptionRenewalRunner`，新增 `handleRenewalFailure()` 和 `clearRetryInfo()`
   - 對應：Phase 2
+  - 完成：2026-01-29 (Commit 96a93ec)
 
 ### 測試完成（Payment Testing）
 
@@ -95,14 +96,14 @@
 |-------------|-------|--------|-----------|
 | SUB-03 | 1 | ✅ Completed | 2026-01-29 |
 | SUB-04 | 1 | ✅ Completed | 2026-01-29 |
-| SUB-05 | 2 | Pending | - |
+| SUB-05 | 2 | ✅ Completed | 2026-01-29 |
 | ATM-03 | 3 | Pending | - |
 | CVS-03 | 3 | Pending | - |
 | WEBHOOK-03 | 4 | Pending | - |
 | API-01 | 4 | Pending | - |
-| TEST-01 | 5 | 🔄 Partial (6 tests) | 2026-01-29 |
+| TEST-01 | 5 | 🔄 Partial (16 tests) | 2026-01-29 |
 | TEST-02 | 5 | Pending | - |
-| TEST-03 | 5 | Pending | - |
+| TEST-03 | 5 | 🔄 Partial | 2026-01-29 |
 | TEST-04 | 5 | Pending | - |
 
 ---

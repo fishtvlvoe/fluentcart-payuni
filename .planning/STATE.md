@@ -2,8 +2,8 @@
 
 ## Current Status
 
-**Phase**: 1 (訂閱核心修復)
-**Status**: ✅ Completed → Phase 2 Ready
+**Phase**: 2 (訂閱重試機制)
+**Status**: ✅ Completed → Phase 3 Ready
 **Last Updated**: 2026-01-29
 
 ## Progress
@@ -11,12 +11,12 @@
 | Phase | Status | Completion |
 |-------|--------|------------|
 | 1: 訂閱核心修復 | ✅ Completed | 100% |
-| 2: 訂閱重試機制 | 🔵 Ready to Start | 0% |
-| 3: ATM/CVS 測試 | ⚪ Not Started | 0% |
+| 2: 訂閱重試機制 | ✅ Completed | 100% |
+| 3: ATM/CVS 測試 | 🔵 Ready to Start | 0% |
 | 4: Webhook 可靠性 | ⚪ Not Started | 0% |
 | 5: 測試覆蓋率 | ⚪ Not Started | 0% |
 
-**Overall**: 2/11 requirements completed (18%)
+**Overall**: 3/11 requirements completed (27%)
 
 ## Current Phase Details
 
@@ -39,21 +39,47 @@
 - 8a1dbf3: fix(subscription): improve 3D verification fallback for card update
 - 900abe3: test(subscription): add unit tests for card update fallback
 
-### Phase 2: 訂閱重試機制 🔵 READY
+### Phase 2: 訂閱重試機制 ✅ COMPLETED
 
 **Goal**: 加入訂閱續扣失敗自動重試機制
 
 **Requirements**:
-- [ ] SUB-05: 訂閱續扣失敗時有自動重試機制
+- [x] SUB-05: 訂閱續扣失敗時有自動重試機制 ✅
+
+**Completed Tasks**:
+1. ✅ 分析 PayUNiSubscriptionRenewalRunner 續扣邏輯
+2. ✅ 設計重試策略（24h/48h/72h）
+3. ✅ 在 subscription meta 記錄重試狀態
+4. ✅ 實作重試排程機制（handleRenewalFailure, clearRetryInfo）
+5. ✅ 撰寫測試（10 tests, 新增 75 assertions）
+
+**Commits**:
+- 96a93ec: feat(subscription): add automatic retry mechanism
+- a5a7faa: test(subscription): add retry mechanism tests
+
+### Phase 3: ATM/CVS 測試 🔵 READY
+
+**Goal**: 完成 ATM 和超商付款的真實交易測試
+
+**Requirements**:
+- [ ] ATM-03: ATM 轉帳完成真實付款測試
+- [ ] CVS-03: 超商代碼完成真實付款測試
 
 **Next Steps**:
-1. 分析 PayUNiSubscriptionRenewalRunner 續扣邏輯
-2. 設計重試策略（24h/48h/72h）
-3. 在 subscription meta 記錄重試次數和時間
-4. 實作重試排程機制
-5. 撰寫測試
+⏸️ **需要使用者手動測試**（無法自動化）
+1. 使用 PayUNi 沙盒環境完成端到端測試
+2. 記錄 Email 通知內容和格式
+3. 撰寫測試文件（步驟、結果、截圖）
 
 ## Recent Changes
+
+### 2026-01-29 (Phase 2 Complete)
+- ✓ **Phase 2: 訂閱重試機制 完成**
+  - 自動重試機制實作（24h/48h/72h 間隔）
+  - Subscription meta 記錄重試狀態
+  - 區分可重試和不可重試的錯誤
+  - 單元測試新增（10 tests, 增加 51 assertions）
+  - Commits: 96a93ec, a5a7faa
 
 ### 2026-01-29 (Phase 1 Complete)
 - ✓ **Phase 1: 訂閱核心修復 完成**
@@ -87,9 +113,10 @@
    - Note: syncSubscriptionStates automatically calculates next_billing_date
 
 ### High (P1)
-3. **無訂閱續扣失敗重試**
+3. **無訂閱續扣失敗重試** ✅ FIXED
    - Impact: 單次失敗即標記 failing
-   - Status: Planned in Phase 2
+   - Status: ✅ Implemented with 3-attempt retry mechanism (24h/48h/72h)
+   - Commit: 96a93ec
 
 4. **ATM/CVS 未實際測試**
    - Impact: 不確定真實付款後的通知格式
