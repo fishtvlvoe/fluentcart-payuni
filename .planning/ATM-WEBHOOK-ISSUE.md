@@ -28,7 +28,8 @@
 
 ### NotifyURL 設定
 ```
-https://test.buygo.me/?fct_payment_listener=1&method=payuni
+舊格式（已棄用）: https://test.buygo.me/?fct_payment_listener=1&method=payuni
+新格式（2026-01-29 改版）: https://test.buygo.me/fluentcart-api/payuni-notify
 ```
 
 ## 問題分析
@@ -107,23 +108,44 @@ php test-webhook-endpoint.php
 
 ### 長期解決方案
 
-#### 方案 A：聯繫 PayUNi 技術支援 ⭐️ 推薦
+#### 方案 A：改用乾淨 URL 格式（✅ 已實作 2026-01-29）
+**問題假設**：PayUNi 對帶 query string 的 URL 處理不穩定
+
+**解決方式**：參考 woomp 外掛，改用乾淨的路徑格式
+- 舊格式：`https://test.buygo.me/?fct_payment_listener=1&method=payuni`
+- 新格式：`https://test.buygo.me/fluentcart-api/payuni-notify`
+
+**實作內容**：
+1. ✅ 新增 WordPress rewrite rule 註冊端點
+2. ✅ 更新 PaymentProcessor.php NotifyURL 生成
+3. ✅ 更新 SubscriptionPaymentProcessor.php NotifyURL 生成
+4. ✅ 加入 debug 日誌記錄 webhook 收到的資訊
+5. ✅ 保留舊格式作為向下相容
+
+**待完成步驟**：
+1. ⏳ 重新整理 WordPress rewrite rules（進入「設定」→「固定網址」→「儲存變更」）
+2. ⏳ 更新 PayUNi 後台 NotifyURL 設定
+3. ⏳ 測試新的 ATM 付款流程
+
+**參考**：`FLUSH-REWRITE-INSTRUCTIONS.md`
+
+#### 方案 B：聯繫 PayUNi 技術支援 ⭐️ 推薦
 1. 確認正式環境 ATM 付款是否會自動發送 webhook
 2. 詢問是否需要特殊設定才能啟用自動通知
 3. 確認通知格式和測試環境是否一致
 4. 取得 PayUNi IP 範圍用於防火牆白名單
 
-#### 方案 B：實作 Webhook 監控
-1. 在 webhook 端點加入詳細日誌
+#### 方案 C：實作 Webhook 監控
+1. ✅ 在 webhook 端點加入詳細日誌（已完成）
 2. 記錄所有收到的請求（包含 IP、Headers、Body）
 3. 設定告警機制，當 webhook 失敗時發送通知
 
-#### 方案 C：實作主動查詢機制
+#### 方案 D：實作主動查詢機制
 1. 定期呼叫 PayUNi API 查詢交易狀態
 2. 當狀態改變時更新本地訂單
 3. 作為 webhook 的備援機制
 
-#### 方案 D：Phase 4 增強可靠性（已規劃）
+#### 方案 E：Phase 4 增強可靠性（已規劃）
 - WEBHOOK-03: 使用資料庫記錄 webhook 去重
 - API-01: 加入 idempotency key 防止重複處理
 
@@ -131,9 +153,12 @@ php test-webhook-endpoint.php
 
 ### 短期（本週）
 1. ✅ 手動標記此筆訂單為已付款
-2. ⏳ 執行 webhook 測試腳本確認端點正常
-3. ⏳ 聯繫 PayUNi 技術支援確認通知機制
-4. ⏳ 檢查伺服器 access log
+2. ✅ 實作新的 webhook 端點（乾淨 URL 格式）
+3. ⏳ 重新整理 WordPress rewrite rules
+4. ⏳ 更新 PayUNi 後台 NotifyURL 設定
+5. ⏳ 測試新的 ATM 付款流程
+6. ⏳ 聯繫 PayUNi 技術支援確認通知機制
+7. ⏳ 檢查伺服器 access log
 
 ### 中期（Phase 4）
 1. 實作 webhook 詳細日誌記錄
@@ -146,11 +171,20 @@ php test-webhook-endpoint.php
 
 ## 相關檔案
 
+### Webhook 端點實作
+- 主外掛檔案: `fluentcart-payuni.php:731-769` - 新的 rewrite rule 和 parse_request handler
 - NotifyHandler: `src/Webhook/NotifyHandler.php:128-141`
-- PaymentProcessor: `src/Processor/PaymentProcessor.php:524-662`
+- PaymentProcessor: `src/Processor/PaymentProcessor.php:68-71` - NotifyURL 生成（已更新）
+- SubscriptionPaymentProcessor: `src/Processor/SubscriptionPaymentProcessor.php:91-94` - NotifyURL 生成（已更新）
+
+### 測試和工具腳本
 - 手動修正腳本: `mark-atm-paid.php`
-- Webhook 測試腳本: `test-webhook-endpoint.php`
+- Webhook 測試腳本: `test-webhook-simple.php`
 - 交易查詢腳本: `check-atm-transaction.php`
+
+### 文件
+- Rewrite rules 重新整理指示: `FLUSH-REWRITE-INSTRUCTIONS.md`
+- woomp 參考實作: `/Users/fishtv/Local Sites/buygo/app/public/wp-content/plugins/woomp/includes/payuni/src/gateways/Atm.php`
 
 ## 測試建議
 
@@ -191,5 +225,18 @@ error_log('[PayUNi Webhook] POST data keys: ' . json_encode(array_keys($_POST)))
 
 ---
 
+## 更新記錄
+
+### 2026-01-29 16:00 - 實作新的 webhook 端點
+- 改用乾淨 URL 格式（無 query string）
+- 參考 woomp 外掛的實作模式
+- 加入 debug 日誌記錄
+- 保留舊格式作為向下相容
+- Git commit: `refactor(webhook): 改用乾淨 URL 格式接收 PayUNi 通知`
+
+待測試驗證新端點是否能成功接收 PayUNi 的 ATM 付款通知。
+
+---
+
 *Document created: 2026-01-29*
-*Last updated: 2026-01-29*
+*Last updated: 2026-01-29 16:00*
