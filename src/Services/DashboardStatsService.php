@@ -2,8 +2,6 @@
 
 namespace BuyGoFluentCart\PayUNi\Services;
 
-use FluentcartPayuni\Database;
-
 /**
  * DashboardStatsService
  *
@@ -85,7 +83,7 @@ final class DashboardStatsService
         global $wpdb;
 
         try {
-            $table = $wpdb->prefix . 'fct_order_transactions';
+            $table = $wpdb->prefix . 'fc_transactions';
 
             $sql = "
                 SELECT
@@ -96,7 +94,7 @@ final class DashboardStatsService
                         ELSE 'other'
                     END as method_type,
                     COUNT(*) as count,
-                    SUM(payment_total) as amount
+                    SUM(amount) as amount
                 FROM {$table}
                 WHERE payment_method LIKE 'payuni%'
                     AND status = 'paid'
@@ -147,7 +145,7 @@ final class DashboardStatsService
         global $wpdb;
 
         try {
-            $table = $wpdb->prefix . 'fct_order_transactions';
+            $table = $wpdb->prefix . 'fc_transactions';
 
             $sql = "
                 SELECT
@@ -224,7 +222,7 @@ final class DashboardStatsService
         global $wpdb;
 
         try {
-            $table = Database::getWebhookLogTable();
+            $table = $wpdb->prefix . 'payuni_webhook_log';
 
             $sql = "
                 SELECT
