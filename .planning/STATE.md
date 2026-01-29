@@ -3,8 +3,8 @@
 ## Current Status
 
 **Phase**: 5 (測試覆蓋率提升)
-**Status**: 🔄 In Progress (3/5 plans complete)
-**Last Updated**: 2026-01-29 17:49
+**Status**: 🔄 In Progress (4/5 plans complete)
+**Last Updated**: 2026-01-29 17:51
 
 ## Progress
 
@@ -14,16 +14,17 @@
 | 2: 訂閱重試機制 | ✅ Completed | 100% |
 | 3: ATM/CVS 測試 | ⏸️ Paused (Webhook Issue) | 80% |
 | 4: Webhook 可靠性 | ✅ Completed | 100% (5/5 plans) |
-| 5: 測試覆蓋率 | 🔄 In Progress | 60% (3/5 plans) |
+| 5: 測試覆蓋率 | 🔄 In Progress | 80% (4/5 plans) |
 
 **Overall**: 8/11 requirements completed (73%)
 
 **Test Coverage Progress**:
 - Current: 47 tests → 139 tests (+92 tests, +196%)
-- Assertions: 138 → 367 (+229 assertions, +166%)
+- Assertions: 138 → 385 (+247 assertions, +179%)
 - Phase 5 Plan 01 added: PayUNiCryptoService (24 tests, 45 assertions)
 - Phase 5 Plan 02 added: NotifyHandler boundary cases (3 tests, 15 assertions)
 - Phase 5 Plan 03 added: SubscriptionStateMachine (32 tests, 128 assertions)
+- Phase 5 Plan 04 added: PaymentProcessor + Gateway (36 tests, 74 assertions)
 
 ## Current Phase Details
 
@@ -128,12 +129,18 @@
    - 邊界案例（零嘗試初始化、缺失 retryInfo、15 分鐘重複防護）
    - Commits: b336f32, 1eddbb2
 
-**Phase Progress**: 3/5 plans (60%)
-**Test Suite**: 139 tests, 367 assertions (+196% tests from Phase 4 end)
+4. ✅ **Plan 04: Gateway/Processor 核心邏輯測試** (2026-01-29)
+   - 建立 PaymentProcessorTest (24 tests, 51 assertions, 392 lines)
+   - 建立 PayUNiGatewayTest (12 tests, 23 assertions, 280 lines)
+   - 測試金額轉換、MerTradeNo 生成、設定驗證、ATM/CVS/Credit 參數
+   - 邏輯提取模式：重新實作可測試的純 PHP 邏輯
+   - Commits: 98c266c, 5e9d67b
+
+**Phase Progress**: 4/5 plans (80%)
+**Test Suite**: 139 tests, 385 assertions (+96% tests from Phase 4 end)
 
 **Next Steps**:
-1. ⏳ Plan 04: Gateway/Processor 核心邏輯測試
-2. ⏳ Plan 05: 整合測試配置、驗證覆蓋率
+1. ⏳ Plan 05: 整合測試配置、驗證覆蓋率
 
 ### Phase 4: Webhook 可靠性 ✅ COMPLETED
 
