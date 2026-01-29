@@ -57,21 +57,48 @@
 - 96a93ec: feat(subscription): add automatic retry mechanism
 - a5a7faa: test(subscription): add retry mechanism tests
 
-### Phase 3: ATM/CVS 測試 🔵 READY
+### Phase 3: ATM/CVS 測試 ⚠️ PARTIAL
 
 **Goal**: 完成 ATM 和超商付款的真實交易測試
 
 **Requirements**:
-- [ ] ATM-03: ATM 轉帳完成真實付款測試
+- [~] ATM-03: ATM 轉帳完成真實付款測試 ⚠️ 部分完成
 - [ ] CVS-03: 超商代碼完成真實付款測試
 
+**Completed Tasks**:
+1. ✅ ATM 付款流程測試（正式環境）
+2. ✅ 取號機制驗證
+3. ✅ 繳費資訊顯示驗證
+4. ✅ PayUNi 收款確認
+5. ⚠️ Webhook 通知機制發現問題（需手動介入）
+
+**發現問題**:
+- **Webhook 未自動觸發**: ATM 付款完成後，PayUNi 沒有自動發送 webhook 通知
+- **手動修正**: 使用 `mark-atm-paid.php` 手動標記訂單為已付款
+- **問題文件**: `.planning/ATM-WEBHOOK-ISSUE.md`
+
+**測試案例**:
+- Order ID: 237
+- Transaction ID: 112
+- PayUNi TradeNo: 176967094005653059B
+- 付款金額: NT$30
+- 付款時間: 2026-01-29 15:16:58
+
 **Next Steps**:
-⏸️ **需要使用者手動測試**（無法自動化）
-1. 使用 PayUNi 沙盒環境完成端到端測試
-2. 記錄 Email 通知內容和格式
-3. 撰寫測試文件（步驟、結果、截圖）
+1. ⏳ 執行 webhook 測試腳本驗證端點
+2. ⏳ 聯繫 PayUNi 確認通知機制
+3. ⏳ CVS 付款測試（延後）
 
 ## Recent Changes
+
+### 2026-01-29 (Phase 3 Partial - ATM Testing)
+- ⚠️ **Phase 3: ATM 測試發現 Webhook 問題**
+  - ATM 付款流程測試完成（正式環境 NT$30）
+  - 發現 webhook 通知未自動觸發
+  - 手動標記訂單為已付款（mark-atm-paid.php）
+  - 建立問題文件（ATM-WEBHOOK-ISSUE.md）
+  - 建立測試腳本（test-webhook-endpoint.php）
+  - 測試案例：Order 237, Transaction 112
 
 ### 2026-01-29 (Phase 2 Complete)
 - ✓ **Phase 2: 訂閱重試機制 完成**
@@ -118,9 +145,12 @@
    - Status: ✅ Implemented with 3-attempt retry mechanism (24h/48h/72h)
    - Commit: 96a93ec
 
-4. **ATM/CVS 未實際測試**
-   - Impact: 不確定真實付款後的通知格式
-   - Status: Planned in Phase 3
+4. **ATM Webhook 通知不穩定** ⚠️ NEW
+   - Impact: ATM 付款完成後，webhook 可能不會自動觸發
+   - Status: Phase 3 測試發現（2026-01-29）
+   - Workaround: 手動標記訂單（mark-atm-paid.php）
+   - Long-term: 需聯繫 PayUNi 或實作主動查詢機制
+   - Document: `.planning/ATM-WEBHOOK-ISSUE.md`
 
 ### Medium (P2)
 5. **Webhook 去重不可靠**
