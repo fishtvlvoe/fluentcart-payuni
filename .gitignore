@@ -5,9 +5,7 @@ coverage/
 .phpunit.result.cache
 
 .DS_Store
-**/.DS_Store
-
-# 診斷工具和測試檔案
+**/.DS_Store# 診斷工具和測試檔案
 check-*.php
 test-*.php
 *.zip
